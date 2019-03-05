@@ -1,0 +1,308 @@
+var cache = {} //reduced shopping update of 5 orders of 18 drugs from 23 secs down to 7secs if no changes and down to 10secs if adding all
+
+function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
+  
+  sheetNameOrUrl = sheetNameOrUrl || SpreadsheetApp.getActiveSheet().getName() || 'Shopping'
+  
+  var cacheKey = sheetNameOrUrl+colOfKeys+rowOfKeys
+  if (cache[cacheKey]) return cache[cacheKey]
+    
+  Log('getSheet', sheetNameOrUrl, colOfKeys, rowOfKeys)
+  
+  var sheet = getSheetByNameOrUrl(sheetNameOrUrl)  
+     
+  var s = {}
+  for (var method in sheet) {
+    s[method] = sheet[method].bind(sheet)
+  }
+    
+  rowOfKeys = rowOfKeys || 1
+  colOfKeys = colOfKeys || 'A'
+
+  s.getRangeVals = function(range) {
+    //Log('getRangeVals')
+    /*
+    TODO write a range cache that can be spliced (or at least invalidated) after sheet.prependRow()
+    var cacheKey = sheetNameOrUrl+range
+    Log('getRangeVals cacheKey', cacheKey)
+    if (cache[cacheKey]) {
+      Log('cached :)')
+      return cache[cacheKey]
+    }
+    Log('not cached :(')
+    return cache[cacheKey] = s.getRange(range).getDisplayValues()
+    */
+    try {
+      return s.getRange(range).getDisplayValues()
+    } catch (e) {
+      //debugEmail('getRangeVals', range, e) //this happens if key didn't exist (such as a drug name that is not in Good Pill Live Inventory)
+      //return [[]]
+    }
+  }
+  
+  s.colArrayByRange = function(range) {
+    //Log('colArrayByRange')
+    range = s.getRangeVals(range) || []
+    return range.map(function(row) { return row[0] })
+  }
+  
+  s.rowArrayByRange = function(range) {
+    //Log('rowArrayByRange')
+    range = s.getRangeVals(range) || []
+    return range[0]
+  }
+  
+  var keyID   = s.getRangeVals(colOfKeys+rowOfKeys)[0][0]
+  var colKeys = s.rowArrayByRange('A'+rowOfKeys+':'+rowOfKeys)
+  var rowKeys = s.colArrayByRange(colOfKeys+'1:'+colOfKeys) 
+  
+  //While we try to make keys unique, we cannot guarantee it
+  s.rowNumberByKey = function(key) {  
+    //Log('rowNumberByKey')
+    if ( ! key) return s.getActiveRange().getRow()
+    
+    var index = rowKeys.indexOf(key+'') + 1  //coerce to string to match type
+    
+    if (index <= 0) {
+      //debugEmail('Could not find row number for key', index, key, rowKeys, new Error().stack)
+    }
+    
+    return index
+  }
+  
+  //https://stackoverflow.com/questions/21229180/convert-column-index-into-corresponding-column-letter
+  s.colNumberByKey = function(key) {
+    //Log('colNumberByKey')
+    if ( ! key) return s.getActiveRange().getColumn()
+    
+    var index = colKeys.indexOf(key+'') + 1  //coerce to string to match type
+    
+    if (index <= 0) {
+      var msg = 'Could not find column number for key '+JSON.stringify(key)+' in '+JSON.stringify(colKeys)
+      Log(msg)
+      throw Error(msg)
+    }
+    
+    return index
+  }
+  
+   //https://stackoverflow.com/questions/21229180/convert-column-index-into-corresponding-column-letter
+  s.colLetterByKey = function(key) {
+    var num  = s.colNumberByKey(key) - 1 //make it a 0-based Alphabet index
+    var col1 = num % 26
+    var col2 = Math.floor(num / 26) //double letter past Z
+    //debugEmail('num', num, 'key', key, 'col2', col2, (col2 ? String.fromCharCode(64 + col2) : ''), 'col1', col1, String.fromCharCode(65 + col1))
+    return (col2 ? String.fromCharCode(64 + col2) : '')+String.fromCharCode(65 + col1)
+  }
+  
+  s.colRangeByKey = function(key) {
+    //Log('colRangeByKey')
+    var colLetter = s.colLetterByKey(key)
+    //Log('nameRange', name, nameArray, colLetter+"4:"+colLetter)
+    return colLetter+"1:"+colLetter
+  }
+  
+  s.rowRangeByKey = function(key) {
+    //Log('rowRangeByKey')
+    var rowNumber = s.rowNumberByKey(key)
+    return 'A'+rowNumber+":"+rowNumber
+  }
+  
+  s.cellRangeByKeys = function(rowKey, colKey) {
+    //Log('cellRangeByKeys')
+    return s.colLetterByKey(colKey)+s.rowNumberByKey(rowKey)
+  }
+  
+  var colCache = {}
+  var rowCache = {}
+  
+  s.colArrayByKey = function(key) {
+    
+    //TODO should we implement real caching here? Doesn't seem like a lot of redundant calls?
+    //TODO: compared to cache, properties are faster and don't expire. https://stackoverflow.com/questions/20398885/how-to-flush-the-cache
+    //https://developers.google.com/apps-script/reference/properties/properties#setProperty(String,String)
+    if (colCache[sheetNameOrUrl+key])
+      Log('colCache', key, sheetNameOrUrl)
+      
+    colCache[sheetNameOrUrl+key] = true
+    
+    try {
+      var range = s.colRangeByKey(key)
+      return s.colArrayByRange(range)
+    } catch (e) {
+      debugEmail(key, range, e)
+    }
+  }
+  
+  s.rowArrayByKey = function(key) {
+    
+    //TODO should we implement real caching here? Doesn't seem like a lot of redundant calls?
+    //TODO: compared to cache, properties are faster and don't expire. https://stackoverflow.com/questions/20398885/how-to-flush-the-cache
+    //https://developers.google.com/apps-script/reference/properties/properties#setProperty(String,String)
+    if (rowCache[sheetNameOrUrl+key])
+      Log('rowCache', key, sheetNameOrUrl)
+      
+    rowCache[sheetNameOrUrl+key] = true
+    
+    //Log('rowArrayByKey', key, s.rowRangeByKey(key), s.rowArrayByRange(s.rowRangeByKey(key)))
+    return s.rowArrayByRange(s.rowRangeByKey(key))
+  }
+  
+  //Returns a col as an object including JSON.parsing properties that are arrays or objects
+  s.colByKey = function(key) {
+    //Log('colByKey')
+    return toObject(rowKeys, s.colArrayByKey(key))
+  }
+  
+  //Returns a row as an object including JSON.parsing properties that are arrays or objects
+  s.rowByKey = function(key) {
+    //Log('rowByKey', colKeys, s.rowArrayByKey(key))
+    return toObject(colKeys, s.rowArrayByKey(key))
+  }
+  
+  s.cellByKeys = function(rowKey, colKey) {
+    //Log('cellByKey')
+    return s.getRangeVals(s.cellRangeByKeys(rowKey, colKey))[0][0]
+  }
+  
+  s.setCellByKeys = function(rowKey, colKey, val) {
+    //Log('setCellByKeys')
+    return setValue(s.getRange(s.cellRangeByKeys(rowKey, colKey)), val)
+  }
+  
+  //Private Helper
+  /*function setValueOLD(cellRange, val) {
+    val = prettyJSON(val)
+    return cellRange[val[0] == '=' ? 'setFormula' : 'setValue'](val)
+  }*/
+  
+  function setValue(cellRange, val) {
+    val = prettyJSON(val)
+    var method = 'setValue'
+    var value  = val
+    
+    if (val[0] == '=') {
+      method = 'setFormula'
+      value = replaceColumnVars(val, cellRange)
+      //debugEmail('setFormula',val, value, cellRange.getColumn(), cellRange.getRow(), cellRange.getLastRow())
+    }
+    
+    return cellRange[method](value)
+  }
+  
+  function replaceColumnVars(formula, cellRange) {
+    return formula.replace(/(^|[^"'])(\$[a-zA-Z]+)(\d*)/g, function(full, pre, key, row) {
+      //Log('newFormula', full, key, row)
+      var col = s.colLetterByKey(key)
+      return pre + col+cellRange.getRow()+':'+col+cellRange.getLastRow() //if no row set assume this is for a newly prepended row
+    })
+  }
+  
+  s.updateCol = function(newCol) {
+    //Log('setColByKey')
+    //
+    //While simple, the following is slow because of lots of getRange() calls
+    //for (var rowKey in data) {
+    // s.setCellByKeys(rowKey, colKey, data[rowKey])
+    //}
+    
+    var oldCol = s.getRange(s.colRangeByKey(newCol[keyID]))
+    
+    for (var rowKey in newCol) {
+      setValue(oldRow.getCell(s.rowNumberByKey(rowKey), 1), newCol[rowKey])
+    }
+  }
+ 
+  s.updateRow = function(newRow, overwrite) {
+    //Log('setRowByKey')
+    //
+    //While simple, the following is slow because of lots of getRange() calls
+    //for (var colKey in data) {
+    // s.setCellByKeys(rowKey, colKey, data[colKey])
+    //}
+    //Swapping this with code below reduced "per row" exec time from 4 secs to .5 secs.
+    
+    var oldRow = s.getRange(s.rowRangeByKey(newRow[keyID]))
+    
+    for (var colKey in newRow) {
+      
+      var val = newRow[colKey]
+      
+      var isFormula = typeof val == 'string' && val[0] == '='
+      
+      if (colKey == keyID && ! overwrite) //don't reset keyID just in case its a hyperlink.  dont reset formulas just in case user changed them or did a hardcode overwrite
+        continue
+        
+      setValue(oldRow.getCell(1, s.colNumberByKey(colKey)), val)
+    }
+  }
+  
+  s.prependRow = function(row) {
+    //Log('prependRow')
+    s.insertRowAfter(rowOfKeys)
+    rowKeys.splice(rowOfKeys, 0, row[keyID]) //add the new row to rowKeys
+    s.updateRow(row, true)
+  }
+  
+  return cache[cacheKey] = s
+}
+
+//Combine key and val arrays into an object.  If value is JSON then parse it.  Trim both keys and vals (helpful for MSSQL reports)
+function toObject(keys, vals) {
+  
+  //Log('toObject')
+  //Log(keys.length, vals.length, keys, vals)
+  var row = {}
+  
+  //Log('keys', keys, 'vals', vals)
+  for (var i in keys) {
+    if ( ! keys[i]) continue
+    
+    if (vals[i] && (vals[i][0] == '[' || vals[i][0] == '{')) {
+      try {
+        //Handwritten decimals (corrected refill amounts) may not have required leading 0 so add it here to avoid JSON syntax error
+        vals[i] = JSON.parse(vals[i].replace(/: *\./g, ':0.'))
+      } catch (e) {
+        Log('JSON.parse() error', vals[i], e)
+        vals[i] = vals[i].trim()
+      }
+    }
+    else if (vals[i].trim)
+      vals[i] = vals[i].trim()
+      
+    var key = keys[i].trim()
+    row[key] = row[key] || vals[i] //just in case keys are NOT unique, use the first value because we read the first value with indexOf() in rowNumberByKey().  We can create an infinite update loop if this returned the value of the last row number and rowNumberByKey() returned the first row number
+  }
+  
+  return row
+}
+  
+//JSON the drugs but allow for good readability without too much vertical space
+//Right now do this by doing pretty print JSON and then removing linebreaks after commas
+var regex = RegExp(String.fromCharCode(10)+'(?! *{)', 'g')
+function prettyJSON(val) {
+  
+  //Log('prettyJSON')
+  
+  if (val == null)
+    return ''
+    
+  if (typeof val == 'string' || val instanceof Date)
+    return val
+      
+  return JSON.stringify(val, null, " ").replace(regex, '')
+}
+
+function getSheetByNameOrUrl(sheetNameOrUrl) {
+  
+  if ( ! ~ sheetNameOrUrl.indexOf('//'))
+    return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetNameOrUrl)
+   
+  //Unfortunetely GAS doesn't have a getSheetById() method so we have to iterate to find the right one
+  var sheets = SpreadsheetApp.openByUrl(sheetNameOrUrl).getSheets()
+  
+  for (var i in sheets)
+    if (sheets[i].getSheetId() == sheetNameOrUrl.split('=')[1]) break
+  
+  return sheets[i] 
+}
