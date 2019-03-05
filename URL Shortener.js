@@ -1,8 +1,8 @@
 function shortLink(link) {
-  var apiUrl = 'https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=AIzaSyAp2kBJyxIGGx541gjixMrl_rJXF485fXY'
-  
+  var apiUrl = 'https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key='+SHORT_LINK
+
   var longLink = 'https://y7hja.app.goo.gl/?link='+link+'&efr=1'
-  
+
   var opts = {
     method:'POST',
     payload:JSON.stringify({"longDynamicLink":longLink, "suffix": {"option": "SHORT"}}),
