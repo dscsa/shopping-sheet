@@ -65,7 +65,7 @@ function isNotInOrder(drug, order) {
     return 'needs to be checked to determine if it is available'
     
   //Added because of Order #9554.  Meslamine was pended okay, but then a change of another drug, caused it to run again and this time the TotalQty was too low (because it had been pended) and gave patient a notification that it was too low to fill
-  drug.$IsPended = !! openSpreadsheet('Shopping List #'+drug.$OrderId, 'Shopping Lists v4').getSheetByName(drug.$v2) //This should be cached so not too expensive
+  drug.$IsPended = !! openSpreadsheet('Shopping List #'+drug.$OrderId, 'Shopping Lists').getSheetByName(drug.$v2) //This should be cached so not too expensive
        
   //Should we allow apparent one time fills (refills_left == 0) as well?
   if ( ! drug.$IsPended && ! drug.$IsRefill && ~ ['Out of Stock', 'Refills Only', 'Not Offered'].indexOf(drug.$Stock)) {
@@ -86,6 +86,9 @@ function isNotInOrder(drug, order) {
 
   if ( ! drug.$InOrder && drug.$NextRefill == 'AutoRefill Off')
     return 'has automatic refills turned off.  Please request 2 weeks in advance'
+    
+  if (order.$Status == 'Needs Form')
+    return 'cannot be filled until patient registration is complete'
     
   if ( ! drug.$Autofill.patient && drug.$AutoPopulated)
     return 'was requested but you have turned all medications off autorefill'
