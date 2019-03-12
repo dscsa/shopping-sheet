@@ -49,14 +49,14 @@ function testParseSig() {
     "ORAL 1 TAB PO QAM PRN SWELLING",
     "one tablet ORAL every day",
     "take 1 tablet by oral route  every 8 hours as needed for nausea",
-    "Take 2 tablets in the morning and 1 at noon and 1 at supper", //UNFIXED 
-    "1 at noon", 
-    "Take  One capsule by mouth four times daily.", 
-    "1 tab(s) PO BID,x30 day(s)", 
+    "Take 2 tablets in the morning and 1 at noon and 1 at supper", //UNFIXED
+    "1 at noon",
+    "Take  One capsule by mouth four times daily.",
+    "1 tab(s) PO BID,x30 day(s)",
     "Inject 1 each under the skin 3 (three) times a day  To test sugar DX e11.9",
     "Use daily with lantus",
-    "take 1 tablet by Oral route 3 times per day with food as needed for pain", 
-    "Take 1 capsule daily for 7 days then increase to 1 capsule twice daily"  //UNFIXED BUT USING 2nd RATHER THAN 1st HALF 
+    "take 1 tablet by Oral route 3 times per day with food as needed for pain",
+    "Take 1 capsule daily for 7 days then increase to 1 capsule twice daily"  //UNFIXED BUT USING 2nd RATHER THAN 1st HALF
     "take 1 tablet (500 mg) by oral route 2 times per day with morning and evening meals" */
     //"Take 1 tablet (12.5 mg total) by mouth every 12 (twelve) hours",
     //"1 ORAL every eight hours as needed",
@@ -74,45 +74,51 @@ function testParseSig() {
 //""written_qty":"13.0","dispense_qty":"4.0","days_supply":"90.0","dispense_date":"2018-01-22","refill_date":"2018-02-18","sig_text"://
 
 function setDaysQtyRefills(drug, order) {
-  
+
   var lowStock = drug.$Stock && drug.$TotalQty < 1000 //Only do 45 day if its Low Stock AND less than 1000 Qty.  Cindy noticed we had 8000 Amlodipine but we were filling in 45 day supplies
-   
+
   //For out of stock and refills only that still have days supply really high
   var stockChanged =  (lowStock && (drug.$DaysSupply > 75)) || ( ! lowStock && (drug.$DaysSupply < 60)) //If this was med synced or didn't have a lot left on Rx then adjust back to our regular qtys
-      
+
   //LastRefill rather than order.$Dispensed because there is some intermediate time between the drug being dispensed and the order being shipped
   var today = Utilities.formatDate(new Date(), "America/New_York", "yyyy-MM-dd")
- 
+
+  var leftoverQty = (drug.$WrittenQty*drug.$RefillsLeft) % drug.$DispenseQty
+
   if (drug.$IsDispensed)
-    useDispensed(drug)  
-  else if (drug.$DispenseQty && drug.$DaysSupply >= 45 && ! stockChanged) //don't do a refill of something supershort like 15 or 30 days
-    useRefill(drug)  
+    useDispensed(drug)
+
+  //TODO should we just get rid of useRefill Completely.  Seems like a VERY narrow use case
+  else if (drug.$DispenseQty && drug.$DaysSupply >= 45 && ! leftoverQty && ! stockChanged) //don't do a refill of something supershort like 15 or 30 days.  Modulus so we only do refill quantity if we can keep qty the same without an leftover qty on RX. This is because CK would have preferred Order 1151 to go back up to 90 days rather than a Refill of 60 Days (set because of Med Sync)
+    useRefill(drug)
+
   else if ( ~ drug.$Name.indexOf(' INH') && drug.$WrittenQty > 1)
     useInhaler(drug)
+
   else
     useEstimate(drug)
-  
+
   var msg = isNotInOrder(drug, order)
   if (msg) {
     drug.$Msg  = msg
     //infoEmail('Setting 0 Days', msg, 'drug.$Stock', drug.$Stock, 'drug.$TotalQty < drug.$Qty', drug.$TotalQty < drug.$Qty, 'drug', drug)
     drug.$Days = 0 //Price is not yet set do no need to reset it here.  New Patients don't get out of stock drugs - they are reserved for refills only.  Set days to 0 after qty is set so we don't get 0 qty too
   }
-  
+
   setPrice(drug)
 }
 
 function useDispensed(drug) {
-  
+
    drug.$Days      = +drug.$DaysSupply
-   drug.$Qty       = Math.round(drug.$DispenseQty) //Rounding because Order #4225 had some long decimals. 
+   drug.$Qty       = Math.round(drug.$DispenseQty) //Rounding because Order #4225 had some long decimals.
    drug.$Refills   = drug.$Refills || +(drug.$RefillsTotal).toFixed(2) //Default of Rx Expiring
-   drug.$Type      = "Dispensed" 
+   drug.$Type      = "Dispensed"
 }
 
 function useRefill(drug) {
    //if (drug.$RefillsLeft <= 0) debugEmail('useRefill but has NO refills', drug)
-   
+
    drug.$Qty         = Math.min(drug.$DispenseQty, drug.$WrittenQty*drug.$RefillsLeft)
    drug.$Days        = Math.round(drug.$DaysSupply * drug.$Qty / drug.$DispenseQty)
    drug.$Refills     = drug.$Refills || +(drug.$RefillsTotal - drug.$Qty/drug.$WrittenQty).toFixed(2) //Refills AFTER it is dispensed.  Default is Rx Expiring
@@ -124,24 +130,24 @@ function useInhaler(drug) {
    drug.$Days    = 30
    drug.$Qty     = 1
    drug.$Refills = +(drug.$RefillsTotal - 1).toFixed(2)
-   drug.$Type    = "Inhaler" 
+   drug.$Type    = "Inhaler"
 }
 
 function useEstimate(drug) {
-  
+
   var parsed = parseSig(drug)
-    
-  if ( ! parsed) { 
+
+  if ( ! parsed) {
     return drug.$Stock = (drug.$Stock || '') + 'Sig Parse Error'
   }
-  
+
   parsed.numDaily = parsed.numDosage * parsed.freqNumerator / parsed.freqDemoninator / parsed.frequency
-  
+
   var qty_before_dispensed = drug.$WrittenQty * drug.$RefillsLeft
   var days_before_dispensed = Math.round(qty_before_dispensed/parsed.numDaily, 0)
-  
+
   var stdDays = (drug.$Stock && drug.$TotalQty < 1000) ? 45 : 90 //Only do 45 day if its Low Stock AND less than 1000 Qty.  Cindy noticed we had 8000 Amlodipine but we were filling in 45 day supplies
-  
+
   //TODO Include Medicine Sync inside of Math.min()
   //High Supply: If <= 120 (90+30) then dispense all at once.  If > 120 then split it into two fills.
   //Low Supply: If <= 75 (45+30) then dispense all at once).  If > 75 then split into two fills
@@ -149,7 +155,7 @@ function useEstimate(drug) {
   drug.$Qty  = +Math.min(drug.$Days * parsed.numDaily, qty_before_dispensed).toFixed(0) //Math.min added on 2019-01-02 because Order 9240 Promethizine had $Qty 42 > qty_before_dispensed Qty 40 because of rounding
   drug.$Type = "Estimate"
   if ( ! drug.$Refills) setRefills(drug) //Default is Rx Expiring
-  
+
   //if (drug.$DaysSupply && drug.$DispenseQty)
   //  debugEmail('"useEstimate" rather than "useRefill', drug)
 }
@@ -177,26 +183,26 @@ function setPrice(drug) {
 }
 
 function parseSig(drug) {
-  
+
   //TODO capture BOTH parts of "then" but for now just use second half
   //"1 capsule by mouth at bedtime for 1 week then 2 capsules at bedtime" --split
   //"Take 2 tablets in the morning and 1 at noon and 1 at supper" --split
   //"take 1 tablet (500 mg) by oral route 2 times per day with morning and evening meals" -- don't split
   var cleanedSigs = drug.$Sig.split(/ then | and \d/).reverse()
-  
+
   for (var i in cleanedSigs) {
     var cleanedSig = subsituteNumerals(cleanedSigs[i])
-    
+
     var parsed = {
       numDosage:getNumDosage(cleanedSig),
       freqNumerator:getFreqNumerator(cleanedSig),
       freqDemoninator:getFreqDemoninator(cleanedSig),
       frequency:getFrequency(cleanedSig)
     }
-    
+
     if (parsed.numDosage && parsed.freqNumerator && parsed.freqDemoninator && parsed.frequency)
       return parsed
-      
+
     Log('Could not parse sig', drug.$Sig, '|'+cleanedSig+'|', parsed)
     drug.$Msg = (drug.$Msg || '') + "Sig Parse Error"
   }
@@ -219,29 +225,29 @@ function subsituteNumerals(sig) {
   sig = sig.replace(/\bseven /ig, '7 ') // \b is for space or start of line
   sig = sig.replace(/\beight /ig, '8 ') // \b is for space or start of line
   sig = sig.replace(/\bnine /ig, '9 ') // \b is for space or start of line
-  
+
   sig = sig.replace(/ breakfast /ig, ' morning ')
   sig = sig.replace(/ dinner /ig, ' evening ')
   sig = sig.replace(/ mornings? and evenings? /ig, ' 2 times ')
-  
+
   sig = sig.replace(/ hrs /ig, ' hours ')
-  
+
   return sig.trim()
 }
-  
+
 function getNumDosage(sig) {
   try {
     var numDosage = sig.match(/(^|use +|take +|inhale +|chew +|inject +|oral +)([0-9]?\.[0-9]+|[1-9])(?! ?mg)/i)
     return numDosage ? numDosage[2] : 1 //"Use daily with lantus" won't match the RegEx above
   } catch (e) {}
 }
-  
+
 function getFreqNumerator(sig) {
   var match = sig.match(/([1-9]\b|10|11|12) time/i)
   Log('getFreqNumerator', sig, match)
-  return match ? match[1] : 1 
+  return match ? match[1] : 1
 }
-  
+
 function getFreqDemoninator(sig) {
   var match = sig.match(/every ([1-9]\b|10|11|12)(?! time)/i)
   Log('getFreqDemoninator', sig, match)
@@ -250,24 +256,24 @@ function getFreqDemoninator(sig) {
 
 //Returns frequency in number of days (e.g, weekly means 7 days)
 function getFrequency(sig) {
-  
-  var freq = 1 //defaults to daily if no matches 
-    
+
+  var freq = 1 //defaults to daily if no matches
+
   if (sig.match(/ day| daily/i))
     freq = 1
-    
+
   else if (sig.match(/ week| weekly/i))
     freq = 30/4 //rather than 7 days, calculate as 1/4th a month so we get 45/90 days rather than 42/84 days
-    
+
   else if (sig.match(/ month| monthly/i))
-    freq = 30 
-    
+    freq = 30
+
   else if (sig.match(/( hours?| hourly)(?! before| after| prior to)/i)) //put this last so less likely to match thinks like "2 hours before (meals|bedtime) every day"
     freq = 1/24 // One 24th of a day
-    
+
   if (sig.match(/ prn| as needed/i)) //Not mutually exclusive like the others. TODO: Does this belong in freq demoninator instead? TODO: Check with Cindy how often does as needed mean on average.  Assume once every 3 days for now
     freq *= 1 // I had this as 3 which I think is approximately correct, but Cindy didn't like so setting at 1 which basically means we ignore for now
-    
+
   //Default to daily Example 1 tablet by mouth at bedtime
   return freq
 }
