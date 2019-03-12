@@ -161,7 +161,7 @@ function updateShopping(email) {
     }
 
     //Skip updating drugs if their status is complete or they are unchanged
-    if ( ! drugsChanged) {
+    if ( ! drugsChanged && status[order.$OrderId] != 'Needs Form') { //"Needs Form" will have all 0 days so need to make sure drugs update once registration complete
 
       //debugEmail(' ! drugsChanged', order.$OrderId, status[order.$OrderId]+' -> '+order.$Status, drugsChanged, order)
 
@@ -178,7 +178,7 @@ function updateShopping(email) {
       drugsChanged = JSON.stringify(drugsChanged, null, ' ') //hacky way for us to search for partial matches with indexOf (see below)
 
       //Don't renotify on small changes like QTY, DAYS, REFILLS.  Only when adding or subtracting drugs
-      var numChanges  = drugsChanged.split(/REMOVED FROM ORDER|ADDED TO ORDER|ADDED TO PROFILE AND ORDER/).length - 1
+      var numChanges  = drugsChanged && drugsChanged.split(/REMOVED FROM ORDER|ADDED TO ORDER|ADDED TO PROFILE AND ORDER/).length - 1
       if (numChanges) {
         rxReceivedNotification(order)
         debugEmail('rxReceivedNotification called because status changed', '#'+order.$OrderId, status[order.$OrderId]+' --> '+order.$Status, drugsChanged, order)
