@@ -169,9 +169,9 @@ function normalizeDrug(row) {
     row.drug.$Msg = 'will expire soon, ask your doctor for a new Rx'
   }
 
-  if (row.invoice_nbr == '11121') {
-    debugEmail('WHAT IS GOING ON', '#'+row.invoice_nbr, row.drug.$Autofill, {rx:row.rx_autofill, patient:row.pat_autofill}, row)
-  }
+  //if (row.invoice_nbr == '11121') {
+  //  debugEmail('WHAT IS GOING ON', '#'+row.invoice_nbr, row.drug.$Autofill, {rx:row.rx_autofill, patient:row.pat_autofill}, row)
+  //}
 }
 
 /*
