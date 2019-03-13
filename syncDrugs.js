@@ -23,8 +23,7 @@ function setOrderSync(order) {
 
   var orderAdded = new Date(order.$OrderAdded)/1000/60/60/24
 
-  var numInOrder   = 0
-  order.$SyncDates = {}
+  order.$Patient.syncDates = { numInOrder:0 }
 
   //Count how many drugs have each NextFill date
   for (var i in order.$Drugs) {
@@ -33,42 +32,40 @@ function setOrderSync(order) {
 
     if (nextFill.split('-').length != 3) continue
 
-    if (order.$Drugs[i].$Days) numInOrder++
+    if (order.$Drugs[i].$Days) order.$Patient.syncDates.numInOrder++
 
     var newDays = new Date(nextFill)/1000/60/60/24 - orderAdded
 
-    newDays = Math.ceil((newDays-5)/15)*15   //Cindy wants us to round up to the nearest 15 days.  For rounding to 15, I don't want an equal Math.round() since I would want to error on giving people more than less but not quite just Math.ceil(), instead I do Math.ceil(x-5) because I want 66-80 -> 75, and 81-95 -> 90
-
     if (newDays >= 30 && newDays <= 120) {
-      order.$SyncDates[nextFill] = order.$SyncDates[nextFill] || 0
-      order.$SyncDates[nextFill]++
+      order.$Patient.syncDates[nextFill] = order.$Patient.syncDates[nextFill] || 0
+      order.$Patient.syncDates[nextFill]++
     }
   }
 
   //Pick the date with most drugs (must be greater than num in current order), if tie chose the furthest out
-  order.$SyncDates.Best = Object.keys(order.$SyncDates).reduce(function(bestDate, syncDate) {
+  order.$Patient.syncDates.Best = Object.keys(order.$Patient.syncDates).reduce(function(bestDate, syncDate) {
 
-    if (order.$SyncDates[syncDate] <= numInOrder) return bestDate
+    if (order.$Patient.syncDates[syncDate] > order.$Patient.syncDates[bestDate]) return syncDate
 
-    if (order.$SyncDates[syncDate] > order.$SyncDates[bestDate]) return syncDate
-
-    if (order.$SyncDates[syncDate] == order.$SyncDates[bestDate] && syncDate > bestDate) return syncDate
+    if (order.$Patient.syncDates[syncDate] == order.$Patient.syncDates[bestDate] && (syncDate > bestDate || bestDate == 'numInOrder')) return syncDate
 
     return bestDate
-  })
 
-  debugEmail('setOrderSync', order.$SyncDates, order)
+  }, 'numInOrder')
+
+  debugEmail('setOrderSync', order.$Patient.syncDates, order)
 }
 
-setDrugSync(order, drug) {
+function setDrugSync(order, drug) {
 
-  if (drug.$IsDispensed || ! drug.$Days || ! order.$SyncDates) return //Cindy asked for this but I am not sure || drug.$Type != "Estimate"
+  if (drug.$IsDispensed || ! drug.$Days || ! order.$Patient.syncDates) return //Cindy asked for this but I am not sure || drug.$Type != "Estimate"
 
-  if ( ! order.$SyncDates.Best)
-    return debugEmail('Cannot Sync: Appears there is no best Sync Date', order.$SyncDates, order)
+  if (order.$Patient.syncDates.Best == 'numInOrder')
+    return debugEmail('Cannot Sync: Appears there is no best Sync Date', order.$Patient.syncDates, order)
 
   var orderAdded = new Date(order.$OrderAdded)/1000/60/60/24
-  var newDays    = new Date(order.$SyncDates.Best)/1000/60/60/24 - orderAdded
+  var newDays    = new Date(order.$Patient.syncDates.Best)/1000/60/60/24 - orderAdded
+  newDays = Math.ceil((newDays-5)/15)*15   //Cindy wants us to round up to the nearest 15 days.  For rounding to 15, I don't want an equal Math.round() since I would want to error on giving people more than less but not quite just Math.ceil(), instead I do Math.ceil(x-5) because I want 66-80 -> 75, and 81-95 -> 90
 
   var daysLeftInRx = Math.round(drug.$WrittenQty * drug.$RefillsLeft * drug.$Days / drug.$Qty, 0)
 
@@ -77,7 +74,7 @@ setDrugSync(order, drug) {
   var oldDays  = drug.$Days
   drug.$Days   = newDays
   drug.$SyncBy = newDays - oldDays
-  drug.$Msg    = (drug.$InOrder ? 'will be' : 'may be')+' Med Synced to '+order.$SyncDates.Best+' *'
+  drug.$Msg    = (drug.$InOrder ? 'will be' : 'may be')+' Med Synced to '+order.$Patient.syncDates.Best+' *'
   drug.$Price  = Math.round(drug.$Days * drug.$Price/oldDays)
   drug.$Qty    = Math.round(drug.$Days * drug.$Qty/oldDays)
 }

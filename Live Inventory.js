@@ -64,13 +64,14 @@ function isNotInOrder(drug, order) {
   if ( ! +drug.$Gcn)
     return 'needs to be checked to determine if it is available'
 
+  if (drug.$InOrder && ! drug.$v2)
+    debugEmail('Could not find GCN in v2', drug, order)
+
   //Added because of Order #9554.  Meslamine was pended okay, but then a change of another drug, caused it to run again and this time the TotalQty was too low (because it had been pended) and gave patient a notification that it was too low to fill
   drug.$IsPended = !! openSpreadsheet('Shopping List #'+drug.$OrderId, 'Shopping Lists').getSheetByName(drug.$v2) //This should be cached so not too expensive
 
   //Should we allow apparent one time fills (refills_left == 0) as well?
   if ( ! drug.$IsPended && ! drug.$IsRefill && ~ ['Out of Stock', 'Refills Only', 'Not Offered'].indexOf(drug.$Stock)) {
-
-       if ( ! drug.$Gcn) return 'appears to be out-of-stock but we are currently confirming'
 
        if (drug.$MonthlyPrice >= 20) return 'is unavailable for new RXs at this time'
 
@@ -165,10 +166,6 @@ function liveInventoryByGcn(drug) {
     }
 
     Log('liveInventoryByGcn 4', gcn, liveInventoryCache)
-  }
-
-  if (drug.$InOrder && +gcn && ! liveInventoryCache[gcn]) {
-    sendEmail('Could not find GCN in v2', [gcn, JSON.stringify(drug), JSON.stringify(liveInventoryCache)])
   }
 
   return liveInventoryCache[gcn] || {}
