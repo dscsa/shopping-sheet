@@ -11,7 +11,7 @@ function testShoppingLists() {
 //So Cindy doesn't have to unpend things that didn't ship
 function deleteShoppingLists(orderID) {
   var res = v2Fetch('http://v2.goodpill.org/account/8889875187/pend/'+orderID, 'DELETE')
-  //debugEmail('deleteShoppingLists', orderID, res && res.getContentText(), res && res.getResponseCode(), res && res.getHeaders())
+  infoEmail('deleteShoppingLists', orderID, res && res.getContentText(), res && res.getResponseCode(), res && res.getHeaders())
 }
 
 function createShoppingLists(order, drugs) {
