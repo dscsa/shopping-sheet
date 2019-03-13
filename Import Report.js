@@ -136,11 +136,8 @@ function normalizeDrug(row) {
     row.drug.$DaysUntilRefill = new Date(row.drug.$NextRefill) - toDate(row.order_added)
     if (row.drug.$DaysUntilRefill > minMedSyncTime(row.drug) && row.drug.$DaysUntilRefill < maxMedSyncTime(row.drug)) {
 
-      var verb = ' will be'
-      if ( ! row.drug.$InOrder) {
-        verb = ' may be'
-        row.drug.$Name = row.drug.$Name.replace('*', '^')
-      }
+      var verb = row.drug.$InOrder ? ' will be' : ' may be'
+
       row.drug.$SyncBy = 0 //show that this med was medsynced
       row.drug.$Msg  = 'due on '+row.drug.$NextRefill+verb+' Med Synced to this Order *'
     }
@@ -155,11 +152,8 @@ function normalizeDrug(row) {
     row.drug.$DaysUntilRefill = new Date(row.drug.$NextRefill) - toDate(row.order_added)
     if (row.drug.$DaysUntilRefill > minMedSyncTime(row.drug) && row.drug.$DaysUntilRefill < maxMedSyncTime(row.drug)) {
 
-      var verb = ' will be'
-      if ( ! row.drug.$InOrder) {
-        verb = ' may be'
-        row.drug.$Name = row.drug.$Name.replace('*', '^')
-      }
+      var verb = row.drug.$InOrder ? ' will be' : ' may be'
+
       row.drug.$SyncBy = 0 //show that this med was medsynced
       row.drug.$Msg = 'due on '+row.drug.$NextRefill+verb+' Med Synced to this Order *'
     }

@@ -50,7 +50,7 @@ function _setV2info(drug) {
     sendEmail('Change Order for Low stock Item', ['Consider updating v2 order for '+drug.$v2, drug.$v2+' ('+drug.$Name+') is '+drug.$Stock+' but is ordered only if it has a quantity > '+v2info['order.minQty']+' and expires more than '+v2info['order.minDays']+' days from now'+' '+emailJson]) ///only send if max inventory is not the issue
 }
 
-function isNotInOrder(drug, order) {
+function excludeFromOrder(drug, order) {
 
   //Mirror the logic of when we are using useDispensed in SetDaysQtyRefills
   if (drug.$Type == 'Dispensed') return
