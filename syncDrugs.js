@@ -53,7 +53,7 @@ function setOrderSync(order) {
 
   }, 'numInOrder')
 
-  debugEmail('setOrderSync', order.$Patient.syncDates, order)
+  //debugEmail('setOrderSync', order.$Patient.syncDates, order)
 }
 
 function setDrugSync(order, drug) {
@@ -61,7 +61,7 @@ function setDrugSync(order, drug) {
   if (drug.$IsDispensed || ! drug.$Days || ! order.$Patient.syncDates) return //Cindy asked for this but I am not sure || drug.$Type != "Estimate"
 
   if (order.$Patient.syncDates.Best == 'numInOrder')
-    return debugEmail('Cannot Sync: Appears there is no best Sync Date', order.$Patient.syncDates, order)
+    return //debugEmail('Cannot Sync: Appears there is no best Sync Date', order.$Patient.syncDates, order)
 
   var orderAdded = new Date(order.$OrderAdded)/1000/60/60/24
   var newDays    = new Date(order.$Patient.syncDates.Best)/1000/60/60/24 - orderAdded
