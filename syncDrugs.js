@@ -29,10 +29,13 @@ function setOrderSync(order) {
   for (var i in order.$Drugs) {
 
     var nextFill = order.$Drugs[i].$NextRefill
+    var isDate   = nextFill.split('-').length != 3
 
-    if (nextFill.split('-').length != 3) continue
+    if ( ! isDate && ! order.$Drugs[i].$LastFill) continue //$LastFill == "" means we have N/A for next_fill. #11272 3 new surescipts were being synced to only 2 old sure scripts
 
     if (order.$Drugs[i].$Days) order.$Patient.syncDates.numInOrder++
+
+    if ( ! isDate) continue  //
 
     var newDays = new Date(nextFill)/1000/60/60/24 - orderAdded
 
