@@ -67,6 +67,7 @@ function setDrugSync(order, drug) {
 
   if ( ! order.$Patient.syncDates.inOrder && drug.$Days && ! drug.$InOrder) {
     drug.$Days = 0
+    drug.$Name = drug.$Name.replace('^', '*')
     drug.$Msg  = 'due on '+drug.$LastRefill
     return
   }
