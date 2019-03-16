@@ -18,26 +18,23 @@ function minMedSyncTime(drug) {
 //In other words she only wants to sync when numDrugsBeingSynced < numDrugsSyncedTo
 function setOrderSync(order) {
 
-
-  if (order.$Drugs.length < 2) return
-
   var orderAdded = new Date(order.$OrderAdded)/1000/60/60/24
 
-  order.$Patient.syncDates = { numInOrder:0 }
+  order.$Patient.syncDates = { inOrder:0, maySyncToOrder:0 }
 
   //Count how many drugs have each NextFill date
   for (var i in order.$Drugs) {
 
-    var nextFill = order.$Drugs[i].$NextRefill
-    var isDate   = nextFill.split('-').length != 3
+    var drug     = order.$Drugs[i]
+    var nextFill = drug.$NextRefill
+    var isDate   = nextFill.split('-').length == 3
 
-    if ( ! isDate && ! order.$Drugs[i].$LastFill) continue //$LastFill == "" means we have N/A for next_fill. #11272 3 new surescipts were being synced to only 2 old sure scripts
+    if (drug.$Days && ! drug.$InOrder) order.$Patient.syncDates.maySyncToOrder++
+    if (drug.$Days &&   drug.$InOrder) order.$Patient.syncDates.inOrder++
 
-    if (order.$Drugs[i].$Days) order.$Patient.syncDates.numInOrder++
+    if ( ! isDate && drug.$LastFill) continue //$LastFill == "" means we have N/A for next_fill. #11272 3 new surescipts were being synced to only 2 old sure scripts
 
-    if ( ! isDate) continue  //
-
-    var newDays = new Date(nextFill)/1000/60/60/24 - orderAdded
+    var newDays = isDate ? new Date(nextFill)/1000/60/60/24 - orderAdded : drug.$Days
 
     if (newDays >= 30 && newDays <= 120) {
       order.$Patient.syncDates[nextFill] = order.$Patient.syncDates[nextFill] || 0
@@ -45,25 +42,36 @@ function setOrderSync(order) {
     }
   }
 
+  if (order.$Patient.syncDates.inOrder) //Only add sync refills that are not due yet if there are other drugs in the order #11274 had drugs synced to order but nothing otherwise in it
+    order.$Patient.syncDates.inOrder += order.$Patient.syncDates.maySyncToOrder
+
   //Pick the date with most drugs (must be greater than num in current order), if tie chose the furthest out
   order.$Patient.syncDates.Best = Object.keys(order.$Patient.syncDates).reduce(function(bestDate, syncDate) {
 
+    if (syncDate == 'maySyncToOrder') return bestDate
+
     if (order.$Patient.syncDates[syncDate] > order.$Patient.syncDates[bestDate]) return syncDate
 
-    if (order.$Patient.syncDates[syncDate] == order.$Patient.syncDates[bestDate] && (syncDate > bestDate || bestDate == 'numInOrder')) return syncDate
+    if (order.$Patient.syncDates[syncDate] == order.$Patient.syncDates[bestDate] && (syncDate > bestDate || bestDate == 'inOrder')) return syncDate
 
     return bestDate
 
-  }, 'numInOrder')
+  }, 'inOrder')
 
   //debugEmail('setOrderSync', order.$Patient.syncDates, order)
 }
 
 function setDrugSync(order, drug) {
 
-  if (drug.$IsDispensed || ! drug.$Days || ! order.$Patient.syncDates) return //Cindy asked for this but I am not sure || drug.$Type != "Estimate"
+  if (drug.$IsDispensed || ! drug.$Days) return //Cindy asked for this but I am not sure || drug.$Type != "Estimate"
 
-  if (order.$Patient.syncDates.Best == 'numInOrder')
+  if ( ! order.$Patient.syncDates.inOrder && drug.$Days && ! drug.$InOrder) {
+    drug.$Days = 0
+    drug.$Msg  = 'due on '+drug.$LastRefill
+    return
+  }
+
+  if (order.$Patient.syncDates.Best == 'inOrder')
     return //debugEmail('Cannot Sync: Appears there is no best Sync Date', order.$Patient.syncDates, order)
 
   var orderAdded = new Date(order.$OrderAdded)/1000/60/60/24
