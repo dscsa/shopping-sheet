@@ -75,21 +75,12 @@ function testParseSig() {
 
 function setDaysQtyRefills(drug, order) {
 
-  var lowStock = drug.$Stock && drug.$TotalQty < 1000 //Only do 45 day if its Low Stock AND less than 1000 Qty.  Cindy noticed we had 8000 Amlodipine but we were filling in 45 day supplies
-
-  //For out of stock and refills only that still have days supply really high
-  var stockChanged =  (lowStock && (drug.$DaysSupply > 75)) || ( ! lowStock && (drug.$DaysSupply < 60)) //If this was med synced or didn't have a lot left on Rx then adjust back to our regular qtys
-
-  //LastRefill rather than order.$Dispensed because there is some intermediate time between the drug being dispensed and the order being shipped
-  var today = Utilities.formatDate(new Date(), "America/New_York", "yyyy-MM-dd")
-
-  var leftoverQty = (drug.$WrittenQty*drug.$RefillsLeft) % drug.$DispenseQty
 
   if (drug.$IsDispensed)
     useDispensed(drug)
 
   //TODO should we just get rid of useRefill Completely.  Seems like a VERY narrow use case
-  else if (drug.$DispenseQty && drug.$DaysSupply >= 45 && ! leftoverQty && ! stockChanged) //don't do a refill of something supershort like 15 or 30 days.  Modulus so we only do refill quantity if we can keep qty the same without an leftover qty on RX. This is because CK would have preferred Order 1151 to go back up to 90 days rather than a Refill of 60 Days (set because of Med Sync)
+  else if (drug.$DispenseQty && drug.$DaysSupply >= 45) //don't do a refill of something supershort like 15 or 30 days.  Modulus so we only do refill quantity if we can keep qty the same without an leftover qty on RX. This is because CK would have preferred Order 1151 to go back up to 90 days rather than a Refill of 60 Days (set because of Med Sync)
     useRefill(drug)
 
   else if ( ~ drug.$Name.indexOf(' INH') && drug.$WrittenQty > 1)
@@ -119,6 +110,26 @@ function useDispensed(drug) {
 
 function useRefill(drug) {
    //if (drug.$RefillsLeft <= 0) debugEmail('useRefill but has NO refills', drug)
+
+   var lowStock = drug.$Stock && drug.$TotalQty < 1000 //Only do 45 day if its Low Stock AND less than 1000 Qty.  Cindy noticed we had 8000 Amlodipine but we were filling in 45 day supplies
+
+   //For out of stock and refills only that still have days supply really high
+   var tooHigh = lowStock && (drug.$DaysSupply > 75)
+   var tooLow  = ! lowStock && (drug.$DaysSupply < 60)
+   var stockChanged = tooHigh || tooLow  //If this was med synced or didn't have a lot left on Rx then adjust back to our regular qtys
+
+   var leftoverQty = (drug.$WrittenQty*drug.$RefillsLeft) % drug.$DispenseQty
+
+   if (leftoverQty) {
+     useEstimate(drug)
+     drug.$Type = "Refill but leftoverQty "+leftoverQty
+     return
+   }
+   else if (stockChanged) {
+     useEstimate(drug)
+     drug.$Type = "Refill but stockChanged tooHigh:"+tooHigh+" tooLow:"+tooLow
+     return
+   }
 
    drug.$Qty         = Math.min(drug.$DispenseQty, drug.$WrittenQty*drug.$RefillsLeft)
    drug.$Days        = Math.round(drug.$DaysSupply * drug.$Qty / drug.$DispenseQty)
@@ -150,11 +161,18 @@ function useEstimate(drug) {
   var stdDays = (drug.$Stock && drug.$TotalQty < 1000) ? 45 : 90 //Only do 45 day if its Low Stock AND less than 1000 Qty.  Cindy noticed we had 8000 Amlodipine but we were filling in 45 day supplies
 
   //TODO Include Medicine Sync inside of Math.min()
-  //High Supply: If <= 120 (90+30) then dispense all at once.  If > 120 then split it into two fills.
+  //High Supply: If <= 120 (90+30) then dispense all at once.  If >= 120 then split it into two fills.
   //Low Supply: If <= 75 (45+30) then dispense all at once).  If > 75 then split into two fills
-  drug.$Days = days_before_dispensed <= stdDays+30 ? days_before_dispensed : stdDays
+  if (days_before_dispensed <= stdDays+30) {
+    drug.$Days = days_before_dispensed
+    drug.$Type = "Estimate Finish Rx"
+  } else {
+    drug.$Days = stdDays
+    drug.$Type = "Estimate Std Days"
+  }
+
   drug.$Qty  = +Math.min(drug.$Days * parsed.numDaily, qty_before_dispensed).toFixed(0) //Math.min added on 2019-01-02 because Order 9240 Promethizine had $Qty 42 > qty_before_dispensed Qty 40 because of rounding
-  drug.$Type = "Estimate"
+
   if ( ! drug.$Refills) setRefills(drug) //Default is Rx Expiring
 
   //if (drug.$DaysSupply && drug.$DispenseQty)
