@@ -63,7 +63,7 @@ function setOrderSync(order) {
 
 function setDrugSync(order, drug) {
 
-  if (drug.$IsDispensed || ! drug.$Days) return //Cindy asked for this but I am not sure || drug.$Type != "Estimate"
+  if (drug.$IsDispensed || ! drug.$Days || order.$Patient.syncDates.Best == 'N/A') return //Check for "N/A" because of #11360. Cindy asked for this but I am not sure || drug.$Type != "Estimate"
 
   if ( ! order.$Patient.syncDates.inOrder && drug.$Days && ! drug.$InOrder) {
     drug.$Days = 0
