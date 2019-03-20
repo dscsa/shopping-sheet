@@ -123,7 +123,7 @@ function shopV2(drug, orderID) {
 
   //Organize by NDC since we don't want to mix them
   var ndcs = {}
-  var caps = $Name.match(/ caps/i) //"caps" to exclude caplet which is closer to a tablet
+  var caps = $Name.match(/ caps| cp/i) //"caps" to exclude caplet which is closer to a tablet
   var tabs = $Name.match(/ tab| tb/i)
 
 

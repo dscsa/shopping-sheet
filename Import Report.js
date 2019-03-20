@@ -67,7 +67,7 @@ function normalizeDrug(row) {
 
   var dispenseDate = +row.is_refill ? row.dispense_date : row.orig_disp_date //See Order 10062.  Seems that orig_disp_date may get set before dispense date causing a mismatch.  Correct for that here.
 
-  //Changed threshold from 4 days to 2 days because of order 11265, which showed as dispensing with the same meds that we had shipped out 
+  //Changed threshold from 4 days to 2 days because of order 11265, which showed as dispensing with the same meds that we had shipped out
   var $IsDispensed = row.ship_date ? !!row.in_order : row.in_order && (new Date() - new Date(dispenseDate) < 2*24*60*60*1000)  //See Order #8590.  Risperidone 2mg was dispensed but it didn't register here and so because it was out of refills was excluded from the order //Order 10862 was shipped within 4 days of 10698, so showed Levothroxine and Metoprolol as dispensed even though they were in order 10698 and not 10862
   var $InOrder = $IsDispensed || (row.in_order && +row.refills_total)   //Even if its "in the order" it could be a pending or denied surescript refill request (order 7236) so need to make sure refills are available
   var $InOrderNotDispensed = row.in_order && ! $IsDispensed
@@ -164,9 +164,9 @@ function normalizeDrug(row) {
     row.drug.$Msg = 'will expire soon, ask your doctor for a new Rx'
   }
 
-  //if (row.invoice_nbr == '11121') {
-  //  debugEmail('WHAT IS GOING ON', '#'+row.invoice_nbr, row.drug.$Autofill, {rx:row.rx_autofill, patient:row.pat_autofill}, row)
-  //}
+  if (row.invoice_nbr == '11350' || row.invoice_nbr == '11349') {
+    //debugEmail('WHAT IS GOING ON', '#'+row.invoice_nbr, row.drug.$Autofill, {rx:row.rx_autofill, patient:row.pat_autofill}, row)
+  }
 }
 
 /*

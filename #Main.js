@@ -60,6 +60,10 @@ function updateShopping(email) {
 
     Log('Order ID from Report', orderId, order.$Status)
 
+    if (orderId == '11350' || orderId == '11349') {
+       //debugEmail('Main DEBUG', order, isTrackingNumber(order.$Tracking, order), drugs[orderId] == null, tracking[orderId], didStatusChange(status[orderId], order.$Status))
+    }
+
     if (tracking[orderId])
       Log("Don't do anything if there is already a tracking number", orderId, tracking[orderId], status[orderId])
 
