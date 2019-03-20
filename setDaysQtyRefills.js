@@ -249,6 +249,9 @@ function subsituteNumerals(sig) {
   sig = sig.replace(/\b1 vial /ig, '3ml ') // vials for inhalation are 2.5 or 3ml, so use 3ml to be conservative
   sig = sig.replace(/\b2 vials? /ig, '6ml ') // vials for inhalation are 2.5 or 3ml, so use 3ml to be conservative
 
+  sig = sig.replace(/\b\d+ to (\d+) /i, '$1 ') //Take 1 to 2 every 3 to 4 hours. Let's convert that to Take 2 every 3 to 4 hours (no global flag).  CK approves of first substitution but not sure of the 2nd so the conservative answer is to leave it alone
+  sig = sig.replace(/\b\d+ or (\d+) /i, '$1 ') //Take 1 or 2 every 3 or 4 hours. Let's convert that to Take 2 every 3 or 4 hours (no global flag).  CK approves of first substitution but not sure of the 2nd so the conservative answer is to leave it alone
+
   sig = sig.replace(/ breakfast /ig, ' morning ')
   sig = sig.replace(/ dinner /ig, ' evening ')
   sig = sig.replace(/ mornings? and evenings? /ig, ' 2 times ')
