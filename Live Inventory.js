@@ -89,7 +89,7 @@ function excludeFromOrder(drug, order) {
     return 'has automatic refills turned off.  Please request 2 weeks in advance'
 
   if ( ! order.$Pharmacy) {//order.$Status == 'Needs Form' was messing up on #11121 since status showed as "Shopping" but this message still appeared
-    debugEmail('Patient needs to register email', '#'+drug.$OrderId, order.$Pharmacy, order.$Status, drug, order)
+    //debugEmail('Patient needs to register email', '#'+drug.$OrderId, order.$Pharmacy, order.$Status, drug, order)
     return 'cannot be filled until patient registration is complete'
   }
 
