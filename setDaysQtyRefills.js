@@ -60,8 +60,9 @@ function testParseSig() {
     "take 1 tablet (500 mg) by oral route 2 times per day with morning and evening meals" */
     //"Take 1 tablet (12.5 mg total) by mouth every 12 (twelve) hours",
     //"1 ORAL every eight hours as needed",
-    "Take 5 mg by mouth 2 (two) times daily.",
-    "Take 5 by mouth 2 (two) times daily."
+    //"Take 5 mg by mouth 2 (two) times daily.",
+    //"Take 5 by mouth 2 (two) times daily.",
+    "Use 1 vial via neb every 4 hours"  //Should be 1620mls for a 90 day supply
   ]
     //2 am 2 pm ORAL three times a day
   //"Take 5 mg by mouth daily."
@@ -244,6 +245,9 @@ function subsituteNumerals(sig) {
   sig = sig.replace(/\bseven /ig, '7 ') // \b is for space or start of line
   sig = sig.replace(/\beight /ig, '8 ') // \b is for space or start of line
   sig = sig.replace(/\bnine /ig, '9 ') // \b is for space or start of line
+
+  sig = sig.replace(/\b1 vial /ig, '3ml ') // vials for inhalation are 2.5 or 3ml, so use 3ml to be conservative
+  sig = sig.replace(/\b2 vials? /ig, '6ml ') // vials for inhalation are 2.5 or 3ml, so use 3ml to be conservative
 
   sig = sig.replace(/ breakfast /ig, ' morning ')
   sig = sig.replace(/ dinner /ig, ' evening ')
