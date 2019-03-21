@@ -93,7 +93,7 @@ function setDaysQtyRefills(drug, order) {
   var msg = excludeFromOrder(drug, order)
   if (msg) {   //infoEmail('Setting 0 Days', msg, 'drug.$Stock', drug.$Stock, 'drug.$TotalQty < drug.$Qty', drug.$TotalQty < drug.$Qty, 'drug', drug)
     drug.$Msg  = msg
-    drug.$Days = 0 //Price is not yet set do no need to reset it here.  New Patients don't get out of stock drugs - they are reserved for refills only.  Set days to 0 after qty is set so we don't get 0 qty too
+    if (drug.$AddedToOrderBy != 'MANUAL') drug.$Days = 0 //Price is not yet set do no need to reset it here.  New Patients don't get out of stock drugs - they are reserved for refills only.  Set days to 0 after qty is set so we don't get 0 qty too
   } else if ( ! drug.$InOrder) {
     drug.$Name = drug.$Name.replace('*', '^')
   }
