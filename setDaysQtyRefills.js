@@ -128,10 +128,7 @@ function useRefill(drug) {
      drug.$Type = "Refill but leftoverQty "+leftoverQty
      return
    }
-   else if (subsituteNumerals(drug.$Sig).match(complexSigRegEx)) {
-     //Do nothing on purpose
-   }
-   else if (stockChanged) {
+   else if (stockChanged && ! subsituteNumerals(drug.$Sig).match(complexSigRegEx)) {
      useEstimate(drug)
      drug.$Type = "Refill but stockChanged tooHigh:"+tooHigh+" tooLow:"+tooLow
      return
