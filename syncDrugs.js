@@ -32,7 +32,7 @@ function setOrderSync(order) {
     if (drug.$Days && ! drug.$InOrder) order.$Patient.syncDates.maySyncToOrder++
     if (drug.$Days &&   drug.$InOrder) order.$Patient.syncDates.inOrder++
 
-    if ( ! isDate && drug.$LastFill) continue //$LastFill == "" means we have N/A for next_fill. #11272 3 new surescipts were being synced to only 2 old sure scripts
+    if ( ! isDate && ! drug.$Days) continue //$LastFill == "" means we have N/A for next_fill but still want to count it as a potential sync date. #11272 3 new surescipts were being synced to only 2 old sure scripts
 
     var newDays = isDate ? new Date(nextFill)/1000/60/60/24 - orderAdded : drug.$Days
 
@@ -48,7 +48,8 @@ function setOrderSync(order) {
   //Pick the date with most drugs (must be greater than num in current order), if tie chose the furthest out
   order.$Patient.syncDates.Best = Object.keys(order.$Patient.syncDates).reduce(function(bestDate, syncDate) {
 
-    if (syncDate == 'maySyncToOrder') return bestDate
+    //Check for "N/A" because of #11360. Check for 'AutoRefill Off' because of #11420.
+    if (syncDate == 'maySyncToOrder' || syncDate == 'N/A' || syncDate == 'AutoRefill Off') return bestDate
 
     if (order.$Patient.syncDates[syncDate] > order.$Patient.syncDates[bestDate]) return syncDate
 
@@ -63,7 +64,7 @@ function setOrderSync(order) {
 
 function setDrugSync(order, drug) {
 
-  if (drug.$IsDispensed || ! drug.$Days || order.$Patient.syncDates.Best == 'N/A') return //Check for "N/A" because of #11360. Cindy asked for this but I am not sure || drug.$Type != "Estimate"
+  if (drug.$IsDispensed || ! drug.$Days) return
 
   if ( ! order.$Patient.syncDates.inOrder && drug.$Days && ! drug.$InOrder) {
     drug.$Days = 0

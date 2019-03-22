@@ -62,7 +62,8 @@ function testParseSig() {
     //"1 ORAL every eight hours as needed",
     //"Take 5 mg by mouth 2 (two) times daily.",
     //"Take 5 by mouth 2 (two) times daily.",
-    "Use 1 vial via neb every 4 hours"  //Should be 1620mls for a 90 day supply
+    //"Use 1 vial via neb every 4 hours"  //Should be 1620mls for a 90 day supply
+    "Take 1 tablet by mouth every morning and 2 tablets in the evening"
   ]
     //2 am 2 pm ORAL three times a day
   //"Take 5 mg by mouth daily."
@@ -73,6 +74,7 @@ function testParseSig() {
 }
 
 //""written_qty":"13.0","dispense_qty":"4.0","days_supply":"90.0","dispense_date":"2018-01-22","refill_date":"2018-02-18","sig_text"://
+var complexSigRegEx = / then | and (?=\d)/
 
 function setDaysQtyRefills(drug, order) {
 
@@ -125,6 +127,9 @@ function useRefill(drug) {
      useEstimate(drug)
      drug.$Type = "Refill but leftoverQty "+leftoverQty
      return
+   }
+   else if (subsituteNumerals(drug.$Sig).match(complexSigRegEx)) {
+     //Do nothing on purpose
    }
    else if (stockChanged) {
      useEstimate(drug)
@@ -208,10 +213,13 @@ function parseSig(drug) {
   //"1 capsule by mouth at bedtime for 1 week then 2 capsules at bedtime" --split
   //"Take 2 tablets in the morning and 1 at noon and 1 at supper" --split
   //"take 1 tablet (500 mg) by oral route 2 times per day with morning and evening meals" -- don't split
-  var cleanedSigs = drug.$Sig.split(/ then | and \d/).reverse()
+  //"Take 1 tablet by mouth every morning and 2 tablets in the evening" -- split
+  var cleanedSigs = subsituteNumerals(drug.$Sig).split(complexSigRegEx).reverse()
 
   for (var i in cleanedSigs) {
-    var cleanedSig = subsituteNumerals(cleanedSigs[i])
+    var cleanedSig = cleanedSigs[i]
+
+    Log('cleanedSig', i, cleanedSig, cleanedSigs)
 
     var parsed = {
       numDosage:getNumDosage(cleanedSig),
@@ -223,7 +231,7 @@ function parseSig(drug) {
     if (parsed.numDosage && parsed.freqNumerator && parsed.freqDemoninator && parsed.frequency)
       return parsed
 
-    Log('Could not parse sig', drug.$Sig, '|'+cleanedSig+'|', parsed)
+    debugEmail('Could not parse sig', drug.$Sig, '|'+cleanedSig+'|', parsed)
     drug.$Msg = (drug.$Msg || '') + "Sig Parse Error"
   }
 }
@@ -249,7 +257,6 @@ function subsituteNumerals(sig) {
   sig = sig.replace(/\b1 vial /ig, '3ml ') // vials for inhalation are 2.5 or 3ml, so use 3ml to be conservative
   sig = sig.replace(/\b2 vials? /ig, '6ml ') // vials for inhalation are 2.5 or 3ml, so use 3ml to be conservative
 
-  sig = sig.replace(/\b\d+ to (\d+) /i, '$1 ') //Take 1 to 2 every 3 to 4 hours. Let's convert that to Take 2 every 3 to 4 hours (no global flag).  CK approves of first substitution but not sure of the 2nd so the conservative answer is to leave it alone
   sig = sig.replace(/\b\d+ or (\d+) /i, '$1 ') //Take 1 or 2 every 3 or 4 hours. Let's convert that to Take 2 every 3 or 4 hours (no global flag).  CK approves of first substitution but not sure of the 2nd so the conservative answer is to leave it alone
 
   sig = sig.replace(/ breakfast /ig, ' morning ')
