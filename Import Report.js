@@ -97,7 +97,7 @@ function normalizeDrug(row) {
     $OrderId:row.invoice_nbr,
     $ScriptNo:row.script_no,
     $InOrder:$InOrder, //if current_refills_left is not null then it currently is in the order
-    $AddedToOrderBy:row.add_to_order_by,
+    $AddedToOrderBy:row.added_to_order_by,
     $InOrderId:row.in_order,
     $ScriptStatus:row.script_status,
     $ScriptSource:row.rx_source,
