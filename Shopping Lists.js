@@ -11,6 +11,7 @@ function testShoppingLists() {
 //So Cindy doesn't have to unpend things that didn't ship
 function deleteShoppingLists(orderID) {
   var res = v2Fetch('http://v2.goodpill.org/account/8889875187/pend/'+orderID, 'DELETE')
+  openSpreadsheet('Shopping List #'+orderID, 'Shopping Lists').setTrashed(true) //Prevent printing an old list that Cindy pended and shipped on her own
   infoEmail('deleteShoppingLists', orderID, res && res.getContentText(), res && res.getResponseCode(), res && res.getHeaders())
 }
 
