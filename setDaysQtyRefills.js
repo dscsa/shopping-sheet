@@ -63,7 +63,9 @@ function testParseSig() {
     //"Take 5 mg by mouth 2 (two) times daily.",
     //"Take 5 by mouth 2 (two) times daily.",
     //"Use 1 vial via neb every 4 hours"  //Should be 1620mls for a 90 day supply
-    "Take 1 tablet by mouth every morning and 2 tablets in the evening"
+    "Take 1 tablet by mouth every morning and 2 tablets in the evening",
+    "Take 2 tablet by mouth three times a day Take 2 with meals and 1 with snacks", //Not working
+    "Take 5 tablets by mouth 3 times a day with meals and 3 tablets 3 times a day with snack" //Not working
   ]
     //2 am 2 pm ORAL three times a day
   //"Take 5 mg by mouth daily."
@@ -83,7 +85,7 @@ function setDaysQtyRefills(drug, order) {
     useDispensed(drug)
 
   //TODO should we just get rid of useRefill Completely.  Seems like a VERY narrow use case
-  else if (drug.$DispenseQty && drug.$DaysSupply >= 45) //don't do a refill of something supershort like 15 or 30 days.  Modulus so we only do refill quantity if we can keep qty the same without an leftover qty on RX. This is because CK would have preferred Order 1151 to go back up to 90 days rather than a Refill of 60 Days (set because of Med Sync)
+  else if (drug.$DispenseQty)
     useRefill(drug)
 
   else if ( ~ drug.$Name.indexOf(' INH') && drug.$WrittenQty > 1)
@@ -121,8 +123,14 @@ function useRefill(drug) {
    var tooLow  = ! lowStock && (drug.$DaysSupply < 60)
    var stockChanged = tooHigh || tooLow  //If this was med synced or didn't have a lot left on Rx then adjust back to our regular qtys
 
-   var leftoverQty = (drug.$WrittenQty*drug.$RefillsLeft) % drug.$DispenseQty
-
+   var leftoverQty = (drug.$WrittenQty*drug.$RefillsLeft) % drug.$DispenseQty //Modulus so we only do refill quantity if we can keep qty the same without an leftover qty on RX. This is because CK would have preferred Order 1151 to go back up to 90 days rather than a Refill of 60 Days (set because of Med Sync)
+   var dailyQty    = drug.$DispenseQty/drug.$DaysSupply
+   
+   if (drug.$DaysSupply < 45 && dailyQty < 4) { //don't do a refill of something supershort like 15 or 30 days if not a a really high qty per day
+     useEstimate(drug)
+     drug.$Type = "Refill but only "+dailyQty+" per day for "+drug.$DaysSupply+" days"
+     return
+   }
    if (leftoverQty) {
      useEstimate(drug)
      drug.$Type = "Refill but leftoverQty "+leftoverQty
