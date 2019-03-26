@@ -258,17 +258,8 @@ function toObject(keys, vals) {
   for (var i in keys) {
     if ( ! keys[i]) continue
 
-    if (vals[i] && (vals[i][0] == '[' || vals[i][0] == '{')) {
-      try {
-
-        vals[i] = vals[i].replace(/: *\./g, ':0.') //Handwritten decimals (corrected refill amounts) may not have required leading 0 so add it here to avoid JSON syntax error
-        vals[i] = vals[i].replace(/: *,/g, ':"",') //If user deletes a value altogther assume it is an empty string to keep the JSON valid
-        vals[i] = JSON.parse(vals[i])
-      } catch (e) {
-        debugEmail('JSON.parse() error', vals[i], e)
-        vals[i] = vals[i].trim()
-      }
-    }
+    if (vals[i] && (vals[i][0] == '[' || vals[i][0] == '{'))
+        vals[i] = JSONparse(vals[i])
     else if (vals[i].trim)
       vals[i] = vals[i].trim()
 
