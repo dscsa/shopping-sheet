@@ -11,8 +11,15 @@ function testShoppingLists() {
 //So Cindy doesn't have to unpend things that didn't ship
 function deleteShoppingLists(orderID) {
   var res = v2Fetch('http://v2.goodpill.org/account/8889875187/pend/'+orderID, 'DELETE')
-  openSpreadsheet('Shopping List #'+orderID, 'Shopping Lists').setTrashed(true) //Prevent printing an old list that Cindy pended and shipped on her own
-  infoEmail('deleteShoppingLists', orderID, res && res.getContentText(), res && res.getResponseCode(), res && res.getHeaders())
+
+  var shoppingListFolder   = DriveApp.getFolderById('1PcDYKM_Ky-9zWmCNuBnTka3uCKjU3A0q')
+  var shoppingListIterator = shoppingListFolder.getFilesByName('Shopping List #'+orderID)
+  var hasNext              = shoppingListIterator.hasNext()
+
+  if (hasNext)
+    shoppingListIterator.next().setTrashed(true) //Prevent printing an old list that Cindy pended and shipped on her own
+
+  infoEmail('deleteShoppingLists', orderID, 'hasNext', hasNext, res && res.getContentText(), res && res.getResponseCode(), res && res.getHeaders())
 }
 
 function createShoppingLists(order, drugs) {
