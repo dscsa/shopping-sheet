@@ -65,7 +65,8 @@ function testParseSig() {
     //"Use 1 vial via neb every 4 hours"  //Should be 1620mls for a 90 day supply
     "Take 1 tablet by mouth every morning and 2 tablets in the evening",
     "Take 2 tablet by mouth three times a day Take 2 with meals and 1 with snacks", //Not working
-    "Take 5 tablets by mouth 3 times a day with meals and 3 tablets 3 times a day with snack" //Not working
+    "Take 5 tablets by mouth 3 times a day with meals and 3 tablets 3 times a day with snack", //Not working
+    "Take 1 tablet by mouth every twelve hours"
   ]
     //2 am 2 pm ORAL three times a day
   //"Take 5 mg by mouth daily."
@@ -125,7 +126,7 @@ function useRefill(drug) {
 
    var leftoverQty = (drug.$WrittenQty*drug.$RefillsLeft) % drug.$DispenseQty //Modulus so we only do refill quantity if we can keep qty the same without an leftover qty on RX. This is because CK would have preferred Order 1151 to go back up to 90 days rather than a Refill of 60 Days (set because of Med Sync)
    var dailyQty    = drug.$DispenseQty/drug.$DaysSupply
-   
+
    if (drug.$DaysSupply < 45 && dailyQty < 4) { //don't do a refill of something supershort like 15 or 30 days if not a a really high qty per day
      useEstimate(drug)
      drug.$Type = "Refill but only "+dailyQty+" per day for "+drug.$DaysSupply+" days"
@@ -243,12 +244,9 @@ function parseSig(drug) {
 
 function subsituteNumerals(sig) {
   sig = sig.replace(/[()]/g, '') //get rid of parenthesis // "Take 1 capsule (300 mg total) by mouth 3 (three) times daily."
+
   sig = sig.replace(/( and| &) 1\/2 /ig, '.5 ') //Take 1 and 1/2 tablets or Take 1 & 1/2 tablets.  Could combine with next regex but might get complicated
   sig = sig.replace(/ 1\/2| one-half/ig, ' .5 ')
-  sig = sig.replace(/ once /ig, ' 1 time ')
-  sig = sig.replace(/ twice | q12h| BID\b|(?!every) 12 hours/ig, ' 2 times ')
-  sig = sig.replace(/ q8h| TID\b|(?!every) 8 hours/ig, ' 3 times ')
-  sig = sig.replace(/ q6h|(?!every) 6 hours/ig, ' 4 times ')
   sig = sig.replace(/\bone /ig, '1 ') // \b is for space or start of line
   sig = sig.replace(/\btwo | other /ig, '2 ') // \b is for space or start of line
   sig = sig.replace(/\bthree /ig, '3 ') // \b is for space or start of line
@@ -258,6 +256,14 @@ function subsituteNumerals(sig) {
   sig = sig.replace(/\bseven /ig, '7 ') // \b is for space or start of line
   sig = sig.replace(/\beight /ig, '8 ') // \b is for space or start of line
   sig = sig.replace(/\bnine /ig, '9 ') // \b is for space or start of line
+  sig = sig.replace(/\bten /ig, '10 ') // \b is for space or start of line
+  sig = sig.replace(/\beleven /ig, '11 ') // \b is for space or start of line
+  sig = sig.replace(/\btwelve /ig, '12 ') // \b is for space or start of line
+
+  sig = sig.replace(/ once /ig, ' 1 time ')
+  sig = sig.replace(/ twice | q12h| BID\b|(?!every) 12 hours/ig, ' 2 times ')
+  sig = sig.replace(/ q8h| TID\b|(?!every) 8 hours/ig, ' 3 times ')
+  sig = sig.replace(/ q6h|(?!every) 6 hours/ig, ' 4 times ')
 
   sig = sig.replace(/\b1 vial /ig, '3ml ') // vials for inhalation are 2.5 or 3ml, so use 3ml to be conservative
   sig = sig.replace(/\b2 vials? /ig, '6ml ') // vials for inhalation are 2.5 or 3ml, so use 3ml to be conservative
