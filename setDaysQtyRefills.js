@@ -63,10 +63,12 @@ function testParseSig() {
     //"Take 5 mg by mouth 2 (two) times daily.",
     //"Take 5 by mouth 2 (two) times daily.",
     //"Use 1 vial via neb every 4 hours"  //Should be 1620mls for a 90 day supply
-    "Take 1 tablet by mouth every morning and 2 tablets in the evening",
+    //"Take 1 tablet by mouth every morning and 2 tablets in the evening",
     "Take 2 tablet by mouth three times a day Take 2 with meals and 1 with snacks", //Not working
     "Take 5 tablets by mouth 3 times a day with meals and 3 tablets 3 times a day with snack", //Not working
-    "Take 1 tablet by mouth every twelve hours"
+    "Take 1 tablet by mouth every twelve hours",
+    "Take 1/2 tablet by mouth every day",
+    "Take 1-2 tablet by mouth at bedtime"
   ]
     //2 am 2 pm ORAL three times a day
   //"Take 5 mg by mouth daily."
@@ -268,7 +270,10 @@ function subsituteNumerals(sig) {
   sig = sig.replace(/\b1 vial /ig, '3ml ') // vials for inhalation are 2.5 or 3ml, so use 3ml to be conservative
   sig = sig.replace(/\b2 vials? /ig, '6ml ') // vials for inhalation are 2.5 or 3ml, so use 3ml to be conservative
 
+  //Take Last (Max?) of Numeric Ranges
   sig = sig.replace(/\b\d+ or (\d+) /i, '$1 ') //Take 1 or 2 every 3 or 4 hours. Let's convert that to Take 2 every 3 or 4 hours (no global flag).  CK approves of first substitution but not sure of the 2nd so the conservative answer is to leave it alone
+  sig = sig.replace(/\b\d+ to (\d+) /i, '$1 ') //Take 1 to 2 every 3 or 4 hours. Let's convert that to Take 2 every 3 or 4 hours (no global flag).  CK approves of first substitution but not sure of the 2nd so the conservative answer is to leave it alone
+  sig = sig.replace(/\b\d+-(\d+) /i, '$1 ') //Take 1-2 every 3 or 4 hours. Let's convert that to Take 2 every 3 or 4 hours (no global flag).  CK approves of first substitution but not sure of the 2nd so the conservative answer is to leave it alone
 
   sig = sig.replace(/ breakfast /ig, ' morning ')
   sig = sig.replace(/ dinner /ig, ' evening ')
