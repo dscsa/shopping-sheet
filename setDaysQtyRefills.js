@@ -87,12 +87,12 @@ function setDaysQtyRefills(drug, order) {
   if (drug.$IsDispensed)
     useDispensed(drug)
 
+  else if ( ~ drug.$Name.indexOf(' INH') && drug.$WrittenQty > 1)
+    useInhaler(drug)
+
   //TODO should we just get rid of useRefill Completely.  Seems like a VERY narrow use case
   else if (drug.$DispenseQty)
     useRefill(drug)
-
-  else if ( ~ drug.$Name.indexOf(' INH') && drug.$WrittenQty > 1)
-    useInhaler(drug)
 
   else
     useEstimate(drug)
