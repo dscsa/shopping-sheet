@@ -80,15 +80,15 @@ function normalizeDrug(row) {
     $Qty:null,         //placeholder for JSON ordering.
     $Refills:null,     //placeholder for JSON ordering.
     $Price:null,       //placeholder for JSON ordering.
-    $SyncBy:undefined, //placeholder for JSON ordering.
+    $FirstRefill:row.orig_disp_date,
+    $LastRefill:dispenseDate,
+    $NextRefill:'N/A',
     $Stock:undefined,  //placeholder for JSON ordering.
+    $SyncBy:undefined, //placeholder for JSON ordering.
     $RefillsLeft:$RefillsLeft, //if not in order or already shipped use total refills not just the last dispensed to avoid erroneous out of refills warning
     $RefillsTotal:+(+row.refills_total).toFixed(2),
     $IsRefill:+row.is_refill,
     $IsDispensed:$IsDispensed,
-    $FirstRefill:row.orig_disp_date,
-    $LastRefill:dispenseDate,
-    $NextRefill:'N/A',
     $DaysSupply:+row.days_supply,
     $DispenseQty:+row.dispense_qty,
     $WrittenQty:+row.written_qty,
