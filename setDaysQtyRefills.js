@@ -68,7 +68,8 @@ function testParseSig() {
     "Take 5 tablets by mouth 3 times a day with meals and 3 tablets 3 times a day with snack", //Not working
     "Take 1 tablet by mouth every twelve hours",
     "Take 1/2 tablet by mouth every day",
-    "Take 1-2 tablet by mouth at bedtime"
+    "Take 1-2 tablet by mouth at bedtime",
+    "1/2 tablet Once a day Orally 90 days"
   ]
     //2 am 2 pm ORAL three times a day
   //"Take 5 mg by mouth daily."
@@ -247,8 +248,8 @@ function parseSig(drug) {
 function subsituteNumerals(sig) {
   sig = sig.replace(/[()]/g, '') //get rid of parenthesis // "Take 1 capsule (300 mg total) by mouth 3 (three) times daily."
 
-  sig = sig.replace(/( and| &) 1\/2 /ig, '.5 ') //Take 1 and 1/2 tablets or Take 1 & 1/2 tablets.  Could combine with next regex but might get complicated
-  sig = sig.replace(/ 1\/2| one-half/ig, ' .5 ')
+  sig = sig.replace(/(^| and | & )(1\/2|one-half) /ig, '.5 ') //Take 1 and 1/2 tablets or Take 1 & 1/2 tablets.  Could combine with next regex but might get complicated
+  sig = sig.replace(/ (1\/2|one-half) /ig, ' .5 ')
   sig = sig.replace(/\bone /ig, '1 ') // \b is for space or start of line
   sig = sig.replace(/\btwo | other /ig, '2 ') // \b is for space or start of line
   sig = sig.replace(/\bthree /ig, '3 ') // \b is for space or start of line
