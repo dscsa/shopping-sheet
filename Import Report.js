@@ -87,6 +87,8 @@ function normalizeDrug(row) {
     $SyncBy:undefined, //placeholder for JSON ordering.
     $RefillsLeft:$RefillsLeft, //if not in order or already shipped use total refills not just the last dispensed to avoid erroneous out of refills warning
     $RefillsTotal:+(+row.refills_total).toFixed(2),
+    $AutofillDate:row.autofill_date && row.autofill_date.slice(0, 10),
+    $RefillDate:row.refill_date && row.refill_date.slice(0,10),
     $IsRefill:+row.is_refill,
     $IsDispensed:$IsDispensed,
     $DaysSupply:+row.days_supply,
@@ -133,8 +135,8 @@ function normalizeDrug(row) {
     row.drug.$Refills = row.drug.$NextRefill = 'Rx Expired'
     row.drug.$Msg = 'has expired, ask your doctor for a new Rx'
   }
-  else if (row.autofill_date) {  //We will fill even if autofill is off when this is set
-    row.drug.$NextRefill = row.autofill_date.slice(0, 10)
+  else if (row.drug.$AutofillDate) {  //We will fill even if autofill is off when this is set
+    row.drug.$NextRefill = row.drug.$AutofillDate
     row.drug.$DaysUntilRefill = new Date(row.drug.$NextRefill) - toDate(row.order_added)
     if (row.drug.$DaysUntilRefill > minMedSyncTime(row.drug) && row.drug.$DaysUntilRefill < maxMedSyncTime(row.drug)) {
 
@@ -149,8 +151,8 @@ function normalizeDrug(row) {
 
     if ($InOrder) row.drug.$Msg = row.drug.$AutoPopulated ? 'has autorefill off but was just requested to be filled' : 'has autorefill off but was requested by you'  //Someone called in to request a med off autofill or a doctor sent one in (not sure if we should send the latter but better safe than sorry???).  Keeping second option ambiguous right now: to add "requessted by your doctor" we would need to check date_written.  Checking FirstRefill is giving us some false postives (e.g "requested by your doctor" but should be "by you")
   }
-  else if (row.refill_date.slice(0,10) >= toDate(row.order_added).toJSON().slice(0, 10)) { //else if (row.drug.$LastRefill) estimateNextRefill(drug)
-    row.drug.$NextRefill = row.refill_date.slice(0,10)
+  else if (row.drug.$RefillDate >= toDate(row.order_added).toJSON().slice(0, 10)) { //else if (row.drug.$LastRefill) estimateNextRefill(drug)
+    row.drug.$NextRefill = row.drug.$RefillDate
     row.drug.$DaysUntilRefill = new Date(row.drug.$NextRefill) - toDate(row.order_added)
     if (row.drug.$DaysUntilRefill > minMedSyncTime(row.drug) && row.drug.$DaysUntilRefill < maxMedSyncTime(row.drug)) {
 
@@ -169,23 +171,6 @@ function normalizeDrug(row) {
     //debugEmail('WHAT IS GOING ON', '#'+row.invoice_nbr, row.drug.$Autofill, {rx:row.rx_autofill, patient:row.pat_autofill}, row)
   }
 }
-
-/*
-function estimateNextRefill(drug) {
-   var nextRefill = new Date(drug.$LastRefill)
-   nextRefill.setDate(nextRefill.getDate()+drug.$DaysSupply)
-   drug.$NextRefill = nextRefill.toJSON().slice(0, 10)
-}
-*/
-
-/*
-function addV2Name(drug, v2Names) {
-
-  if ( ! v2Names[drug.$Gcn])
-    drug.$Stock = 'Update GCN'
-
-  drug.$v2 = v2Names[drug.$Gcn] || '' //use empty string so string.replace doesn't cause issues later on in the code
-}*/
 
 function groupByOrder(report) {
   //Log('report', report.length, report.reverse())
