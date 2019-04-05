@@ -92,8 +92,8 @@ function setDaysQtyRefills(drug, order) {
     useInhaler(drug)
 
   //TODO should we just get rid of useRefill Completely.  Seems like a VERY narrow use case
-  else if (drug.$DispenseQty)
-    useRefill(drug)
+  //else if (drug.$DispenseQty)
+  //  useRefill(drug)
 
   else
     useEstimate(drug)
