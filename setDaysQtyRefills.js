@@ -69,7 +69,8 @@ function testParseSig() {
     "Take 1 tablet by mouth every twelve hours",
     "Take 1/2 tablet by mouth every day",
     "Take 1-2 tablet by mouth at bedtime",
-    "1/2 tablet Once a day Orally 90 days"
+    "1/2 tablet Once a day Orally 90 days",
+    "Take 1 tablet by mouth every morning then 1/2 tablet in the evening" //Not working
   ]
     //2 am 2 pm ORAL three times a day
   //"Take 5 mg by mouth daily."

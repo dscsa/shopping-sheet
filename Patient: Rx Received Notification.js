@@ -60,7 +60,7 @@ function rxReceivedNotification(order, numChanges) {
 
     }
     else {
-      if ( ! drug.$AutoPopulated) debugEmail('Non autopopulated drug in Order but no days!  Why is this?',drug, order) //Most likely an autopopulated Rx that is not due yet
+      if (drug.$AddedToOrderBy == "Manual") debugEmail('Manually added drug in Order but no days!  Why is this?',drug, order) //Most likely an autopopulated Rx that is not due yet
       drug.$Email = "rxReceivedNoFill: default. Old Msg: "+drug.$Msg+" Old Days:"+drug.$Days
       rxReceivedNoFill.push(name+' '+drug.$Msg)
     }

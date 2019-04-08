@@ -103,7 +103,6 @@ function normalizeDrug(row) {
     $InOrderId:row.in_order,
     $ScriptStatus:row.script_status,
     $ScriptSource:row.rx_source,
-    $AutoPopulated:row.script_status == "SureScripts" && (row.rx_changed.slice(0, 10) >= row.order_added.slice(0, 10)), //If Rx was created on same day as order or after, then its likely a SureScript autopopulation.  Otherwise Cindy/AutoRefill added an existing Rx to an order
     $RxChanged:row.rx_changed,
     $RxExpires:toDate(row.expire_date),
     $Autofill:{rx:+row.rx_autofill, patient:+row.pat_autofill},
@@ -149,7 +148,7 @@ function normalizeDrug(row) {
   else if (row.user_def_1.slice(1, -1) && ( ! +row.rx_autofill || ! +row.pat_autofill)) { //Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
     row.drug.$NextRefill = 'AutoRefill Off'
 
-    if ($InOrder) row.drug.$Msg = row.drug.$AutoPopulated ? 'has autorefill off but was just requested to be filled' : 'has autorefill off but was requested by you'  //Someone called in to request a med off autofill or a doctor sent one in (not sure if we should send the latter but better safe than sorry???).  Keeping second option ambiguous right now: to add "requessted by your doctor" we would need to check date_written.  Checking FirstRefill is giving us some false postives (e.g "requested by your doctor" but should be "by you")
+    if ($InOrder) row.drug.$Msg = 'has autorefill off but was just requested to be filled'  //Someone called in to request a med off autofill or a doctor sent one in (not sure if we should send the latter but better safe than sorry???).  Keeping second option ambiguous right now: to add "requessted by your doctor" we would need to check date_written.  Checking FirstRefill is giving us some false postives (e.g "requested by your doctor" but should be "by you")
   }
   else if (row.drug.$RefillDate >= toDate(row.order_added).toJSON().slice(0, 10)) { //else if (row.drug.$LastRefill) estimateNextRefill(drug)
     row.drug.$NextRefill = row.drug.$RefillDate

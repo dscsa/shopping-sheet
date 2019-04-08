@@ -93,7 +93,7 @@ function excludeFromOrder(drug, order) {
     return 'cannot be filled until patient registration is complete'
   }
 
-  if ( ! drug.$Autofill.patient && drug.$AutoPopulated)
+  if ( ! drug.$Autofill.patient && drug.$AddedToOrderBy != "Manual")
     return 'was requested but you have turned all medications off autorefill'
 
   if ( ! drug.$InOrder && drug.$NextRefill == 'N/A')
