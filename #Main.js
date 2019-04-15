@@ -237,7 +237,7 @@ function updateShopping(email) {
     var formulas = {
       //$Total:'=SUM(PICKPROPERTY($Drugs, "$Price"))',
       $Fee:'=IF(NOT(ISBLANK($New))*ISBLANK($Coupon), 6, $Total)',
-      $Due:'=IF(ISBLANK($Coupon)*ISBLANK($Card), $Fee, 0)',
+      $Due:'=IF((ISBLANK($Coupon)+(LEFT($Coupon, 6)="track_"))*ISBLANK($Card), $Fee, 0)',
       $BilledAt:'=IF(AND($Fee > 0, LEN($Card)), TEXT(DATE(YEAR($RowChanged),MONTH($RowChanged)+1,1), "M/D/YY")&" - "&TEXT(DATE(YEAR($RowChanged),MONTH($RowChanged)+1,7), "M/D/YY"),"N/A")'
     }
 
