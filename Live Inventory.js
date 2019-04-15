@@ -93,7 +93,7 @@ function excludeFromOrder(drug, order) {
     return 'cannot be filled until patient registration is complete'
   }
 
-  if ( ! drug.$Autofill.patient && drug.$AddedToOrderBy != "Manual")
+  if ( ! drug.$Autofill.patient && drug.$AddedToOrderBy != "MANUAL" && drug.$AddedToOrderBy != "Webform")
     return 'was requested but you have turned all medications off autorefill'
 
   if ( ! drug.$InOrder && drug.$NextRefill == 'N/A')
@@ -102,9 +102,8 @@ function excludeFromOrder(drug, order) {
   if (new Date(drug.$NextRefill) - new Date(order.$OrderAdded) > maxMedSyncTime(drug))
     return 'is due for a refill on '+drug.$NextRefill
 
-  if ( ! drug.$IsPended && drug.$TotalQty < 2000 && drug.$Qty > 2.5*drug.$RepackQty) {
+  if (drug.$TotalQty < 2000 && drug.$Qty > drug.$DispenseQty && drug.$Qty > 2.5*drug.$RepackQty)
     return 'was prescribed in an unusually high qty and needs to be reviewed by a pharmacist'
-  }
 
   if (drug.$TotalQty < drug.$Qty && ! drug.$IsPended) {
 
