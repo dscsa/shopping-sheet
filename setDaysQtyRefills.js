@@ -64,16 +64,21 @@ function testParseSig() {
     //"Take 5 by mouth 2 (two) times daily.",
     //"Use 1 vial via neb every 4 hours"  //Should be 1620mls for a 90 day supply
     //"Take 1 tablet by mouth every morning and 2 tablets in the evening",
-    "Take 2 tablet by mouth three times a day Take 2 with meals and 1 with snacks", //Not working
-    "Take 5 tablets by mouth 3 times a day with meals and 3 tablets 3 times a day with snack", //Not working
-    "Take 1 tablet by mouth every twelve hours",
-    "Take 1/2 tablet by mouth every day",
-    "Take 1-2 tablet by mouth at bedtime",
-    "1/2 tablet Once a day Orally 90 days",
-    "Take 1 tablet by mouth every morning then 1/2 tablet in the evening" //Not working
+    //"Take 1 tablet by mouth every twelve hours",
+    //"Take 1/2 tablet by mouth every day",
+    //"Take 1-2 tablet by mouth at bedtime",
+    //"1/2 tablet Once a day Orally 90 days",
+    "1 capsule every 8 hrs Orally 30 days"
   ]
-    //2 am 2 pm ORAL three times a day
+  
+  
+  //TODO: NOT WORKING
+  //"Take 2 tablet by mouth three times a day Take 2 with meals and 1 with snacks", //Not working
+  //"Take 5 tablets by mouth 3 times a day with meals and 3 tablets 3 times a day with snack", //Not working
+  //"Take 1 tablet by mouth every morning then 1/2 tablet in the evening", //Not working
+  //2 am 2 pm ORAL three times a day
   //"Take 5 mg by mouth daily."
+  
   for (var i in testSigs) {
     var parsed = parseSig({$Sig:testSigs[i]})
     Log(testSigs[i], parsed)
@@ -264,6 +269,7 @@ function subsituteNumerals(sig) {
   sig = sig.replace(/\beleven /ig, '11 ') // \b is for space or start of line
   sig = sig.replace(/\btwelve /ig, '12 ') // \b is for space or start of line
 
+  sig = sig.replace(/ hrs /ig, ' hours ')
   sig = sig.replace(/ once /ig, ' 1 time ')
   sig = sig.replace(/ twice | q12h| BID\b|(?!every) 12 hours/ig, ' 2 times ')
   sig = sig.replace(/ q8h| TID\b|(?!every) 8 hours/ig, ' 3 times ')
