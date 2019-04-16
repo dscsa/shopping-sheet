@@ -87,16 +87,19 @@ function createWebformOrder(orderId, woocommerceOrder) {
 function updateWebformOrder(orderId, woocommerceOrder, address) {
   try {
     //infoEmail('updateWebformOrder', '#'+orderId, woocommerceOrder)
-    return saveWebformOrder('put', 'orders/'+orderId, woocommerceOrder)
+    var res = saveWebformOrder('put', 'orders/'+orderId, woocommerceOrder)
+
+    if (res.code != "woocommerce_rest_shop_order_invalid_id") return res
+
   } catch (err) {
     //infoEmail('updateWebformOrder failed', err, '#'+orderId, woocommerceOrder)
-    //Just to be certain we are HIPAA compliant, only change address information on creation
-    if (address) {
-      //woocommerceOrder.billing = address
-      woocommerceOrder.shipping = address
-    }
-    return createWebformOrder(orderId, woocommerceOrder) //if no order exists, then create one rather than throwing error
   }
+
+  if (address) { //Just to be certain we are HIPAA compliant, only change address information on creation
+    woocommerceOrder.shipping = address
+  }
+
+  return createWebformOrder(orderId, woocommerceOrder) //if no order exists, then create one rather than throwing error
 }
 
 function saveWebformOrder(action, endpoint, woocommerceOrder) {
@@ -119,7 +122,7 @@ function saveWebformOrder(action, endpoint, woocommerceOrder) {
     //I could not figure out how to respond with a good error message to check for this by trying throwing/returning
     //errors from woocommerce but could not get it to work.  SOOOO just assume any error here means that we should try
     //creating the order rather than updating it
-    debugEmail('Save Webform Error', e, e.stack, content, response, action, endpoint, woocommerceOrder)
+    debugEmail('saveWebformOrder Error', e, e.stack, content, response, action, endpoint, woocommerceOrder)
     throw e
   }
 }
