@@ -131,8 +131,8 @@ function shopV2(drug, orderID) {
 
   //Organize by NDC since we don't want to mix them
   var ndcs = {}
-  var caps = $Name.match(/ caps| cp| softgel/i) //"caps" to exclude caplet which is closer to a tablet
-  var tabs = $Name.match(/ tab| tb/i)
+  var caps = $Name.match(/ caps?| cp| softgel/i) //"caps" to exclude caplet which is closer to a tablet
+  var tabs = $Name.match(/ tabs?| tb/i)
 
 
   //TODO test to see if this sorts things as we want.  In high stock, we want long exps first
