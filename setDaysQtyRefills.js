@@ -68,7 +68,9 @@ function testParseSig() {
     //"Take 1/2 tablet by mouth every day",
     //"Take 1-2 tablet by mouth at bedtime",
     //"1/2 tablet Once a day Orally 90 days",
-    "1 capsule every 8 hrs Orally 30 days"
+    //"1 capsule every 8 hrs Orally 30 days",
+    "TAKE 1/2 TO 1 TABLET(S) by mouth EVERY DAY",
+    "TAKE 1/2 TO 2 TABLETS AT BEDTIME FOR SLEEP."
   ]
   
   
@@ -279,9 +281,9 @@ function subsituteNumerals(sig) {
   sig = sig.replace(/\b2 vials? /ig, '6ml ') // vials for inhalation are 2.5 or 3ml, so use 3ml to be conservative
 
   //Take Last (Max?) of Numeric Ranges
-  sig = sig.replace(/\b\d+ or (\d+) /i, '$1 ') //Take 1 or 2 every 3 or 4 hours. Let's convert that to Take 2 every 3 or 4 hours (no global flag).  CK approves of first substitution but not sure of the 2nd so the conservative answer is to leave it alone
-  sig = sig.replace(/\b\d+ to (\d+) /i, '$1 ') //Take 1 to 2 every 3 or 4 hours. Let's convert that to Take 2 every 3 or 4 hours (no global flag).  CK approves of first substitution but not sure of the 2nd so the conservative answer is to leave it alone
-  sig = sig.replace(/\b\d+-(\d+) /i, '$1 ') //Take 1-2 every 3 or 4 hours. Let's convert that to Take 2 every 3 or 4 hours (no global flag).  CK approves of first substitution but not sure of the 2nd so the conservative answer is to leave it alone
+  sig = sig.replace(/[.\d]+ or ([.\d]+) /i, '$1 ') //Take 1 or 2 every 3 or 4 hours. Let's convert that to Take 2 every 3 or 4 hours (no global flag).  CK approves of first substitution but not sure of the 2nd so the conservative answer is to leave it alone
+  sig = sig.replace(/[.\d]+ to ([.\d]+) /i, '$1 ') //Take 1 to 2 every 3 or 4 hours. Let's convert that to Take 2 every 3 or 4 hours (no global flag).  CK approves of first substitution but not sure of the 2nd so the conservative answer is to leave it alone
+  sig = sig.replace(/[.\d]+-([.\d]+) /i, '$1 ') //Take 1-2 every 3 or 4 hours. Let's convert that to Take 2 every 3 or 4 hours (no global flag).  CK approves of first substitution but not sure of the 2nd so the conservative answer is to leave it alone
 
   sig = sig.replace(/ breakfast /ig, ' morning ')
   sig = sig.replace(/ dinner /ig, ' evening ')
