@@ -1,6 +1,6 @@
 //These are based on MSSQL SP of 3 days and 7 day buffer for 1st fills
 function maxMedSyncTime(drug) {
-  return (drug.$IsRefill == 1 ? 21 : 14)*24*60*60*1000
+  return 14*24*60*60*1000
 }
 
 //These are based on MSSQL SP of 3 days and 10 day buffer for 1st fills

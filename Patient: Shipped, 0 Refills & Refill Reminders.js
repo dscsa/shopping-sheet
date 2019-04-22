@@ -24,6 +24,7 @@ function orderShippedNotification(order, invoice, drugs) {
     warning.push('The following medications were NOT filled:<br>'+unfilled.join('<br>'))
   }
 
+  //Notify of 0 Refills near the first refill date
   var minDays   = 90
   var noRefills = drugs
     .filter(function(drug) { return drug.$Refills < 1 && drug.$Days })
@@ -35,6 +36,19 @@ function orderShippedNotification(order, invoice, drugs) {
     var smsDrugs = removeDelimiters(noRefills.join('; '))
     //cancelFutureCalls(order) //looking at calendar trash this is also deleting necessary events, so going back to duplicates for now. Prevent duplicates that were happening.  Not sure why
     newCallEvent(order, reminderTime, '0 Refills', order.$OrderId, smsDrugs)
+  }
+
+  //Notify of No Autofill near the first refill date
+  var minDays   = 90
+  var noAutofills = drugs
+    .filter(function(drug) { return ! drug.$Autofill.rx && drug.$Days })
+    .map(function(drug) { minDays = Math.min(minDays, drug.$Days); return drugNameMap(drug) })
+
+  if (noAutofills.length) {
+    var reminderTime = addTime(24*(minDays-3)+16.5, null, true) //4:30pm 3 days before refill date (same as refills).  Current thought on timeline is SureScript Refill Auth -> 1 day to hear answer -> 0 Refill Reminder -> Rest of Refills Populated -> 1 day -> Filled & Shipped
+    var smsDrugs = removeDelimiters(noAutofills.join('; '))
+    //cancelFutureCalls(order) //looking at calendar trash this is also deleting necessary events, so going back to duplicates for now. Prevent duplicates that were happening.  Not sure why
+    newCallEvent(order, reminderTime, 'No Autofills', order.$OrderId, smsDrugs)
   }
 
   sendEmail(order.$Patient.email, subject, [
