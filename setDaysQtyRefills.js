@@ -69,8 +69,9 @@ function testParseSig() {
     //"Take 1-2 tablet by mouth at bedtime",
     //"1/2 tablet Once a day Orally 90 days",
     //"1 capsule every 8 hrs Orally 30 days",
-    "TAKE 1/2 TO 1 TABLET(S) by mouth EVERY DAY",
-    "TAKE 1/2 TO 2 TABLETS AT BEDTIME FOR SLEEP."
+    //"TAKE 1/2 TO 1 TABLET(S) by mouth EVERY DAY",
+    //"TAKE 1/2 TO 2 TABLETS AT BEDTIME FOR SLEEP.",
+    "Take 60 mg daily  1 1\\/2 tablet"
   ]
   
   
@@ -255,8 +256,10 @@ function parseSig(drug) {
 
 function subsituteNumerals(sig) {
   sig = sig.replace(/[()]/g, '') //get rid of parenthesis // "Take 1 capsule (300 mg total) by mouth 3 (three) times daily."
-
+  sig = sig.replace(/\\/g, '')   //get rid of backslashes
+  
   sig = sig.replace(/(^| and | & )(1\/2|one-half) /ig, '.5 ') //Take 1 and 1/2 tablets or Take 1 & 1/2 tablets.  Could combine with next regex but might get complicated
+  sig = sig.replace(/(\d+) (1\/2|one-half) /ig, '$1.5 ') //Take 1 1/2 tablets
   sig = sig.replace(/ (1\/2|one-half) /ig, ' .5 ')
   sig = sig.replace(/\bone /ig, '1 ') // \b is for space or start of line
   sig = sig.replace(/\btwo | other /ig, '2 ') // \b is for space or start of line
@@ -296,8 +299,14 @@ function subsituteNumerals(sig) {
 
 function getNumDosage(sig) {
   try {
-    var numDosage = sig.match(/(^|use +|take +|inhale +|chew +|inject +|oral +)([0-9]?\.[0-9]+|[1-9])(?! ?mg)/i)
+    var numDosage = sig.match(/([0-9]?\.[0-9]+|[1-9]) (tab|cap|pill|softgel)/i)
+    
+    if (numDosage) return numDosage[1]
+    
+    numDosage = sig.match(/(^|use +|take +|inhale +|chew +|inject +|oral +)([0-9]?\.[0-9]+|[1-9])(?!\d* ?mg)/i)
+    
     return numDosage ? numDosage[2] : 1 //"Use daily with lantus" won't match the RegEx above
+    
   } catch (e) {}
 }
 
