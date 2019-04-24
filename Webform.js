@@ -22,7 +22,7 @@ function updateWebformDispensed(order, invoice, fee) {
 
     //one email was the string "NULL".  some placeholder emails in fname lname DOB@sirum.org format were accidentally saved with spaces and are rejected by woocommerce.  Empty string & undefined (#8350 & #8375) emails are invalid
     if ( ! email) {
-      debugEmail('saving to webform without a patient email', email, order, invoice, fee)
+      //debugEmail('saving to webform without a patient email', email, order, invoice, fee)
       email = "missing_email@goodpill.org"
     }
 

@@ -133,7 +133,8 @@ function liveInventoryByGcn(drug) {
   //Create a map function for each GCN
   if ( ! Object.keys(liveInventoryCache).length) {
 
-    var sheet = getSheet('https://docs.google.com/spreadsheets/d/1gF7EUirJe4eTTJ59EQcAs1pWdmTm2dNHUAcrLjWQIpY/edit#gid=505223313', 'T', 1)
+    //IF ROWS ARE ADDED TO THE SHEET THE COLUMN WITH GCNS e.g. "U" MUST BE UPDATED.
+    var sheet = getSheet('https://docs.google.com/spreadsheets/d/1gF7EUirJe4eTTJ59EQcAs1pWdmTm2dNHUAcrLjWQIpY/edit#gid=505223313', 'U', 1)
 
     var genericNames  = sheet.colByKey('key.2')
 
