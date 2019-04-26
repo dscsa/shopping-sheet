@@ -93,6 +93,7 @@ function normalizeDrug(row) {
     $IsDispensed:$IsDispensed,
     $DaysSupply:+row.days_supply,
     $DispenseQty:+row.dispense_qty,
+    $WrittenQty:+row.written_qty,
     $RemainingQty:row.written_qty*$RefillsLeft,
     $Gcn:row.gcn_seqno,
     $Sig:row.sig_text.slice(1, -1).trim(),
@@ -257,10 +258,10 @@ function newGroup(row) {
     $Patient:{
        first:row.fname,
        last:row.lname,
-       birth_date:toDate(row.birth_date).slice(0, 10),
+       birth_date:row.birth_date.slice(0, 10),
        email:row.email,
-       phone1:row.home_phone,
-       phone2:row.home_phone != row.cell_phone && row.cell_phone,
+       phone1:formatPhone(row.home_phone),
+       phone2:row.home_phone != row.cell_phone && row.cell_phone ? formatPhone(row.cell_phone) :  '',
        guardian_id:row.pat_id,
        address_1:row.address_1.slice(1, -1),
        address_2:row.address_2.slice(1, -1),
@@ -270,6 +271,10 @@ function newGroup(row) {
        source:rxSource
      }
    }
+}
+
+function formatPhone(phone) {
+  return phone.slice(0, 3)+'-'+phone.slice(3,6)+'-'+phone.slice(6)
 }
 
 function testDate() {
