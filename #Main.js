@@ -6,6 +6,7 @@ function onOpen() {
       .createMenu('Shopping')
       .addItem('Refresh Shopping Sheet', 'updateShopping')
       .addItem('Update Order Invoice', 'createInvoice')
+      .addItem('Transfer Out', 'createTransferFax')
       .addToUi();
 }
 
