@@ -27,6 +27,7 @@ function mergeDoc(template, name, folder, order) {
 function flattenOrder(order) {
  Log('order', order)
  for (var i in order.$Drugs) {
+   
    for (var j in order.$Drugs[i]) {
      order[i+j] = order.$Drugs[i][j]
    }
@@ -71,10 +72,26 @@ function replaceVars(section, order) {
   //Replace most specific strings first: go backwards so that 12$ is replaced before 2$, if 2$ is replaced first then 12$ is no longer recognized (errors occurred when >10 drugs)
   Object.keys(order).reverse().forEach(function(key) {
     //blocks against an empty string key accidentally removing all of our $ prepends
-    //escape the $ otherwise matches line-endings
     //Log('ReplaceVars', key, order[key])
-    key && section.replaceText(key.replace('$', '\\$'), order[key] == null ? 'NULL' : order[key])
+
+    if ( ! key) return
+
+    if (order[key] == null)
+      return replaceVar(section, key, 'NULL')
+
+    if (typeof order[key] != 'object' )
+      return replaceVar(section, key, order[key])
+
+    for (var i in order[key])
+      replaceVar(section, key + '.' + i, order[key][i])
   })
+}
+
+function replaceVar(section, key, val) {
+
+  key = key.replace('$', '\\$').replace('.', '\\.') //escape the $ otherwise matches line-endings
+
+  section.replaceText(key, val)
 }
 
 //Table cells are elements that are divided by a \n(%0A) which replace/findText does not recognize.

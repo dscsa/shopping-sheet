@@ -93,7 +93,7 @@ function normalizeDrug(row) {
     $IsDispensed:$IsDispensed,
     $DaysSupply:+row.days_supply,
     $DispenseQty:+row.dispense_qty,
-    $WrittenQty:+row.written_qty,
+    $RemainingQty:row.written_qty*$RefillsLeft,
     $Gcn:row.gcn_seqno,
     $Sig:row.sig_text.slice(1, -1).trim(),
     $OrderId:row.invoice_nbr,
@@ -228,7 +228,7 @@ function newGroup(row) {
   var pharmacyInfo = row.user_def_2.slice(1, -1).split(',')
   var paymentInfo  = row.user_def_4.slice(1, -1).split(',')
   var rxSource     = row.order_category == 3 ? 'Transfer' : 'eRX'
-  var pharmacyName = row.user_def_1.slice(1, -1).replace(/ #|-\d|\d-|\d/g, '').replace(/\s{2,}/g, ' ')  //Remove digits, pound sign, and hyphens (Store Number) from pharmacy name
+  var pharmacyName = row.user_def_1.slice(1, -1)  //Remove digits, pound sign, and hyphens (Store Number) from pharmacy name
 
   var now = new Date()
   //if (now.getHours() == 17 && now.getMinutes() < 3 && (row.tracking_code || row.ship_date))
@@ -241,7 +241,14 @@ function newGroup(row) {
     $Coupon:paymentInfo[3],
     $Card:paymentInfo[2] && paymentInfo[0] ? paymentInfo[2]+' '+paymentInfo[0] : '',
     $Lang:row.primary_language_cd,
-    $Pharmacy:pharmacyName ? pharmacyName+' on '+pharmacyInfo[3]+' ('+pharmacyInfo[2]+')' : '',
+    $Pharmacy:{
+      short:pharmacyName ? pharmacyName.replace(/ #|-\d|\d-|\d/g, '').replace(/\s{2,}/g, ' ')+' on '+pharmacyInfo[3]+' ('+pharmacyInfo[2]+')' : '',
+      name:pharmacyName,
+      npi:pharmacyInfo[0],
+      fax:pharmacyInfo[1],
+      phone:pharmacyInfo[2],
+      street:pharmacyInfo[3]
+    },
     $PatientAdded:toDate(row.patient_added),
     $OrderDispensed:row.ship_date ? toDate(row.ship_date) : '',
     $OrderAdded:toDate(row.order_added),
@@ -250,7 +257,7 @@ function newGroup(row) {
     $Patient:{
        first:row.fname,
        last:row.lname,
-       birth_date:toDate(row.birth_date),
+       birth_date:toDate(row.birth_date).slice(0, 10),
        email:row.email,
        phone1:row.home_phone,
        phone2:row.home_phone != row.cell_phone && row.cell_phone,

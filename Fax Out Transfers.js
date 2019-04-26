@@ -4,7 +4,7 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
   var sheet = getSheet(null, 'A', 2) //allow to work for archived shopping sheets as well
   order = sheet.rowByKey(orderId)    //Defaults to getting active row if OrderID is undefined
 
-  mergeDoc("Transfer Out Fax v1", "Transfer #"+orderId, "Transfer Outs", order)
+  mergeDoc("Transfer Out Fax v1", "Transfer #"+order.$OrderId, "Transfer Outs", order)
 }
 
 function getToken(){
