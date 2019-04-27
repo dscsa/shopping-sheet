@@ -100,7 +100,6 @@ function normalizeDrug(row) {
     $ProviderName:row.provider_fname+' '+row.provider_lname,
     $ProviderPhone:row.provider_phone,
     $Npi:row.npi,
-    $Dea:row.dea,
     $Gcn:row.gcn_seqno,
     $Sig:row.sig_text.slice(1, -1).trim(),
     $OrderId:row.invoice_nbr,
@@ -121,14 +120,15 @@ function normalizeDrug(row) {
     }
   }
 
-  row.drug.$RxWritten = row.drug.$RxExpires
 
-  if (row.drug.$RxWritten.setMonth) {
+
+  if (row.drug.$RxExpires.getTime) {
+    row.drug.$RxWritten = new Date(row.drug.$RxExpires.getTime())
     row.drug.$RxWritten.setMonth(row.drug.$RxWritten.getMonth() - 12)
     row.drug.$RxWritten = row.drug.$RxWritten.toJSON().slice(0, 10)
   } else {
-    row.drug.$RxWritten = typeof row.drug.$RxWritten + ' ' + row.drug.$RxWritten
-    Logger.log(row.drug.$RxWritten)
+    row.drug.$RxWritten = typeof row.drug.$RxExpires + ' ' + row.drug.$RxExpires
+    if (row.drug.$RxExpires) debugEmail('$RxWritten', row.drug.$RxExpires, row.expire_date)
   }
 
   if (row.script_status == 'Transferred Out') { //Or expired?

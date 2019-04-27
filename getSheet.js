@@ -187,6 +187,11 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
       //debugEmail('setFormula',val, value, cellRange.getColumn(), cellRange.getRow(), cellRange.getLastRow())
     }
 
+    if (value.length >= 50000) {
+      debugEmail('Error: cell length cannot be over 50,0000', value)
+      value = value.slice(0, 50000)
+    }
+
     return cellRange[method](value)
   }
 

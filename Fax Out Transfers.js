@@ -5,8 +5,12 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
   order = sheet.rowByKey(orderId)    //Defaults to getting active row if OrderID is undefined
 
   order.$Drugs = order.$Drugs.filter(function(drug) {
-    return drug.$Msg && ~ drug.$Msg.indexOf('transferred') && drug.$NextRefill != 'Transferred Out'
+    return drug.$InOrder && drug.$Msg && ~ drug.$Msg.indexOf('transferred')
   })
+
+  if ( ! order.$Drugs.length) return
+
+  debugEmail('Sending Transfer Out Fax', orderId, order)
 
   var fax = mergeDoc("Transfer Out Fax v1", "Transfer #"+order.$OrderId, "Transfer Outs", order)
 
