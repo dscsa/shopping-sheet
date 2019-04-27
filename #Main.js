@@ -114,7 +114,8 @@ function updateShopping(email) {
 
     Log('Order Added: Prepend Row')
 
-    if (order.$Status != 'Dispensed') return
+    if (order.$Status != 'Dispensed')
+      return createTransferFax(order.$OrderId)
 
     Log('Order Added: Is Dispensed')
 

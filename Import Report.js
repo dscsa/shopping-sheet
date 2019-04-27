@@ -85,6 +85,7 @@ function normalizeDrug(row) {
     $NextRefill:'N/A',
     $Stock:undefined,  //placeholder for JSON ordering.
     $SyncBy:undefined, //placeholder for JSON ordering.
+    $RefillsOrig:+(+row.refills_orig).toFixed(2),
     $RefillsLeft:$RefillsLeft, //if not in order or already shipped use total refills not just the last dispensed to avoid erroneous out of refills warning
     $RefillsTotal:+(+row.refills_total).toFixed(2),
     $AutofillDate:row.autofill_date && row.autofill_date.slice(0, 10),
@@ -94,7 +95,12 @@ function normalizeDrug(row) {
     $DaysSupply:+row.days_supply,
     $DispenseQty:+row.dispense_qty,
     $WrittenQty:+row.written_qty,
-    $RemainingQty:row.written_qty*$RefillsLeft,
+    $RemainingQty:row.written_qty*row.refills_left,
+    $OriginalQty:row.written_qty*row.refills_orig,
+    $ProviderName:row.provider_fname+' '+row.provider_lname,
+    $ProviderPhone:row.provider_phone,
+    $Npi:row.npi,
+    $Dea:row.dea,
     $Gcn:row.gcn_seqno,
     $Sig:row.sig_text.slice(1, -1).trim(),
     $OrderId:row.invoice_nbr,
@@ -113,6 +119,16 @@ function normalizeDrug(row) {
       with_refills:row.oldest_script_with_refills,
       newest:row.newest_script
     }
+  }
+
+  row.drug.$RxWritten = row.drug.$RxExpires
+
+  if (row.drug.$RxWritten.setMonth) {
+    row.drug.$RxWritten.setMonth(row.drug.$RxWritten.getMonth() - 12)
+    row.drug.$RxWritten = row.drug.$RxWritten.toJSON().slice(0, 10)
+  } else {
+    row.drug.$RxWritten = typeof row.drug.$RxWritten + ' ' + row.drug.$RxWritten
+    Logger.log(row.drug.$RxWritten)
   }
 
   if (row.script_status == 'Transferred Out') { //Or expired?

@@ -4,7 +4,15 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
   var sheet = getSheet(null, 'A', 2) //allow to work for archived shopping sheets as well
   order = sheet.rowByKey(orderId)    //Defaults to getting active row if OrderID is undefined
 
-  mergeDoc("Transfer Out Fax v1", "Transfer #"+order.$OrderId, "Transfer Outs", order)
+  order.$Drugs = order.$Drugs.filter(function(drug) {
+    return drug.$Msg && ~ drug.$Msg.indexOf('transferred') && drug.$NextRefill != 'Transferred Out'
+  })
+
+  var fax = mergeDoc("Transfer Out Fax v1", "Transfer #"+order.$OrderId, "Transfer Outs", order)
+
+  fax = fax.getAs(MimeType.PDF)
+
+  sendSFax('18882987726', fax)
 }
 
 function getToken(){
@@ -25,10 +33,10 @@ function getToken(){
 //Given the info from an SFax ping, puts together an API request to them, and process the full info for a given fax
 //https://stackoverflow.com/questions/26615546/google-apps-script-urlfetchapp-post-file
 //https://stackoverflow.com/questions/24340340/urlfetchapp-upload-file-multipart-form-data-in-google-apps-script
-function sendSFax(){
+function sendSFax(toFax, blob){
   var token = getToken()
-  var blob  = DriveApp.getFileById("1lyRpFl0GiEvj5Ixu-BwTvQB-sw6lt3UH").getBlob()
-  var toFax = '18882987726'
+  //var blob  = DriveApp.getFileById("1lyRpFl0GiEvj5Ixu-BwTvQB-sw6lt3UH").getBlob()
+  //var toFax = '18882987726'
   var url   = "https://api.sfaxme.com/api/SendFax?token=" + encodeURIComponent(token) + "&ApiKey=" + encodeURIComponent(SFAX_KEY) + "&RecipientName=" + encodeURIComponent('Good Pill Pharmacy - Active')  + "&RecipientFax=" + encodeURIComponent(toFax) //+ '&SenderFaxNumber=18557916085' //"&OptionalParams=" + encodeURIComponent('SenderFaxNumber=18557916085')
 
   var opts  = {

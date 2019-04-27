@@ -21,13 +21,15 @@ function mergeDoc(template, name, folder, order) {
    }
 
    newDoc.saveAndClose()
+
+   return newDoc
 }
 
 //Flatten drug array into the data object by prepending index
 function flattenOrder(order) {
  Log('order', order)
  for (var i in order.$Drugs) {
-   
+
    for (var j in order.$Drugs[i]) {
      order[i+j] = order.$Drugs[i][j]
    }
