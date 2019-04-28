@@ -14,9 +14,9 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
 
   var fax = mergeDoc("Transfer Out Fax v1", "Transfer #"+order.$OrderId, "Transfer Outs", order)
 
-  fax = fax.getAs(MimeType.PDF)
+  var res = sendSFax('18882987726', fax.getAs(MimeType.PDF))
 
-  sendSFax('18882987726', fax)
+  fax.rename((res.isSuccess ? "Faxed" : "Error") ": Transfer #"+order.$OrderId)
 }
 
 function getToken(){
@@ -61,6 +61,7 @@ function sendSFax(toFax, blob){
 
   } catch(err){
     Logger.log('sendSFax err' + err)
+    return err
   }
 }
 function testDecrypt() {
