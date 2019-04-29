@@ -5,7 +5,7 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
   var changes = []
 
   if (newDrugs[0] && oldDrugs[0] && newDrugs[0].$OrderId != oldDrugs[0].$OrderId) {
-    debugEmail('ABORTING didDrugsChange because OrderId Mismatch', changes, '$Status', $Status, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs)
+    debugEmail('ABORTING didDrugsChange because OrderId Mismatch', newDrugs[0].$OrderId+' != '+oldDrugs[0].$OrderId, '$Status', $Status, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs)
     return changes
   }
 
