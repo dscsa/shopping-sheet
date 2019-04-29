@@ -89,6 +89,8 @@ function updateShopping(email) {
       drugsChanged(order)
   }
 
+  SpreadsheetApp.flush() //Recommended before releasing lock
+
   try { //Error: "There are too many LockService operations against the same script." at #Main:79 (updateShopping),	at #Main:17 (triggerShopping)
     lock.releaseLock()
     Log('Refresh Shopping Sheet Completed')
