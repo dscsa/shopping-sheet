@@ -4,6 +4,7 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
   var sheet = getSheet(null, 'A', 2) //allow to work for archived shopping sheets as well
   order = sheet.rowByKey(orderId)    //Defaults to getting active row if OrderID is undefined
 
+  //TODO we should not rely on "transferred" magic (and user-facing!) string.  Need to mark this in the json.  
   order.$Drugs = order.$Drugs.filter(function(drug) {
     return drug.$InOrder && drug.$Msg && ~ drug.$Msg.indexOf('transferred')
   })

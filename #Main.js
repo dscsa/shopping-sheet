@@ -19,6 +19,14 @@ function triggerShopping() {
       var duration = new Date() - start
       //if (duration > 180000)
       //  debugEmail('Script Users', start, 'Duration', duration, Session.getEffectiveUser().getEmail(), Session.getActiveUser().getEmail(), Logger.getLog())
+    } else {
+      var clinicPortal = SpreadsheetApp.getActiveSpreadsheet()
+        .getSheetByName('Clinic Portal')
+        .getRange('A3')
+        .getDisplayValues()
+
+      if ( ! clinicPortal[0] || ! clinicPortal[0][0])
+        debugEmail('clinicPortal Error', clinicPortal)
     }
   } catch (e) {
     //Log(e, e.message, e.stack)
