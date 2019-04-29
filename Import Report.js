@@ -120,8 +120,6 @@ function normalizeDrug(row) {
     }
   }
 
-
-
   if (row.drug.$RxExpires.getTime) {
     row.drug.$RxWritten = new Date(row.drug.$RxExpires.getTime())
     row.drug.$RxWritten.setMonth(row.drug.$RxWritten.getMonth() - 12)
