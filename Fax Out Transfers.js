@@ -16,7 +16,7 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
 
   var res = sendSFax('18882987726', fax.getAs(MimeType.PDF))
 
-  fax.rename((res.isSuccess ? "Faxed" : "Error") ": Transfer #"+order.$OrderId)
+  fax.rename((res.isSuccess ? "Faxed" : "Error") + ": Transfer #"+order.$OrderId)
 }
 
 function getToken(){
