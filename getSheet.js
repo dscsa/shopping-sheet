@@ -271,12 +271,12 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
     //}
     //Swapping this with code below reduced "per row" exec time from 4 secs to .5 secs.
 
-    var range  = s.rowRangeByKey(newRow[keyID])
+    var range = s.rowRangeByKey(newRow[keyID])
 
     try {
       var oldRow = s.getRange(range)
     } catch (e) {
-      debugEmail('s.updateRow getRange() FAILED', range, e)
+      debugEmail('s.updateRow getRange() FAILED', range, keyID, newRow, e)
       throw e
     }
 
