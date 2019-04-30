@@ -20,7 +20,7 @@ function importCSV(filename){
 
 //Returns array of row objects (only data rows)
 //CSV[1] is headers.  First and last 3 rows do not have data.
-function importReport(filename, sheet) {
+function importReport(filename) {
    var csv = importCSV(filename)
    //Log('importCSV', csv.length, csv)
    if (csv.length < 6) //An empty report is 6 rows long
