@@ -276,7 +276,7 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
     try {
       var oldRow = s.getRange(range)
     } catch (e) {
-      debugEmail('s.updateRow getRange() FAILED', range, keyID, newRow, e)
+      //debugEmail('s.updateRow getRange() FAILED', range, keyID, newRow, e) //This will fail with range A0:0 when an RowKey (e.g Order #) is not found
       throw e
     }
 
