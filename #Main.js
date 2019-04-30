@@ -20,6 +20,9 @@ function triggerShopping() {
       //if (duration > 180000)
       //  debugEmail('Script Users', start, 'Duration', duration, Session.getEffectiveUser().getEmail(), Session.getActiveUser().getEmail(), Logger.getLog())
     } else {
+
+      Logger.log('Skipped update since not on the 3rd minute')
+
       var clinicPortal = SpreadsheetApp.getActiveSpreadsheet()
         .getSheetByName('Clinic Portal')
         .getRange('A3')
