@@ -87,7 +87,7 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
       debugEmail('WARNING! Duplicate Columns', key, first, last, colKeys)
     }
 
-    if (last <= 0) {
+    if (last < 0) {
       var msg = 'Could not find column number for key '+JSON.stringify(key)+' in '+JSON.stringify(colKeys)
       Log(msg)
       throw Error(msg)
