@@ -56,23 +56,33 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
     var range = colOfKeys+rowOfKeys
     var keyID = s.getRangeVals(range)[0][0]
     if (keyID) return keyID
-    Utilities.sleep(10000)
+    Utilities.sleep(3000)
     return s.getRangeVals(range)[0][0]
   }
 
   s.getColKeys = function() {
     var range = 'A'+rowOfKeys+':'+rowOfKeys
+
     var colKeys = s.rowArrayByRange(range)
     if (colKeys[0]) return colKeys
-    Utilities.sleep(10000)
-    return s.rowArrayByRange(range)
+
+    debugEmail('WARNING! 1st getColKeys failed', range, colKeys)
+
+    Utilities.sleep(3000)
+
+    colKeys = s.rowArrayByRange(range)
+    if (colKeys[0]) return colKeys
+
+    debugEmail('WARNING! 2nd getColKeys failed', range, colKeys)
+
+    return colKeys
   }
 
   s.getRowKeys = function() {
     var range = colOfKeys+'1:'+colOfKeys
     var rowKeys = s.colArrayByRange(range)
     if (rowKeys[0]) return rowKeys
-    Utilities.sleep(10000)
+    Utilities.sleep(3000)
     return s.colArrayByRange(range)
   }
 
@@ -111,7 +121,7 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
       debugEmail('WARNING! Duplicate Columns', key, first, last, colKeys)
     }
 
-    if (last < 0) {
+    if (colKeys[0] && last < 0) { //Somethimes colKeys[0] is emptry string because sheet is refreshing
       var msg = 'Could not find column number for key '+JSON.stringify(key)+' in '+JSON.stringify(colKeys)
       Log(msg)
       throw Error(msg)

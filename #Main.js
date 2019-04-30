@@ -51,7 +51,7 @@ function updateShopping(email) {
 
   var scriptId  = new Date() //A unique id per script run
   var sheet     = getSheet('Shopping', 'A', 2)
-  var shipped   = getSheet('Shipped', 'A', 2)
+  var shipped   = getSheet('Shipped', 'A', 1)
   var report    = getReport('ShoppingSheet5.csv', sheet)
 
   var drugs     = sheet.colByKey('$Drugs')
