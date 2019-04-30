@@ -18,7 +18,7 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     "1609395110"
   ]
 
-  var gaPinesLNames = Json.stringify([
+  var gaPinesLNames = JSON.stringify([
     "Anderson",
     "Abt",
     "Stoyle",
