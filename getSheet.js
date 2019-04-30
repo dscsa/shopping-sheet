@@ -61,16 +61,17 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
     //Log('rowNumberByKey')
     if ( ! key) return s.getActiveRange().getRow()
 
+    var first = rowKeys.indexOf(key+'')
+    var last  = rowKeys.lastIndexOf(key+'')  //coerce to string to match type
+
+    if (first != last) {
+      debugEmail('WARNING! Duplicate Rows', key, first, last, rowKeys)
+    }
+
     //Replace indexOf with lastIndexOf.  Both should work but since new orders are being prepended to top of sheet, in the case of an error,
     //the top order (newer order) was being returned which then needed to be updated.  Its better to keep returning the last (oldest) order
     //so that we don't have to keep updating newer orders
-    var index = rowKeys.lastIndexOf(key+'') + 1  //coerce to string to match type
-
-    if (index <= 0) {
-      //debugEmail('Could not find row number for key', index, key, rowKeys, new Error().stack)
-    }
-
-    return index
+    return last + 1
   }
 
   //https://stackoverflow.com/questions/21229180/convert-column-index-into-corresponding-column-letter
@@ -79,7 +80,12 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
     if ( ! key) return s.getActiveRange().getColumn()
 
     //Replace indexOf with lastIndexOf.  Both should work but wanted to keep in sync with change on rowNumberByKey()
-    var index = colKeys.lastIndexOf(key+'') + 1  //coerce to string to match type
+    var first = colKeys.indexOf(key+'')
+    var last  = colKeys.lastIndexOf(key+'')  //coerce to string to match type
+
+    if (first != last) {
+      debugEmail('WARNING! Duplicate Columns', key, first, last, colKeys)
+    }
 
     if (index <= 0) {
       var msg = 'Could not find column number for key '+JSON.stringify(key)+' in '+JSON.stringify(colKeys)
@@ -87,7 +93,7 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
       throw Error(msg)
     }
 
-    return index
+    return last + 1
   }
 
    //https://stackoverflow.com/questions/21229180/convert-column-index-into-corresponding-column-letter
