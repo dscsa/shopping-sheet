@@ -18,7 +18,7 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     "1609395110"
   ]
 
-  var gaPinesLNames = JSON.stringify([
+  var gaPinesLNames = [
     "Anderson",
     "Abt",
     "Stoyle",
@@ -34,7 +34,7 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     "Dickson",
     "Thompson",
     "Harris"
-  ])
+  ]
 
   var sheet = getSheet(null, 'A', 2) //allow to work for archived shopping sheets as well
   order = sheet.rowByKey(orderId)    //Defaults to getting active row if OrderID is undefined
@@ -43,7 +43,7 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
 
   //TODO we should not rely on "transferred" magic (and user-facing!) string.  Need to mark this in the json.
   order.$Drugs = order.$Drugs.filter(function(drug) {
-    var nameMatch = ~ gaPinesLNames.indexOf(drug.$ProviderName)
+    var nameMatch = ~ gaPinesLNames.indexOf(drug.$ProviderName.split(' ')[1])
     var npiMatch  = ~ gaPinesNpis.indexOf(drug.$Npi)
 
     if (nameMatch && npiMatch) isGaPines = 'NAME AND NPI MATCH: '+drug.$ProviderName+' '+drug.$Npi
