@@ -35,7 +35,7 @@ function importReport(filename) {
 }
 
 function getReport(filename, sheet) {
-  var report = importReport(filename, sheet)
+  var report = importReport(filename)
   setImportTimestamp(sheet, report)
   normalizeDrugs(report)
   return groupByOrder(report)
