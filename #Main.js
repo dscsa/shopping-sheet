@@ -48,7 +48,8 @@ function updateShopping(email) {
 
   var scriptId  = new Date() //A unique id per script run
   var sheet     = getSheet('Shopping', 'A', 2)
-  var report    = getReport('ShoppingSheet5.csv', sheet)
+  var shipped   = getSheet('Shipped', 'A', 2)
+  var report    = getReport('ShoppingSheet5.csv')
 
   var drugs     = sheet.colByKey('$Drugs')
   var tracking  = sheet.colByKey('$Tracking')
@@ -161,6 +162,12 @@ function updateShopping(email) {
      order.$Tracking = trackingFormula(order.$Tracking)
 
      sheet.updateRow(order)
+
+     delete order.$Total
+     delete order.$Fee
+     delete order.$Due
+     delete order.$BilledAt
+     shipped.updateRow(order)
   }
 
   function statusChanged(order) {
@@ -218,6 +225,12 @@ function updateShopping(email) {
       updateWebformDispensed(order, created.invoice, created.fee) //Make sure webform is updated and has the exact amount as invoice (should match old fee[orderId] amount if $Days of each drug did not change)
 
       deleteShoppingLists(order.$OrderId)
+
+      delete order.$Total
+      delete order.$Fee
+      delete order.$Due
+      delete order.$BilledAt
+      shipped.prependRow(order)
     }
   }
 
