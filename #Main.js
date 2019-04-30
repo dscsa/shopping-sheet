@@ -170,7 +170,12 @@ function updateShopping(email) {
      delete order.$Fee
      delete order.$Due
      delete order.$BilledAt
-     shipped.updateRow(order)
+
+     try {
+        shipped.updateRow(order)
+     } catch (e) {
+        shipped.prependRow(order)
+     }
   }
 
   function statusChanged(order) {
