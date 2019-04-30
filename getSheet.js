@@ -52,9 +52,33 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
     return range[0]
   }
 
-  var keyID   = s.getRangeVals(colOfKeys+rowOfKeys)[0][0]
-  var colKeys = s.rowArrayByRange('A'+rowOfKeys+':'+rowOfKeys)
-  var rowKeys = s.colArrayByRange(colOfKeys+'1:'+colOfKeys)
+  s.getKeyID = function() {
+    var range = colOfKeys+rowOfKeys
+    var keyID = s.getRangeVals(range)[0][0]
+    if (keyID) return keyID
+    Utilities.sleep(2000)
+    return s.getRangeVals(range)[0][0]
+  }
+
+  s.getColKeys = function() {
+    var range = 'A'+rowOfKeys+':'+rowOfKeys
+    var colKeys = s.rowArrayByRange(range)
+    if (colKeys[0]) return colKeys
+    Utilities.sleep(2000)
+    return s.rowArrayByRange(range)
+  }
+
+  s.getRowKeys = function() {
+    var range = colOfKeys+'1:'+colOfKeys
+    var rowKeys = s.colArrayByRange(range)
+    if (rowKeys[0]) return rowKeys
+    Utilities.sleep(2000)
+    return s.colArrayByRange(range)
+  }
+
+  var keyID   = s.getKeyID()
+  var colKeys = s.getColKeys()
+  var rowKeys = s.getRowKeys()
 
   //While we try to make keys unique, we cannot guarantee it
   s.rowNumberByKey = function(key) {
