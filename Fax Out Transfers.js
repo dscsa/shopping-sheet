@@ -36,7 +36,7 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     "Harris"
   ]
 
-  var sheet = getSheet(null, 'A', 2) //allow to work for archived shopping sheets as well
+  var sheet = getSheet('Shopping', 'A', 2) //allow to work for archived shopping sheets as well
   order = sheet.rowByKey(orderId)    //Defaults to getting active row if OrderID is undefined
 
   var isGaPines = order.$Coupon == 'georgiapinescsb' ? 'COUPON MATCH: georgiapinescsb': false
@@ -50,7 +50,11 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     else if (nameMatch) isGaPines = 'NAME MATCH: '+drug.$ProviderName
     else if (npiMatch) isGaPines = 'NPI MATCH: '+drug.$Npi
 
-    return drug.$InOrder && drug.$Msg && ~ drug.$Msg.indexOf('transferred')
+    if ( ! drug.$InOrder) return false
+
+    if ( ! drug.$v2) return true //Should we be transferring out if the GCN can't be found?
+
+    return drug.$Msg && ~ drug.$Msg.indexOf('transferred')
   })
 
   if (isGaPines)
