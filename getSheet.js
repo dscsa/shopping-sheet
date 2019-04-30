@@ -56,7 +56,7 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
     var range = colOfKeys+rowOfKeys
     var keyID = s.getRangeVals(range)[0][0]
     if (keyID) return keyID
-    Utilities.sleep(4000)
+    Utilities.sleep(10000)
     return s.getRangeVals(range)[0][0]
   }
 
@@ -64,7 +64,7 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
     var range = 'A'+rowOfKeys+':'+rowOfKeys
     var colKeys = s.rowArrayByRange(range)
     if (colKeys[0]) return colKeys
-    Utilities.sleep(4000)
+    Utilities.sleep(10000)
     return s.rowArrayByRange(range)
   }
 
@@ -72,7 +72,7 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
     var range = colOfKeys+'1:'+colOfKeys
     var rowKeys = s.colArrayByRange(range)
     if (rowKeys[0]) return rowKeys
-    Utilities.sleep(4000)
+    Utilities.sleep(10000)
     return s.colArrayByRange(range)
   }
 
