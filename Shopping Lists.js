@@ -140,7 +140,7 @@ function shopV2(drug, orderID) {
   if (list) return list
   */
 
-  drug.$Msg = msg || 'not enough qty found, must be pended manually'
+  drug.$Msg = drug.$Msg || 'not enough qty found, must be pended manually'
   debugEmail('Shopping Error: Not enough qty found, must be pended manually', '#'+orderID, drug.$Name, v2name, minQty, minDays)
 }
 
