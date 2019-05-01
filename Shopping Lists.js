@@ -134,6 +134,16 @@ function shopV2(drug, orderID) {
   var caps = $Name.match(/ caps?| cps?\b| softgel/i) //"caps" to exclude caplet which is closer to a tablet
   var tabs = $Name.match(/ tabs?| tbs?\b/i)
 
+  //Lots of prepacks were expiring because pulled stock with long exp was being paired with short prepack exp making the surplus shortdated
+  //Default to longExp since that simplifies sort() if there are no prepacks
+  var minPrepackExp = rows.reduce(function(minPrepackExp, row) {
+
+    if ( ! row.doc.bin || ! row.doc.exp || ! row.doc.qty ) return minPrepackExp
+
+    return row.doc.bin.length == 3 && row.doc.exp.to < minPrepackExp ? row.doc.exp.to : minPrepackExp
+
+  }, longExp)
+
 
   //TODO test to see if this sorts things as we want.  In high stock, we want long exps first
   //but still want them to retain their ascending order of exps AND then we move to short exps
@@ -150,28 +160,35 @@ function shopV2(drug, orderID) {
     if (aPack && ! bPack) return -1
     if (bPack && ! aPack) return 1
 
-    //prioritize longer exp date for nonprepacks, so prepacks of any surplus generated can sit on shelf longer //OLD: If high supply drug then,  ! drugStock &&
-    var aExp = a.doc.exp.to > longExp
-    var bExp = b.doc.exp.to > longExp
-    if ( ! aPack && aExp && ! bExp) return -1
-    if ( ! bPack && bExp && ! aExp) return 1
+    //Let's shop for non-prepacks that are closest (but not less than) to our min prepack exp date in order to avoid waste
+    aMonths = monthsBetween(minPrepackExp, a.doc.exp.to) // >0 if minPrepackExp < a.doc.exp.to (which is what we prefer)
+    bMonths = monthsBetween(minPrepackExp, b.doc.exp.to) // >0 if minPrepackExp < b.doc.exp.to (which is what we prefer)
 
-    //Now just sort by ascending expiration date
-    if (a.doc.exp.to < b.doc.exp.to) return -1
-    if (b.doc.exp.to < a.doc.exp.to) return 1
+    //Deprioritize anything with a closer exp date than the min prepack exp date.  This - by definition - can only be non-prepack stock
+    if (aMonths >= 0 && bMonths < 0) return -1
+    if (bMonths >= 0 && aMonths < 0) return 1
+
+    //Priorize anything that is closer to - but not under - our min prepack exp
+    //If there is no prepack this is set to 3 months out so that any surplus has time to sit on our shelf
+    if (aMonths >= 0 && bMonths >= 0 && aMonths < bMonths) return -1
+    if (aMonths >= 0 && bMonths >= 0 && bMonths < aMonths) return 1
+
+    //If they both expire sooner than our min prepack exp pick the closest
+    if (aMonths < 0 && bMonths < 0 && aMonths > bMonths) return -1
+    if (aMonths < 0 && bMonths < 0 && bMonths > aMonths) return 1
 
     //When choosing between two items of same type and same exp, choose the one with a higher quantity (less items to shop for).
     if (a.doc.qty.to > b.doc.qty.to) return -1
     if (b.doc.qty.to > a.doc.qty.to) return 1
 
-    //When choosing between two items of same type and same exp, then chose one that is closer to the exact quantity
-    //var aQty  = Math.abs(minDays-a.doc.qty.to)
-    //var bQty  = Math.abs(minDays-b.doc.qty.to)
-    //if (aQty < 5 || bQty < 5) return aQty - bQty
-
     //keep sorting the same as the view (ascending NDCs) [doc.drug._id, doc.exp.to || doc.exp.from, sortedBin, doc.bin, doc._id]
     return 0
   })
+
+  function monthsBetween(from, to) {
+    to = new Date(to), from = new Date(from)
+    return to.getMonth() - from.getMonth() + 12 * (to.getFullYear() - from.getFullYear());
+  }
 
   var rowsB4filter = JSON.stringify(rows, null, '  ')
 
@@ -308,93 +325,4 @@ function sortList(a, b) {
   if (aFlip < bFlip) return -1
 
   return 0
-}
-
-function TESTshopV2() {
-
-  var $Name     = 'Atorvastatin 40mg'
-  var v2name    = $Name
-  var minQty    = 90
-  var minDays   = 90
-  var drugStock = ''
-
-  var minExp   = addTime((+minDays+2*7)*24).toJSON().slice(0, 7).split('-') //14 days is a buffer for dispensing and shipping.
-  var longExp  = addTime((+minDays+6*7)*24).toJSON().slice(0, 7) //2015-05-13 We want any surplus from packing fast movers to be usable for ~6 weeks.  Otherwise a lot of prepacks expire on the shelf
-
-  var safety    = 0.15
-  var startkey  = '["8889875187","month","'+minExp[0]+'","'+minExp[1]+'","'+v2name+'"]'
-  var endkey    = '["8889875187","month","'+minExp[0]+'","'+minExp[1]+'","'+v2name+'",{}]'
-
-  var url  = 'http://52.8.112.88/transaction/_design/inventory.qty-by-generic/_view/inventory.qty-by-generic?reduce=false&include_docs=true&limit=200&startkey='+startkey+'&endkey='+endkey
-  var rows = v2Fetch(url)
-
-  var rowsB4sort = JSON.stringify(rows, null, '  ')
-
-  //Organize by NDC since we don't want to mix them
-  var ndcs = {}
-  var caps = $Name.match(/ cap/i)
-  var tabs = $Name.match(/ tab| tb/i)
-
-
-  /*OLD
-  rows.sort(function(a, b) {
-
-    var aPack = a.doc.bin && a.doc.bin.length == 3
-    var bPack = b.doc.bin && b.doc.bin.length == 3
-    var aExp  = a.doc.exp && a.doc.exp.to > longExp
-    var bExp  = b.doc.exp && b.doc.exp.to > longExp
-    var aQty  = a.doc.qty && Math.abs(minDays-a.doc.qty.to)
-    var bQty  = b.doc.qty && Math.abs(minDays-b.doc.qty.to)
-
-    if (aPack && ! bPack) return -1
-    if (bPack && ! aPack) return 1
-
-    //If we already have a prepack that is close to the exact quantity
-    if (aQty < 5 || bQty < 5) return aQty - bQty
-
-    //If high supply drug then prioritize longer exp date, so prepacks can sit on shelf longer
-    if ( ! drugStock && aExp && ! bExp) return -1
-    if ( ! drugStock && bExp && ! aExp) return 1
-
-    //we already have sorted in ascending expiration
-    return 0
-  })*/
-
-  rows.sort(function(a, b) {
-
-    //Deprioritize ones that are missing data
-    if ( ! b.doc.bin || ! b.doc.exp || ! b.doc.qty) return -1
-    if ( ! a.doc.bin || ! a.doc.exp || ! a.doc.qty) return 1
-
-    //Priortize prepacks over other stock
-    var aPack = a.doc.bin.length == 3
-    var bPack = b.doc.bin.length == 3
-    if (aPack && ! bPack) return -1
-    if (bPack && ! aPack) return 1
-
-    //If high supply drug then prioritize longer exp date for nonprepacks, so prepacks of any surplus generated can sit on shelf longer
-    var aExp = a.doc.exp.to > longExp
-    var bExp = b.doc.exp.to > longExp
-    if ( ! drugStock && ! aPack && aExp && ! bExp) return -1
-    if ( ! drugStock && ! bPack && bExp && ! aExp) return 1
-
-    //Now just sort by ascending expiration date
-    if (a.doc.exp.to < b.doc.exp.to) return -1
-    if (b.doc.exp.to < a.doc.exp.to) return 1
-
-    //When choosing between two items of same type and same exp, choose the one with a higher quantity (less items to shop for).
-    if (a.doc.qty.to > b.doc.qty.to) return -1
-    if (b.doc.qty.to > a.doc.qty.to) return 1
-
-    //When choosing between two items of same type and same exp, then chose one that is closer to the exact quantity
-    //var aQty  = Math.abs(minDays-a.doc.qty.to)
-    //var bQty  = Math.abs(minDays-b.doc.qty.to)
-    //if (aQty < 5 || bQty < 5) return aQty - bQty
-
-    //keep sorting the same as the view (ascending NDCs) [doc.drug._id, doc.exp.to || doc.exp.from, sortedBin, doc.bin, doc._id]
-    return 0
-  })
-
-   debugEmail('TEST shopV2', $Name, v2name, 'minQty', minQty, 'minDays', minDays, 'drugStock', drugStock, 'url:', url, 'rows:', rows)
-
 }
