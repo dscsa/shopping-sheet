@@ -91,7 +91,7 @@ function createShoppingLists(order, drugs) {
       ss.getRange('A1:E'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
 
       //Pend after all forseeable errors are accounted for.
-      var res = v2Fetch('http://52.8.112.88/account/8889875187/pend/'+orderID+' - '+minQty, 'POST', shopped.pend)
+      var res = v2Fetch('http://v2.goodpill.org/account/8889875187/pend/'+orderID+' - '+minQty, 'POST', shopped.pend)
 
       infoEmail('V2 Pended', drug.$Name, v2name, '#'+orderID, minQty, shopped.pend, res, drug, order)
 
@@ -101,15 +101,9 @@ function createShoppingLists(order, drugs) {
   }
 }
 
-function testSheet() {
-  var ss = openSpreadsheet('Shopping List #ADAM', 'Shopping Lists')
-   ss.insertSheet('Test Drug 99mg')
-   ss.getRange('A1:E2').setValues([['A1', 'B1', 'C1', 'D1', 'E1'],['A2', 'B2', 'C2', 'D2', 'E2']]).setHorizontalAlignment('left')
-}
-
 //Returns array on success and error string on failure
 function shopV2(drug, orderID) {
-  var $Name     = drug.$Name
+
   var v2name    = drug.$v2
   var minQty    = drug.$Qty
   var minDays   = drug.$Days
@@ -122,75 +116,39 @@ function shopV2(drug, orderID) {
   var startkey  = '["8889875187","month","'+minExp[0]+'","'+minExp[1]+'","'+v2name+'"]'
   var endkey    = '["8889875187","month","'+minExp[0]+'","'+minExp[1]+'","'+v2name+'",{}]'
 
-  var url  = 'http://52.8.112.88/transaction/_design/inventory.qty-by-generic/_view/inventory.qty-by-generic?reduce=false&include_docs=true&limit=300&startkey='+startkey+'&endkey='+endkey
+  var url  = 'http://v2.goodpill.org/transaction/_design/inventory.qty-by-generic/_view/inventory.qty-by-generic?reduce=false&include_docs=true&limit=300&startkey='+startkey+'&endkey='+endkey
   var rows = v2Fetch(url)
 
-  infoEmail('shopV2', $Name, v2name, 'orderID', '#'+orderID, 'minQty', minQty, 'minDays', minDays, 'drugStock', drugStock, 'url:', url, 'rows:', rows)
+  var unsortedNDCs = groupByNdc(rows, drug)
+  var sortedNDCs   = sortNDCs(unsortedNDCs, longExp)
 
-  var rowsB4sort = JSON.stringify(rows, null, '  ')
+  infoEmail('shopV2', drug.$Name, v2name, 'orderID', '#'+orderID, 'minQty', minQty, 'minDays', minDays, 'drugStock', drugStock, 'url:', url, 'rows:', rows, 'sortedNDCs', sortedNDCs)
 
+  var list = makeList(sortedNDCs, minQty, safety)
+  if (list || minDays <= 45) return list
+
+  infoEmail('Shopping Error: Not enough qty found, trying 45 days and no safety', '#'+orderID, drug.$Name, v2name, minQty, minDays, drugStock, url, 'sortedNDCs', sortedNDCs, 'unsortedNDCs', unsortedNDCs, 'rows', rows)
+
+  var list = makeList(sortedNDCs, +(45/minDays*minQty).toFixed(0), 0)
+  if (list) return list
+
+  /*
+  Cindy thinks its best to do a manual intervention if we can't do at least 45 days.  For example, Order 6552 had minQty of 450 for Vitamin B12 (5x a day).
+  infoEmail('Shopping Error: Not enough qty found, trying 30 days and no safety', '#'+orderID, $Name, v2name, minQty, minDays, drugStock, url, rowsB4sort, rowsB4filter, rowsB4pend)
+
+  var list = makeList(ndcs, +(30/minDays*minQty).toFixed(0), 0)
+  if (list) return list
+  */
+
+  drug.$Msg = msg || 'not enough qty found, must be pended manually'
+  debugEmail('Shopping Error: Not enough qty found, must be pended manually', '#'+orderID, drug.$Name, v2name, minQty, minDays)
+}
+
+function groupByNdc(rows, drug) {
   //Organize by NDC since we don't want to mix them
   var ndcs = {}
-  var caps = $Name.match(/ caps?| cps?\b| softgel/i) //"caps" to exclude caplet which is closer to a tablet
-  var tabs = $Name.match(/ tabs?| tbs?\b/i)
-
-  //Lots of prepacks were expiring because pulled stock with long exp was being paired with short prepack exp making the surplus shortdated
-  //Default to longExp since that simplifies sort() if there are no prepacks
-  var minPrepackExp = rows.reduce(function(minPrepackExp, row) {
-
-    if ( ! row.doc.bin || ! row.doc.exp || ! row.doc.qty ) return minPrepackExp
-
-    return row.doc.bin.length == 3 && row.doc.exp.to < minPrepackExp ? row.doc.exp.to : minPrepackExp
-
-  }, longExp)
-
-
-  //TODO test to see if this sorts things as we want.  In high stock, we want long exps first
-  //but still want them to retain their ascending order of exps AND then we move to short exps
-  //which should also retian their ascending order of exps
-  rows.sort(function(a, b) {
-
-    //Deprioritize ones that are missing data
-    if ( ! b.doc.bin || ! b.doc.exp || ! b.doc.qty) return -1
-    if ( ! a.doc.bin || ! a.doc.exp || ! a.doc.qty) return 1
-
-    //Priortize prepacks over other stock
-    var aPack = a.doc.bin.length == 3
-    var bPack = b.doc.bin.length == 3
-    if (aPack && ! bPack) return -1
-    if (bPack && ! aPack) return 1
-
-    //Let's shop for non-prepacks that are closest (but not less than) to our min prepack exp date in order to avoid waste
-    aMonths = monthsBetween(minPrepackExp, a.doc.exp.to) // >0 if minPrepackExp < a.doc.exp.to (which is what we prefer)
-    bMonths = monthsBetween(minPrepackExp, b.doc.exp.to) // >0 if minPrepackExp < b.doc.exp.to (which is what we prefer)
-
-    //Deprioritize anything with a closer exp date than the min prepack exp date.  This - by definition - can only be non-prepack stock
-    if (aMonths >= 0 && bMonths < 0) return -1
-    if (bMonths >= 0 && aMonths < 0) return 1
-
-    //Priorize anything that is closer to - but not under - our min prepack exp
-    //If there is no prepack this is set to 3 months out so that any surplus has time to sit on our shelf
-    if (aMonths >= 0 && bMonths >= 0 && aMonths < bMonths) return -1
-    if (aMonths >= 0 && bMonths >= 0 && bMonths < aMonths) return 1
-
-    //If they both expire sooner than our min prepack exp pick the closest
-    if (aMonths < 0 && bMonths < 0 && aMonths > bMonths) return -1
-    if (aMonths < 0 && bMonths < 0 && bMonths > aMonths) return 1
-
-    //When choosing between two items of same type and same exp, choose the one with a higher quantity (less items to shop for).
-    if (a.doc.qty.to > b.doc.qty.to) return -1
-    if (b.doc.qty.to > a.doc.qty.to) return 1
-
-    //keep sorting the same as the view (ascending NDCs) [doc.drug._id, doc.exp.to || doc.exp.from, sortedBin, doc.bin, doc._id]
-    return 0
-  })
-
-  function monthsBetween(from, to) {
-    to = new Date(to), from = new Date(from)
-    return to.getMonth() - from.getMonth() + 12 * (to.getFullYear() - from.getFullYear());
-  }
-
-  var rowsB4filter = JSON.stringify(rows, null, '  ')
+  var caps = drug.$Name.match(/ caps?| cps?\b| softgel/i) //"caps" to exclude caplet which is closer to a tablet
+  var tabs = drug.$Name.match(/ tabs?| tbs?\b/i)
 
   //debugEmail('Shopping Now', $Name, v2name, minQty, minDays, drugStock, rows)
 
@@ -212,47 +170,82 @@ function shopV2(drug, orderID) {
     ndcs[ndc] = ndcs[ndc] || []
     ndcs[ndc].prepackQty = ndcs[ndc].prepackQty || 0 //Hacky to set property on an array
 
-    if (rows[i].doc.bin.length == 3)
+    if (rows[i].doc.bin.length == 3) {
       ndcs[ndc].prepackQty += rows[i].doc.qty.to
+      if (rows[i].doc.exp.to < ndcs[ndc].prepackExp)
+        ndcs[ndc].prepackExp = rows[i].doc.exp.to
+    }
 
     ndcs[ndc].push(rows[i].doc)
   }
 
+  return ndcs
+}
+
+function sortNDCs(ndcs, longExp) {
+
   var sortedNDCs = []
   //Sort the highest prepack qty first
   for (var ndc in ndcs) {
-    sortedNDCs.push({ndc:ndc, inventory:ndcs[ndc]})
+    sortedNDCs.push({ndc:ndc, inventory:sortInventory(ndcs[ndc], longExp)})
   }
-
-  var rowsB4sortNDCs = JSON.stringify(sortedNDCs, null, '  ')
-
-  //Sort in descending order of prepackQty.
+  //Sort in descending order of prepackQty. TODO should we look Exp date as well?
   sortedNDCs.sort(function(a, b) { return b.inventory.prepackQty - a.inventory.prepackQty })
+
   //infoEmail('Shopping List Calculations', '#'+orderID, $Name, v2name, minQty, minDays, drugStock, url, rowsB4sort, rowsB4filter, rowsB4pend)
 
-  var rowsB4pend = JSON.stringify(sortedNDCs, null, '  ')
+  return sortedNDCs
+}
 
-  //if (rowsB4sortNDCs != rowsB4pend)
-  //  debugEmail('Order of shopping changed based on prepackQty', 'before', rowsB4sortNDCs, 'after', rowsB4pend)
+function sortInventory(inventory) {
 
-  var list = makeList(sortedNDCs, minQty, safety)
-  if (list || minDays <= 45) return list
+    //Lots of prepacks were expiring because pulled stock with long exp was being paired with short prepack exp making the surplus shortdated
+    //Default to longExp since that simplifies sort() if there are no prepacks
+    return inventory.sort(function(a, b) {
 
-  infoEmail('Shopping Error: Not enough qty found, trying 45 days and no safety', '#'+orderID, $Name, v2name, minQty, minDays, drugStock, url, rowsB4sort, rowsB4filter, rowsB4sortNDCs, rowsB4pend)
+      //Deprioritize ones that are missing data
+      if ( ! b.bin || ! b.exp || ! b.qty) return -1
+      if ( ! a.bin || ! a.exp || ! a.qty) return 1
 
-  var list = makeList(sortedNDCs, +(45/minDays*minQty).toFixed(0), 0)
-  if (list) return list
+      //Priortize prepacks over other stock
+      var aPack = a.bin.length == 3
+      var bPack = b.bin.length == 3
+      if (aPack && ! bPack) return -1
+      if (bPack && ! aPack) return 1
 
-  /*
-  Cindy thinks its best to do a manual intervention if we can't do at least 45 days.  For example, Order 6552 had minQty of 450 for Vitamin B12 (5x a day).
-  infoEmail('Shopping Error: Not enough qty found, trying 30 days and no safety', '#'+orderID, $Name, v2name, minQty, minDays, drugStock, url, rowsB4sort, rowsB4filter, rowsB4pend)
+      //Let's shop for non-prepacks that are closest (but not less than) to our min prepack exp date in order to avoid waste
+      aMonths = monthsBetween(inventory.prepackExp || longExp, a.exp.to.slice(0, 10)) // >0 if minPrepackExp < a.doc.exp.to (which is what we prefer)
+      bMonths = monthsBetween(inventory.prepackExp || longExp, b.exp.to.slice(0, 10)) // >0 if minPrepackExp < b.doc.exp.to (which is what we prefer)
 
-  var list = makeList(ndcs, +(30/minDays*minQty).toFixed(0), 0)
-  if (list) return list
-  */
+      //Debugging
+      a.months = aMonths+' prepackExp:'+inventory.prepackExp+' longExp:'+longExp+' a.exp.to:'+a.exp.to
+      b.months = bMonths+' prepackExp:'+inventory.prepackExp+' longExp:'+longExp+' b.exp.to:'+b.exp.to
 
-  drug.$Msg = msg || 'not enough qty found, must be pended manually'
-  debugEmail('Shopping Error: Not enough qty found, must be pended manually', '#'+orderID, $Name, v2name, minQty, minDays)
+      //Deprioritize anything with a closer exp date than the min prepack exp date.  This - by definition - can only be non-prepack stock
+      if (aMonths >= 0 && bMonths < 0) return -1
+      if (bMonths >= 0 && aMonths < 0) return 1
+
+      //Priorize anything that is closer to - but not under - our min prepack exp
+      //If there is no prepack this is set to 3 months out so that any surplus has time to sit on our shelf
+      if (aMonths >= 0 && bMonths >= 0 && aMonths < bMonths) return -1
+      if (aMonths >= 0 && bMonths >= 0 && bMonths < aMonths) return 1
+
+      //If they both expire sooner than our min prepack exp pick the closest
+      if (aMonths < 0 && bMonths < 0 && aMonths > bMonths) return -1
+      if (aMonths < 0 && bMonths < 0 && bMonths > aMonths) return 1
+
+      //When choosing between two items of same type and same exp, choose the one with a higher quantity (less items to shop for).
+      if (a.qty.to > b.qty.to) return -1
+      if (b.qty.to > a.qty.to) return 1
+
+      //keep sorting the same as the view (ascending NDCs) [doc.drug._id, doc.exp.to || doc.exp.from, sortedBin, doc.bin, doc._id]
+      return 0
+    })
+}
+
+function monthsBetween(from, to) {
+  to = new Date(to), from = new Date(from)
+  return to.getMonth() - from.getMonth() + 12 * (to.getFullYear() - from.getFullYear());
 }
 
 function makeList(ndcs, minQty, safety) {
