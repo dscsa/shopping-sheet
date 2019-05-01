@@ -197,7 +197,7 @@ function sortNDCs(ndcs, longExp) {
   return sortedNDCs
 }
 
-function sortInventory(inventory) {
+function sortInventory(inventory, longExp) {
 
     //Lots of prepacks were expiring because pulled stock with long exp was being paired with short prepack exp making the surplus shortdated
     //Default to longExp since that simplifies sort() if there are no prepacks
