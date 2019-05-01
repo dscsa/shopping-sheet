@@ -48,10 +48,24 @@ function createInvoice(orderID) { //This is undefined when called from Menu
    if (order.$OrderId != +order.$OrderId)
      throw Error('Order Id does not appear to be valid')
 
+   if ( ! order.$Total) {
+     order.$Total = order.$Drugs.reduce(function(sum, drug) { return sum+drug.$Price }, 0)
+     debugEmail('createInvoice has no $Total', '#'+order.$OrderId, order.$Total, order)
+   }
+
    if ( ! order.$Fee) {
-     var fee = order.$Drugs.reduce(function(sum, drug) { return sum+drug.$Price }, 0)
-     debugEmail('createInvoice has no $Fee', '#'+order.$OrderId, order.$Fee, fee, order)
-     order.$Fee = fee
+     order.$Fee = order.$IsNew ? 6 : order.$Total
+     debugEmail('createInvoice has no $Fee', '#'+order.$OrderId, order.$Fee, order)
+   }
+
+   if (order.$Due == null) { //$Due might be $0 so do null check instead
+
+     order.$Due = order.$Fee
+
+     if (order.$Card) order.$Due = 0
+     else if (order.$Coupon && order.$Coupon.slice(0, 6) != "track_") order.$Due = 0
+
+     debugEmail('createInvoice has no $Due', '#'+order.$OrderId, order.$Due, order)
    }
 
    var template  = fileByName("Order Summary v4")
