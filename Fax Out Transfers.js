@@ -50,9 +50,9 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     else if (nameMatch) isGaPines = 'NAME MATCH: '+drug.$ProviderName
     else if (npiMatch) isGaPines = 'NPI MATCH: '+drug.$Npi
 
-    if ( ! drug.$InOrder) return false
+    if ( ! drug.$InOrder || drug.$IsRefill) return false
 
-    if ( ! drug.$v2) return true //Should we be transferring out if the GCN can't be found?
+    if ( ! drug.$v2 && +drug.$Gcn) return true //Should we be transferring out if the GCN can't be found?
 
     return drug.$Msg && ~ drug.$Msg.indexOf('transferred')
   })
