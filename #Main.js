@@ -148,9 +148,6 @@ function updateShopping(email) {
   function addTracking(order) {
      Log("Order Just Shipped", order.$OrderId, drugs[order.$OrderId], status[order.$OrderId], order)
 
-     //Drugs and Invoice should already be finalized
-     delete order.$Drugs
-
      var invoice = getInvoice(order)
 
      if ( ! invoice)
@@ -164,8 +161,6 @@ function updateShopping(email) {
 
      order.$Tracking = trackingFormula(order.$Tracking)
 
-     sheet.updateRow(order)
-
      delete order.$Total
      delete order.$Fee
      delete order.$Due
@@ -176,6 +171,12 @@ function updateShopping(email) {
      } catch (e) {
         shipped.prependRow(order)
      }
+
+     //Drugs and Invoice should already be finalized
+     delete order.$Drugs
+
+     sheet.updateRow(order)
+
   }
 
   function statusChanged(order) {
