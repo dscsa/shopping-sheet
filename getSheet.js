@@ -291,10 +291,16 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
 
       setValue(oldRow.getCell(1, s.colNumberByKey(colKey)), val)
     }
+
+    SpreadsheetApp.flush() //Attempt to keep an old script that has not written changes getting ov
   }
 
   s.prependRow = function(row) {
-    //Log('prependRow')
+
+    if ( ~ rowKeys.indexOf(row[keyID])) {
+      throw new Error('Error: prependRow.  Cannot prepend row with existing key '+JSON.stringify(row, null, " "))
+    }
+
     s.insertRowAfter(rowOfKeys)
     rowKeys.splice(rowOfKeys, 0, row[keyID]) //add the new row to rowKeys
     s.updateRow(row, true)
@@ -320,7 +326,7 @@ function toObject(keys, vals) {
       vals[i] = vals[i].trim()
 
     var key = keys[i].trim()
-    row[key] = row[key] || vals[i] //just in case keys are NOT unique, use the first value because we read the first value with indexOf() in rowNumberByKey().  We can create an infinite update loop if this returned the value of the last row number and rowNumberByKey() returned the first row number
+    row[key] = vals[i] //this will override value in the (rare/error) case keys are NOT unique.  This is okay because lastIndexOf() is used by rowNumberByKey().
   }
 
   return row
