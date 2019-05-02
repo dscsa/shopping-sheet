@@ -100,6 +100,7 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
 
     if (first != last) {
       debugEmail('WARNING! Duplicate Rows', key, first, last, rowKeys)
+      throw new Error('WARNING! Duplicate Rows in rowNumberByKey()')
     }
 
     //Replace indexOf with lastIndexOf.  Both should work but since new orders are being prepended to top of sheet, in the case of an error,

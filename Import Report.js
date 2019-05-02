@@ -210,8 +210,15 @@ function groupByOrder(report) {
     }
 
     //Logger.log(['Log B', group[orderID]])
-    if (report[i].drug.$ScriptNo) //some lines are empty orders with no drugs
-      group[orderID].$Drugs.push(report[i].drug)
+    if (report[i].drug.$ScriptNo) { //some lines are empty orders with no drugs
+
+      if (report[i].drug.$OrderId == orderID)
+        group[orderID].$Drugs.push(report[i].drug)
+      else {
+        debugEmail('WHAT IS GOING ON!!! Drugs in wrong order', 'orderID', orderID, 'i', i, 'drug', report[i].drug, 'group', group, 'report', report)
+        throw new Error('groupByOrder Drugs in wrong order')
+      }
+    }
     //addDrugtoOrder(group[orderID], report[i].drug)
   }
 

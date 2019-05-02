@@ -6,7 +6,7 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
 
   if (newDrugs[0] && oldDrugs[0] && newDrugs[0].$OrderId != oldDrugs[0].$OrderId) {
     debugEmail('ABORTING didDrugsChange because OrderId Mismatch', newDrugs[0].$OrderId+' != '+oldDrugs[0].$OrderId, '$Status', $Status, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs)
-    return changes
+    throw new Error('didDrugsChange Drugs in wrong order')
   }
 
   //https://stackoverflow.com/questions/21987909/difference-between-two-array-of-objects-in-javascript

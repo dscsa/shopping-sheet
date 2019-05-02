@@ -1,4 +1,4 @@
-var LIVE_MODE = true //set to false to turn off emails and text reminders.  Remember to turn it back on again!
+var LIVE_MODE = false //set to false to turn off emails and text reminders.  Remember to turn it back on again!
 
 // Use this code for Google Docs, Forms, or new Sheets.
 function onOpen() {
@@ -16,12 +16,10 @@ function triggerShopping() {
     var start = new Date()
     if ( ! (start.getMinutes() % 3)) { //run every 3 minutes
       updateShopping(true)
-      var duration = new Date() - start
-      //if (duration > 180000)
-      //  debugEmail('Script Users', start, 'Duration', duration, Session.getEffectiveUser().getEmail(), Session.getActiveUser().getEmail(), Logger.getLog())
-    } else {
 
-      Logger.log('Skipped update since not on the 3rd minute')
+      var lock = LockService.getScriptLock();
+
+      if ( ! lock.tryLock(1000)) return
 
       var clinicPortal = SpreadsheetApp.getActiveSpreadsheet()
         .getSheetByName('Clinic Portal')
@@ -30,6 +28,8 @@ function triggerShopping() {
 
       if ( ! clinicPortal[0] || ! clinicPortal[0][0])
         debugEmail('clinicPortal Error', clinicPortal)
+
+      lock.releaseLock()
     }
   } catch (e) {
     //Log(e, e.message, e.stack)
@@ -39,17 +39,19 @@ function triggerShopping() {
 
 function updateShopping(email) {
 
-  console.log('updateShopping')
+
   var lock = LockService.getScriptLock();
+  var scriptId  = new Date() //A unique id per script run
+
+  console.log('updateShopping', scriptId)
 
   if ( ! lock.tryLock(1000)) {
-    var err = 'Refresh Shopping Sheet is already running!'
-    console.log(err)
+    var err = 'Refresh Shopping Sheet is already running! '+scriptId.toJSON()
+    console.log(err, scriptId)
     Logger.log(err)
     return
   }
 
-  var scriptId  = new Date() //A unique id per script run
   var sheet     = getSheet('Shopping', 'A', 2)
   var shipped   = getSheet('Shipped', 'A', 1)
   var report    = getReport('ShoppingSheet5.csv', sheet)
@@ -95,11 +97,9 @@ function updateShopping(email) {
 
   SpreadsheetApp.flush() //Recommended before releasing lock
 
-  try { //Error: "There are too many LockService operations against the same script." at #Main:79 (updateShopping),	at #Main:17 (triggerShopping)
-    lock.releaseLock()
-    Log('Refresh Shopping Sheet Completed')
-  } catch (e) {}
+  Log('Refresh Shopping Sheet Completed')
 
+  lock.releaseLock()
 
   /* Hoisted Helper Functions that need access to the sheet and other local variables */
 
