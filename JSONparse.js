@@ -5,7 +5,7 @@ function JSONparse(str) {
     str = str.replace(/: *,/g, ':"",') //If user deletes a value altogther assume it is an empty string to keep the JSON valid
     return JSON.parse(str)
   } catch (e) {
-    debugEmail('JSON.parse() error', vals[i], e)
+    debugEmail('JSON.parse() error', str, e)
     return {error:'json parse failed', value:str}
   }
 }
