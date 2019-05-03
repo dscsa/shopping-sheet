@@ -273,7 +273,7 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
     //Swapping this with code below reduced "per row" exec time from 4 secs to .5 secs.
 
     if ( ~ rowKeys.indexOf(newRow[keyID])) {
-      throw new Error('Error: updateRow.  Cannot update row with duplicate key '+JSON.stringify(row, null, " "))
+      throw new Error('Error: updateRow.  Cannot update row with duplicate key '+JSON.stringify(newRow, null, " "))
     }
 
     var range = s.rowRangeByKey(newRow[keyID])
