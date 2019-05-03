@@ -42,6 +42,10 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
   var isGaPines = order.$Coupon == 'georgiapinescsb' ? 'COUPON MATCH: georgiapinescsb': false
 
   //TODO we should not rely on "transferred" magic (and user-facing!) string.  Need to mark this in the json.
+  if ( ! order.$Drugs.filter) {
+    debugEmail('order.$Drugs.filter is not a function', typeof order.$Drugs, order.$Drugs, order)
+  }
+
   order.$Drugs = order.$Drugs.filter(function(drug) {
     var nameMatch = ~ gaPinesLNames.indexOf(drug.$ProviderName.split(' ')[1])
     var npiMatch  = ~ gaPinesNpis.indexOf(drug.$Npi)
