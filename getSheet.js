@@ -1,11 +1,11 @@
-var cache = {} //reduced shopping update of 5 orders of 18 drugs from 23 secs down to 7secs if no changes and down to 10secs if adding all
+var getSheetCache = {} //reduced shopping update of 5 orders of 18 drugs from 23 secs down to 7secs if no changes and down to 10secs if adding all
 
 function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
 
   sheetNameOrUrl = sheetNameOrUrl || SpreadsheetApp.getActiveSheet().getName() || 'Shopping'
 
   var cacheKey = sheetNameOrUrl+colOfKeys+rowOfKeys
-  if (cache[cacheKey]) return cache[cacheKey]
+  if (getSheetCache[cacheKey]) return getSheetCache[cacheKey]
 
   Log('getSheet', sheetNameOrUrl, colOfKeys, rowOfKeys)
 
@@ -25,12 +25,12 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
     TODO write a range cache that can be spliced (or at least invalidated) after sheet.prependRow()
     var cacheKey = sheetNameOrUrl+range
     Log('getRangeVals cacheKey', cacheKey)
-    if (cache[cacheKey]) {
+    if (getSheetCache[cacheKey]) {
       Log('cached :)')
-      return cache[cacheKey]
+      return getSheetCache[cacheKey]
     }
     Log('not cached :(')
-    return cache[cacheKey] = s.getRange(range).getDisplayValues()
+    return getSheetCache[cacheKey] = s.getRange(range).getDisplayValues()
     */
     try {
       return s.getRange(range).getDisplayValues()
@@ -316,7 +316,7 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
     lock.releaseLock()
   }
 
-  return cache[cacheKey] = s
+  return getSheetCache[cacheKey] = s
 }
 
 //Combine key and val arrays into an object.  If value is JSON then parse it.  Trim both keys and vals (helpful for MSSQL reports)

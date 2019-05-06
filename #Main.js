@@ -1,5 +1,5 @@
 var LIVE_MODE = true //set to false to turn off emails and text reminders.  Remember to turn it back on again!
-var cache     = CacheService.getScriptCache();
+var mainCache = CacheService.getScriptCache();
 
 // Use this code for Google Docs, Forms, or new Sheets.
 function onOpen() {
@@ -34,8 +34,8 @@ function triggerShopping() {
     }
   } catch (e) {
     //Log(e, e.message, e.stack)
-    if (cache.remove) cache.remove('updateShoppingLock')
-    debugEmail('triggerShopping error', e, e.stack, cache)
+    if (mainCache.remove) mainCache.remove('updateShoppingLock')
+    debugEmail('triggerShopping error', e, e.stack, mainCache)
   }
 }
 
@@ -54,12 +54,12 @@ function updateShopping(email) {
     return
   }
 
-  var updateShoppingLock = cache.get('updateShoppingLock')
+  var updateShoppingLock = mainCache.get('updateShoppingLock')
 
   if (updateShoppingLock)
     return debugEmail('updateShoppingLock was set even though getScriptLock succeeded', scriptId.toJSON())
 
-  cache.put('updateShoppingLock', true, 30*60)
+  mainCache.put('updateShoppingLock', true, 30*60)
 
   var sheet     = getSheet('Shopping', 'A', 2)
   var shipped   = getSheet('Shipped', 'A', 1)
@@ -108,7 +108,7 @@ function updateShopping(email) {
 
   Log('Refresh Shopping Sheet Completed')
 
-  cache.remove('updateShoppingLock')
+  mainCache.remove('updateShoppingLock')
   lock.releaseLock()
 
   /* Hoisted Helper Functions that need access to the sheet and other local variables */
