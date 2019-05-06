@@ -272,10 +272,6 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
     //}
     //Swapping this with code below reduced "per row" exec time from 4 secs to .5 secs.
 
-    if ( ~ rowKeys.indexOf(newRow[keyID])) {
-      throw new Error('Error: updateRow.  Cannot update row with duplicate key '+JSON.stringify(newRow, null, " "))
-    }
-
     var range = s.rowRangeByKey(newRow[keyID])
 
     try {
@@ -306,6 +302,10 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
 
     if ( ! lock.tryLock(1000)) {
       throw new Error('Error: prependRow. Cannot get scriptLock')
+    }
+
+    if ( ~ rowKeys.indexOf(row[keyID])) {
+      throw new Error('Error: updateRow.  Cannot update row with duplicate key '+JSON.stringify(row, null, " "))
     }
 
     s.insertRowAfter(rowOfKeys)
