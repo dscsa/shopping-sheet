@@ -194,6 +194,7 @@ function updateShopping(email) {
   }
 
   function statusChanged(order) {
+
     Log('Status changed', '#'+order.$OrderId, status[order.$OrderId], order.$Status, order, drugs[order.$OrderId])
     infoEmail('Status changed', '#'+order.$OrderId, status[order.$OrderId],  order.$Status, order, drugs[order.$OrderId])
 
@@ -209,12 +210,7 @@ function updateShopping(email) {
     //Skip updating drugs if their status is complete or they are unchanged
     if ( ! drugsChanged && status[order.$OrderId] != 'Needs Form') { //"Needs Form" will have all 0 days so need to make sure drugs update once registration complete
 
-      //debugEmail(' ! drugsChanged', order.$OrderId, status[order.$OrderId]+' -> '+order.$Status, drugsChanged, order)
-
-      delete order.$Drugs
-
-      if (order.$Status == 'Shopping') //details are set on the old drugs but not the new ones
-        order.$Status = createShoppingLists(order, drugs[order.$OrderId])
+      order.$Drugs = drugs[order.$OrderId] //drug details are set on the old drugs but not the new ones
 
     } else {
 
@@ -227,14 +223,13 @@ function updateShopping(email) {
       var numChanges  = drugsChanged && drugsChanged.split(/REMOVED FROM ORDER|ADDED TO ORDER|ADDED TO PROFILE AND ORDER/).length - 1
       if (numChanges) {
         rxReceivedNotification(order)
-        debugEmail('rxReceivedNotification called because status changed', '#'+order.$OrderId, status[order.$OrderId]+' --> '+order.$Status, drugsChanged, order)
+        debugEmail('rxReceivedNotification called because drugs & status both changed', '#'+order.$OrderId, status[order.$OrderId]+' --> '+order.$Status, drugsChanged, order)
       }
-      //else
-      // debugEmail('rxReceivedNotification NOT sent', status[order.$OrderId]+' --> '+order.$Status, drugsChanged, order)
 
-      if (order.$Status == 'Shopping') //Must be called *AFTER* drug details are set
-        order.$Status = createShoppingLists(order, order.$Drugs)
     }
+
+    if (order.$Status == 'Shopping') //Must be called *AFTER* drug details are set
+      order.$Status = createShoppingLists(order, order.$Drugs)
 
     sheet.updateRow(order)
 
@@ -253,6 +248,7 @@ function updateShopping(email) {
       delete order.$Fee
       delete order.$Due
       delete order.$BilledAt
+
       shipped.prependRow(order)
     }
   }
