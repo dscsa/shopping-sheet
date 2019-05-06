@@ -34,8 +34,8 @@ function triggerShopping() {
     }
   } catch (e) {
     //Log(e, e.message, e.stack)
-    cache.remove('updateShoppingLock')
-    debugEmail('triggerShopping error', e, e.stack)
+    if (cache.remove) cache.remove('updateShoppingLock')
+    debugEmail('triggerShopping error', e, e.stack, cache)
   }
 }
 
