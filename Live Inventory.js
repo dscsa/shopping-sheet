@@ -40,9 +40,9 @@ function _setV2info(drug) {
 
   var emailJson = JSON.stringify(v2info, null, " ")
 
-  if ( ! drug.$Stock && v2info['order.maxInventory'] & (v2info['inventory.qty'] < v2info['order.maxInventory']/2))
+  if ( ! drug.$Stock && v2info['order.maxInventory'] && (v2info['inventory.qty'] < v2info['order.maxInventory']/2))
     sendEmail('Change Order for High stock Item', ['Consider updating v2 order for '+drug.$v2, drug.$v2+' ('+drug.$Name+') is high stock but its max inventory of '+v2info['order.maxInventory']+' is already way higher than its total quantity of '+v2info['inventory.qty']+' '+emailJson])
-  else if ( ! drug.$Stock && v2info['inventory.qty'] > 1000 && (v2info['inventory.qty']/v2info['dispense.qty'] > 3) && (v2info['order.minQty'] < 5 || v2info['order.minDays'] < 150))
+  else if ( ! drug.$Stock && (v2info['inventory.qty'] > 1000) && (v2info['inventory.qty']/v2info['dispensed.qty'] > 3) && (v2info['order.minQty'] < 5 || v2info['order.minDays'] < 150))
     sendEmail('Change Order for High stock Item', ['Consider updating v2 order for '+drug.$v2, drug.$v2+' ('+drug.$Name+') is high stock but is ordered even if it has a quantity > '+v2info['order.minQty']+' and expires more than '+v2info['order.minDays']+' days from now'+' '+emailJson])
   else if (drug.$Stock && drug.$Stock != 'Not Offered' && (v2info['inventory.qty'] > v2info['order.maxInventory'] - 100))
     sendEmail('Change Order for Low stock Item', ['Consider updating v2 order for '+drug.$v2, drug.$v2+' ('+drug.$Name+') is '+drug.$Stock+' but its max inventory of '+v2info['order.maxInventory']+' is too low given it already has a total quantity of '+v2info['inventory.qty']+' '+emailJson])
