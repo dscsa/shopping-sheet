@@ -61,9 +61,9 @@ function updateShopping(email) {
   var updateShoppingLock = mainCache.get('updateShoppingLock')
 
   if (updateShoppingLock)
-    return debugEmail('updateShoppingLock was set even though getScriptLock succeeded', scriptId.toJSON())
+    return debugEmail('updateShoppingLock was set even though getScriptLock succeeded', 'Locked at:', updateShoppingLock, 'Failed at:', scriptId.toJSON())
 
-  mainCache.put('updateShoppingLock', true, 30*60)
+  mainCache.put('updateShoppingLock', scriptId.toJSON(), 30*60)
 
   var sheet     = getSheet('Shopping', 'A', 2)
   var shipped   = getSheet('Shipped', 'A', 1)
