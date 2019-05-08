@@ -40,9 +40,9 @@ function _setV2info(drug) {
 
   var emailJson = JSON.stringify(v2info, null, " ")
 
-  if ( ! drug.$Stock && v2info['order.maxInventory'] && (v2info['order.maxInventory'] > 3500) && (v2info["price / month"] < 20) && (v2info['qty threshold'] < v2info['order.maxInventory']/3))
+  if ( ! drug.$Stock && v2info['order.maxInventory'] && (v2info['order.maxInventory'] > 3500) && (v2info["price / month"] < 20) && (v2info['order.maxInventory']/v2info['qty threshold'] > 5))
     sendEmail('Change Order for High stock Item', ['Consider updating v2 order for '+drug.$v2, drug.$v2+' ('+drug.$Name+') is high stock but its max inventory of '+v2info['order.maxInventory']+' is already way higher than its total quantity of '+v2info['inventory.qty']+' '+emailJson])
-  else if ( ! drug.$Stock && (v2info['inventory.qty'] > 1000) && (v2info["price / month"] < 20) && (v2info['inventory.qty']/v2info['qty threshold'] > 3) && (v2info['order.minQty'] < 5 || v2info['order.minDays'] < 150))
+  else if ( ! drug.$Stock && (v2info['inventory.qty'] > 1000) && (v2info["price / month"] < 20) && (v2info['inventory.qty']/v2info['qty threshold'] > 5) && (v2info['order.minQty'] < 5 || v2info['order.minDays'] < 150))
     sendEmail('Change Order for High stock Item', ['Consider updating v2 order for '+drug.$v2, drug.$v2+' ('+drug.$Name+') is high stock but is ordered even if it has a quantity > '+v2info['order.minQty']+' and expires more than '+v2info['order.minDays']+' days from now'+' '+emailJson])
   else if (drug.$Stock && drug.$Stock != 'Not Offered' && (v2info['inventory.qty'] > v2info['order.maxInventory'] - 100))
     sendEmail('Change Order for Low stock Item', ['Consider updating v2 order for '+drug.$v2, drug.$v2+' ('+drug.$Name+') is '+drug.$Stock+' but its max inventory of '+v2info['order.maxInventory']+' is too low given it already has a total quantity of '+v2info['inventory.qty']+' '+emailJson])
@@ -178,38 +178,3 @@ function liveInventoryByGcn(drug) {
 
   return liveInventoryCache[gcn] || {}
 }
-
-/*
-var v2drugs
-var totalQtys
-var stocks
-var monthlyPrices
-var minQtys
-var minDays
-var maxInventory
-
-function getV2info(v2drug) {
-
-  //Log('getV2info', v2drug)
-  var sheet = getSheet('https://docs.google.com/spreadsheets/d/1gF7EUirJe4eTTJ59EQcAs1pWdmTm2dNHUAcrLjWQIpY/edit#gid=505223313', 'T', 1)
-
-  //Get and cache all the remote columns we will need
-  v2drugs = v2drugs || sheet.colByKey('key.2')
-  totalQtys = totalQtys || sheet.colByKey('inventory.qty')
-  stocks = stocks || sheet.colByKey('stock')
-  monthlyPrices = monthlyPrices || sheet.colByKey('price / month')
-  minQtys = minQtys || sheet.colByKey('order.minQty')
-  minDays = minDays || sheet.colByKey('order.minDays')
-  maxInventory = maxInventory || sheet.colByKey('order.maxInventory')
-
-  return {
-    'generic':v2drugs[v2drug],
-    'inventory.qty':totalQtys[v2drug],
-    'stock':stocks[v2drug],
-    'price / month':monthlyPrices[v2drug],
-    'order.minQty':minQtys[v2drug] || 5,
-    'order.minDays':minDays[v2drug] || 150,
-    'order.maxInventory':maxInventory[v2drug] || 2500
-  }
-}
-*/
