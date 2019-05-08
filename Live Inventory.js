@@ -38,16 +38,17 @@ function _setV2info(drug) {
 
   drug.$MonthlyPrice = +v2info['price / month']
 
-  var emailJson = JSON.stringify(v2info, null, " ")
-
   if ( ! drug.$Stock && v2info['order.maxInventory'] && (v2info['order.maxInventory'] > 3500) && (v2info["price / month"] < 20) && (+v2info['order.maxInventory'] > +v2info['dispensed.qty']+5*v2info['qty threshold']))
-    sendEmail('Change Order for High stock Item', ['Consider decreasing v2 max inventory for '+drug.$v2, drug.$v2+' ('+drug.$Name+') '+v2info['order.maxInventory']+' > '+v2info['dispensed.qty']+' + 5*'+v2info['qty threshold']+' '+emailJson])
+    emailBody.push(['Consider decreasing v2 max inventory for '+drug.$v2, drug.$v2+' ('+drug.$Name+') '+v2info['order.maxInventory']+' > '+v2info['dispensed.qty']+' + 5*'+v2info['qty threshold']])
   else if ( ! drug.$Stock && (v2info['inventory.qty'] > 1000) && (v2info["price / month"] < 20) && (+v2info['inventory.qty'] > +v2info['dispensed.qty']+5*v2info['qty threshold']) && (v2info['order.minQty'] < 5 || v2info['order.minDays'] < 150))
-    sendEmail('Change Order for High stock Item', ['Consider increasing v2 minDays & minQty for '+drug.$v2, drug.$v2+' ('+drug.$Name+') '+v2info['inventory.qty']+' > '+v2info['dispensed.qty']+' + 5*'+v2info['qty threshold']+' '+emailJson])
+    emailBody.push(['Consider increasing v2 minDays & minQty for '+drug.$v2, drug.$v2+' ('+drug.$Name+') '+v2info['inventory.qty']+' > '+v2info['dispensed.qty']+' + 5*'+v2info['qty threshold']])
   else if (drug.$Stock && drug.$Stock != 'Not Offered' && (v2info['inventory.qty'] > v2info['order.maxInventory'] - 100))
-    sendEmail('Change Order for Low stock Item', ['Consider updating v2 order for '+drug.$v2, drug.$v2+' ('+drug.$Name+') is '+drug.$Stock+' but its max inventory of '+v2info['order.maxInventory']+' is too low given it already has a total quantity of '+v2info['inventory.qty']+' '+emailJson])
+    emailBody.push(['Consider increasing v2 max inventory for '+drug.$v2, drug.$v2+' ('+drug.$Name+') is '+drug.$Stock+' but its max inventory of '+v2info['order.maxInventory']+' is too low given it already has a total quantity of '+v2info['inventory.qty']])
   else if (drug.$Stock && drug.$Stock != 'Not Offered' && (v2info['order.minQty'] > 1 || v2info['order.minDays'] > 90))
-    sendEmail('Change Order for Low stock Item', ['Consider updating v2 order for '+drug.$v2, drug.$v2+' ('+drug.$Name+') is '+drug.$Stock+' but is ordered only if it has a quantity > '+v2info['order.minQty']+' and expires more than '+v2info['order.minDays']+' days from now'+' '+emailJson]) ///only send if max inventory is not the issue
+    emailBody.push(['Consider updating v2 order for '+drug.$v2, drug.$v2+' ('+drug.$Name+') is '+drug.$Stock+' but is ordered only if it has a quantity > '+v2info['order.minQty']+' and expires more than '+v2info['order.minDays']+' days from now']) ///only send if max inventory is not the issue
+
+  if (emailBody.length)
+    sendEmail('Consider updating v2 Drug Orders', emailBody.concat(v2info))
 }
 
 function excludeFromOrder(drug, order) {
