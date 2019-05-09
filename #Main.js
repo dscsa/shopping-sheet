@@ -298,7 +298,7 @@ function setStatus(order, oldStatus) {
     order.$Status = 'Dispensed'
   else if (order.$Drugs.reduce(function(dispensing, drug) { return dispensing || drug.$IsDispensed }, false)) //Solve reshopping for drugs that Cindy is about to dispense. This could also be solved by looking to see if the drug was automatically addded to order or whether Cindy added it herself
     order.$Status = 'Dispensing'
-  else if ( ! order.$Pharmacy)
+  else if ( ! order.$Pharmacy.short)
     order.$Status = 'Needs Form'
   else
     order.$Status = 'Shopping'
