@@ -120,7 +120,7 @@ function rxReceivedNotification(order, numChanges) {
       return debugEmail('Order Updated BUT Email Not Sent', '#'+order.$OrderId, drugs, 'notOrdered', notOrdered, 'medSynced', medSynced, 'inStockRefills', inStockRefills, 'rxReceivedWillFill', rxReceivedWillFill, 'rxReceivedNoFill', rxReceivedNoFill)
     else {
       order.$FirstCall = addTime(120/60) //Just in case multiple changes happen lets batch them together for every 2 hours
-      scheduleCalls(order, 'Order Updated', order.$OrderId, drugs, true)
+      scheduleCalls(order, 'Order Updated', order.$OrderId, drugs)
     }
 
     //Debug Code
