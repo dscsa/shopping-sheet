@@ -76,22 +76,22 @@ function cancelFutureCalls(order, reason) {
       email.push('Deleting New Patient: '+title+' '+location)
     }
 
-    if ( ~ location.indexOf('Missing eRX') && order.$Drugs.length) { //Empty orders should not get rid of this alert
+    else if ( ~ location.indexOf('Missing eRX') && order.$Drugs.length) { //Empty orders should not get rid of this alert
       events[j].deleteEvent()
       email.push('Deleting Missing eRx: '+title+' '+location)
     }
 
-    if ( ~ location.indexOf('Transfer Failed')) {
+    else if ( ~ location.indexOf('Transfer Failed')) {
       events[j].deleteEvent()
       email.push('Deleting Transfer Failed: '+title+' '+location)
     }
 
-    if ( ~ location.indexOf('Order Updated')) {
+    else if ( ~ location.indexOf('Order Updated')) {
       events[j].deleteEvent()
       email.push('Deleting Order Updated: '+title+' '+location)
     }
 
-    if ( ~ location.indexOf('0 Refills')) {
+    else if ( ~ location.indexOf('0 Refills')) {
       var newTitle = title
       for (var i in order.$Drugs) {
         var drug = order.$Drugs[i]
@@ -108,6 +108,10 @@ function cancelFutureCalls(order, reason) {
 
         email.push((newTitle.match(/[A-Z]{2}.*SMS/) ? 'Modifying' : 'Deleting')+' 0 Refills oldTitle:'+title+' newTitle:'+newTitle+' Location:'+location)
       }
+    }
+
+    else {
+      email.push('NOT Deleting: '+title+' '+location)
     }
   }
 
