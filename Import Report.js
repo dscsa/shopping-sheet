@@ -264,7 +264,7 @@ function newGroup(row) {
     $Card:paymentInfo[2] && paymentInfo[0] ? paymentInfo[2]+' '+paymentInfo[0] : '',
     $Lang:row.primary_language_cd,
     $Pharmacy:{
-      short:pharmacyName ? pharmacyName.replace(/ #|-\d|\d-|\d/g, '').replace(/\s{2,}/g, ' ')+' on '+pharmacyInfo[3]+' ('+pharmacyInfo[2]+')' : '',
+      short:pharmacyName ? pharmacyName.replace(/ #|-\d|\d-|\d|pharmacy/ig, '').replace(/\s{2,}/g, ' ')+' on '+pharmacyInfo[3]+' ('+pharmacyInfo[2]+')' : '',
       name:pharmacyName,
       npi:pharmacyInfo[0],
       fax:pharmacyInfo[1],
