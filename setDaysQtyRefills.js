@@ -71,17 +71,18 @@ function testParseSig() {
     //"1 capsule every 8 hrs Orally 30 days",
     //"TAKE 1/2 TO 1 TABLET(S) by mouth EVERY DAY",
     //"TAKE 1/2 TO 2 TABLETS AT BEDTIME FOR SLEEP.",
-    "Take 60 mg daily  1 1\\/2 tablet"
+    //"Take 60 mg daily  1 1\\/2 tablet",
+    "ORAL 1 q8-12h prn muscle spasm"
   ]
-  
-  
+
+
   //TODO: NOT WORKING
   //"Take 2 tablet by mouth three times a day Take 2 with meals and 1 with snacks", //Not working
   //"Take 5 tablets by mouth 3 times a day with meals and 3 tablets 3 times a day with snack", //Not working
   //"Take 1 tablet by mouth every morning then 1/2 tablet in the evening", //Not working
   //2 am 2 pm ORAL three times a day
   //"Take 5 mg by mouth daily."
-  
+
   for (var i in testSigs) {
     var parsed = parseSig({$Sig:testSigs[i]})
     Log(testSigs[i], parsed)
@@ -257,7 +258,7 @@ function parseSig(drug) {
 function subsituteNumerals(sig) {
   sig = sig.replace(/[()]/g, '') //get rid of parenthesis // "Take 1 capsule (300 mg total) by mouth 3 (three) times daily."
   sig = sig.replace(/\\/g, '')   //get rid of backslashes
-  
+
   sig = sig.replace(/(^| and | & )(1\/2|one-half) /ig, '.5 ') //Take 1 and 1/2 tablets or Take 1 & 1/2 tablets.  Could combine with next regex but might get complicated
   sig = sig.replace(/(\d+) (1\/2|one-half) /ig, '$1.5 ') //Take 1 1/2 tablets
   sig = sig.replace(/ (1\/2|one-half) /ig, ' .5 ')
@@ -276,9 +277,9 @@ function subsituteNumerals(sig) {
 
   sig = sig.replace(/ hrs /ig, ' hours ')
   sig = sig.replace(/ once /ig, ' 1 time ')
-  sig = sig.replace(/ twice | q12h| BID\b|(?!every) 12 hours/ig, ' 2 times ')
-  sig = sig.replace(/ q8h| TID\b|(?!every) 8 hours/ig, ' 3 times ')
-  sig = sig.replace(/ q6h|(?!every) 6 hours/ig, ' 4 times ')
+  sig = sig.replace(/ twice | q12.*?h| BID\b|(?!every) 12 hours/ig, ' 2 times ')
+  sig = sig.replace(/ q8.*?h| TID\b|(?!every) 8 hours/ig, ' 3 times ')
+  sig = sig.replace(/ q6.*?h|(?!every) 6 hours/ig, ' 4 times ')
 
   sig = sig.replace(/\b1 vial /ig, '3ml ') // vials for inhalation are 2.5 or 3ml, so use 3ml to be conservative
   sig = sig.replace(/\b2 vials? /ig, '6ml ') // vials for inhalation are 2.5 or 3ml, so use 3ml to be conservative
@@ -300,13 +301,13 @@ function subsituteNumerals(sig) {
 function getNumDosage(sig) {
   try {
     var numDosage = sig.match(/([0-9]?\.[0-9]+|[1-9]) (tab|cap|pill|softgel)/i)
-    
+
     if (numDosage) return numDosage[1]
-    
+
     numDosage = sig.match(/(^|use +|take +|inhale +|chew +|inject +|oral +)([0-9]?\.[0-9]+|[1-9])(?!\d* ?mg)/i)
-    
+
     return numDosage ? numDosage[2] : 1 //"Use daily with lantus" won't match the RegEx above
-    
+
   } catch (e) {}
 }
 
