@@ -38,6 +38,8 @@ function _setV2info(drug) {
 
   drug.$MonthlyPrice = +v2info['price / month']
 
+  var emailBody = []
+
   if ( ! drug.$Stock && v2info['order.maxInventory'] && (v2info['order.maxInventory'] > 3500) && (v2info["price / month"] < 20) && (+v2info['order.maxInventory'] > +v2info['dispensed.qty']+5*v2info['qty threshold']))
     emailBody.push(['Consider decreasing v2 max inventory for '+drug.$v2, drug.$v2+' ('+drug.$Name+') '+v2info['order.maxInventory']+' > '+v2info['dispensed.qty']+' + 5*'+v2info['qty threshold']])
   else if ( ! drug.$Stock && (v2info['inventory.qty'] > 1000) && (v2info["price / month"] < 20) && (+v2info['inventory.qty'] > +v2info['dispensed.qty']+5*v2info['qty threshold']) && (v2info['order.minQty'] < 5 || v2info['order.minDays'] < 150))
