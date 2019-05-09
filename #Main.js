@@ -1,5 +1,6 @@
 var LIVE_MODE = true //set to false to turn off emails and text reminders.  Remember to turn it back on again!
 var mainCache = CacheService.getScriptCache();
+var scriptId  = new Date() //A unique id per script run
 
 // Use this code for Google Docs, Forms, or new Sheets.
 function onOpen() {
@@ -45,9 +46,7 @@ function clearCacheLock() {
 
 function updateShopping(email) {
 
-
   var lock = LockService.getScriptLock();
-  var scriptId  = new Date() //A unique id per script run
 
   console.log('updateShopping', scriptId)
 
