@@ -86,6 +86,11 @@ function cancelFutureCalls(order, reason) {
       email.push('Deleting Transfer Failed: '+title+' '+location)
     }
 
+    if ( ~ location.indexOf('Order Updated')) {
+      events[j].deleteEvent()
+      email.push('Deleting Order Updated: '+title+' '+location)
+    }
+
     if ( ~ location.indexOf('0 Refills')) {
       var newTitle = title
       for (var i in order.$Drugs) {
