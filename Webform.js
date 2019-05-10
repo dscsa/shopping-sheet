@@ -16,6 +16,21 @@ function updateWebformShipped(order, invoice) {
     updateWebformOrder(order.$OrderId, woocommerceOrder)
 }
 
+function updateWebformTest() {
+
+    var woocommerceOrder = {
+      meta_data:[
+        {key:"date_dispensed", value:new Date().toDateString()}
+      ],
+      shipping_total:3 //TODO if run multiple times this will always append the new rate (cumulative) rather than replacing old values.
+
+    }
+
+    infoEmail('updateWebformTest', woocommerceOrder)
+    //Order was already created (1) by user when registering, or (2) by status update when rx recieved
+    updateWebformOrder(10482, woocommerceOrder)
+}
+
 function updateWebformDispensed(order, invoice, fee) {
 
     var email = order.$Patient.email.replace(/ |NULL/g, '')
