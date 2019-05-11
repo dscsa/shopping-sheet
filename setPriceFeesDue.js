@@ -18,7 +18,7 @@ function setFee(order) {
 }
 
 function setTotal(order) {
-  return order.$Total = order.$Drugs.reduce(function(sum, drug) { return sum+setPrice(drug) }, 0)
+  return order.$Total = order.$Drugs.reduce(function(sum, drug) { return sum + (setPrice(drug) || 0) }, 0)
 }
 
 function setPrice(drug) {
