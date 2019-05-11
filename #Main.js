@@ -304,10 +304,10 @@ function addDrugDetails(order) {
     Log(order.$OrderId, order.$Drugs[i].$Name, "setV2info")
 
     setDaysQtyRefills(order.$Drugs[i], order)
-    setPriceFeesDue(order.$Drugs[i]) //Must call this after $Day and $MonthlyPrice are set
     Log(order.$OrderId, order.$Drugs[i].$Name, "setDaysQtyRefills")
   }
 
+  setPriceFeesDue(order) //Must call this after $Day and $MonthlyPrice are set
   setOrderSync(order)
 
   for (var i in order.$Drugs) {
