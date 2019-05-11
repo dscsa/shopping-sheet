@@ -17,7 +17,7 @@ function triggerShopping() {
   try {
     var start = new Date()
     if ( ! (start.getMinutes() % 3)) { //run every 3 minutes
-      updateShopping(true)
+      mainLoop(true)
 
       var lock = LockService.getScriptLock();
 
@@ -44,7 +44,16 @@ function clearCacheLock() {
   if (mainCache.remove) mainCache.remove('updateShoppingLock')
 }
 
-function updateShopping(email) {
+function updateShopping() {
+  try {
+    mainLoop()
+  } catch (e) {
+    clearCacheLock()
+    throw e //Since this was run manually, show the error to the user
+  }
+}
+
+function mainLoop(email) {
 
   var lock = LockService.getScriptLock();
 
