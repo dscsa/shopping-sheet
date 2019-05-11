@@ -1,4 +1,4 @@
-var LIVE_MODE = true //set to false to turn off emails and text reminders.  Remember to turn it back on again!
+var LIVE_MODE = false  //set to false to turn off emails and text reminders.  Remember to turn it back on again!
 var mainCache = CacheService.getScriptCache();
 var scriptId  = new Date() //A unique id per script run
 
@@ -7,7 +7,7 @@ function onOpen() {
   SpreadsheetApp.getUi() // Or DocumentApp or FormApp.
       .createMenu('Shopping')
       .addItem('Refresh Shopping Sheet', 'updateShopping')
-      .addItem('Update Order Invoice', 'createInvoice')
+      .addItem('Update Order Invoice', 'updateInvoice')
       .addItem('Transfer Out', 'createTransferFax')
       .addToUi();
 }
@@ -130,8 +130,6 @@ function updateShopping(email) {
 
     order.$RowAdded = order.$RowChanged //Script Id
 
-    setFormulas(order) //Formulas only needs to be set once for new rows (updating a row skips them)
-
     //Even though this section is a kind of $Status update but we separate it from other $Status updates because if we start a new sheet and re-add rows we don't want to duplicate patient emails/text/calls
     setNewRowCalls(order)
 
@@ -150,11 +148,10 @@ function updateShopping(email) {
 
     if (invoice)
       addInvoiceIdToRow(sheet, order.$OrderId, invoice)
-    else {//INVOICE CREATION MUST BE CALLED *AFTER* ROW IS UPDATED
+    else {
       debugEmail('Order readded but no invoice?',  status[order.$OrderId]+' -> '+order.$Status, order)
-      //var created = createInvoice(order.$OrderId) //If Order is already correct we run the risk of replacing the old invoice attached to this order
-      //updateWebformDispensed(order, created.invoice, created.fee) //Orders 7042 & 7908 were incorrectly changed because of this call
-      //This got called for Order 7182 (altough this is incorrect should be 9826, no sure why it pulled an old order#) because Cindy created an order, dispensed lines to see the autofill hold dates, and then deleted order.  This process makes Guardian update the $OrderChanged date which is used by getInvoice() so the invoice won't be found and the code will arrive here
+      //var invoice = createInvoice(order) //If Order is already correct we run the risk of replacing the old invoice attached to this order
+      //updateWebformDispensed(order, invoice) //Orders 7042 & 7908 were incorrectly changed because of this call
     }
   }
 
@@ -173,11 +170,6 @@ function updateShopping(email) {
      deleteShoppingLists(order.$OrderId)
 
      order.$Tracking = trackingFormula(order.$Tracking)
-
-     delete order.$Total
-     delete order.$Fee
-     delete order.$Due
-     delete order.$BilledAt
 
      try {
         shipped.updateRow(order)
@@ -237,16 +229,11 @@ function updateShopping(email) {
       //SEE HOW ACCURATE OUR PREDICTIONS WERE COMPARED TO WHAT WAS ACTUALLY DISPENSED
       infoEmail('Invoice Comparison', '#'+order.$OrderId, drugsChanged, 'New Drugs', order.$Drugs, 'Old Drugs', drugs[order.$OrderId], order)
 
-      //INVOICE CREATION MUST BE CALLED *AFTER* ROW IS UPDATED
-      var created = createInvoice(order.$OrderId) //Pre-create invoice so Cindy doesn't always need to run it manually
-      updateWebformDispensed(order, created.invoice, created.fee) //Make sure webform is updated and has the exact amount as invoice (should match old fee[orderId] amount if $Days of each drug did not change)
+      var invoice = createInvoice(order) //Pre-create invoice so Cindy doesn't always need to run it manually
+
+      updateWebformDispensed(order, invoice) //Make sure webform is updated and has the exact amount as invoice (should match old fee[orderId] amount if $Days of each drug did not change)
 
       deleteShoppingLists(order.$OrderId)
-
-      delete order.$Total
-      delete order.$Fee
-      delete order.$Due
-      delete order.$BilledAt
 
       shipped.prependRow(order)
     }
@@ -273,19 +260,6 @@ function updateShopping(email) {
       order.$Status = createShoppingLists(order, order.$Drugs)
 
     sheet.updateRow(order)
-  }
-
-  function setFormulas(order) {
-
-    var formulas = {
-      //$Total:'=SUM(PICKPROPERTY($Drugs, "$Price"))',
-      $Fee:'=IF(NOT(ISBLANK($New))*ISBLANK($Coupon), 6, $Total)',
-      $Due:'=IF((ISBLANK($Coupon)+(LEFT($Coupon, 6)="track_"))*ISBLANK($Card), $Fee, 0)',
-      $BilledAt:'=IF(AND($Fee > 0, LEN($Card)), TEXT(DATE(YEAR($RowChanged),MONTH($RowChanged)+1,1), "M/D/YY")&" - "&TEXT(DATE(YEAR($RowChanged),MONTH($RowChanged)+1,7), "M/D/YY"),"N/A")'
-    }
-
-    for (var key in formulas)
-      order[key] = formulas[key]
   }
 }
 
@@ -330,6 +304,7 @@ function addDrugDetails(order) {
     Log(order.$OrderId, order.$Drugs[i].$Name, "setV2info")
 
     setDaysQtyRefills(order.$Drugs[i], order)
+    setPriceFeesDue(order.$Drugs[i]) //Must call this after $Day and $MonthlyPrice are set
     Log(order.$OrderId, order.$Drugs[i].$Name, "setDaysQtyRefills")
   }
 

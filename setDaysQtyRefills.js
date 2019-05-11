@@ -115,8 +115,6 @@ function setDaysQtyRefills(drug, order) {
   } else if ( ! drug.$InOrder) {
     drug.$Name = drug.$Name.replace('*', '^')
   }
-
-  setPrice(drug)
 }
 
 function useDispensed(drug) {

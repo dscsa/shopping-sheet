@@ -9,29 +9,15 @@ function updateWebformShipped(order, invoice) {
         {key:"date_shipped", value:new Date().toDateString()},
         {key:"invoice_doc_id", value:invoice.getId() || ''},
         {key:"invoice_number", value:order.$OrderId},
-      ]
+      ],
+      shipping_lines:[{method_id:'flat_rate', total:order.$Fee}] //TODO if run multiple times this will always append the new rate (cumulative) rather than replacing old values.
     }
 
     //Order was already created (1) by user when registering, or (2) by status update when rx recieved
     updateWebformOrder(order.$OrderId, woocommerceOrder)
 }
 
-function updateWebformTest() {
-
-    var woocommerceOrder = {
-      meta_data:[
-        {key:"date_dispensed", value:new Date().toDateString()}
-      ],
-      shipping_total:3 //TODO if run multiple times this will always append the new rate (cumulative) rather than replacing old values.
-
-    }
-
-    infoEmail('updateWebformTest', woocommerceOrder)
-    //Order was already created (1) by user when registering, or (2) by status update when rx recieved
-    updateWebformOrder(10482, woocommerceOrder)
-}
-
-function updateWebformDispensed(order, invoice, fee) {
+function updateWebformDispensed(order, invoice) {
 
     var email = order.$Patient.email.replace(/ |NULL/g, '')
 
@@ -60,7 +46,7 @@ function updateWebformDispensed(order, invoice, fee) {
         {key:"invoice_number", value:order.$OrderId},
         {key:"invoice_doc_id", value:invoice.getId() || ''} //cannot be null otherwise nothing saves
       ],
-      shipping_lines:[{method_id:'flat_rate', total:fee}] //TODO if run multiple times this will always append the new rate (cumulative) rather than replacing old values.
+      shipping_lines:[{method_id:'flat_rate', total:order.$Fee}] //TODO if run multiple times this will always append the new rate (cumulative) rather than replacing old values.
 
     }
 

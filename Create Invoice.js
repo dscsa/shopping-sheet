@@ -36,11 +36,26 @@ function getInvoiceByName(name) {
   }
 }
 
-function createInvoice(orderID) { //This is undefined when called from Menu
+//Called by user manually from menu.  This is done when a manual correction is made
+function updateInvoice() {
+
+  var sheet = getSheet(null, 'A', 2) //allow to work for archived shopping sheets as well
+
+  order = sheet.rowByKey() //When null, we should get active row. Get Order Ourselves because this is manually called by user and can't pass a parameter
+
+  setPriceFeesDue(order) //User may have changed $Days and $Prices so recalculate totals
+
+  sheet.setCellByKeys(order.$OrderId, '$Total', order.$Total)
+  sheet.setCellByKeys(order.$OrderId, '$Fee', order.$Fee)
+  sheet.setCellByKeys(order.$OrderId, '$Due', order.$Due)
+
+  createInvoice(order)
+}
+
+function createInvoice(order) { //This is undefined when called from Menu
 
    var sheet = getSheet(null, 'A', 2) //allow to work for archived shopping sheets as well
 
-   order = sheet.rowByKey(orderID) //Defaults to getting active row if OrderID is undefined
    order = flattenOrder(order)
 
    //debugEmail('flatten order', orderID, order)
@@ -48,24 +63,9 @@ function createInvoice(orderID) { //This is undefined when called from Menu
    if (order.$OrderId != +order.$OrderId)
      throw Error('Order Id does not appear to be valid')
 
-   if ( ! order.$Total) {
-     order.$Total = order.$Drugs.reduce(function(sum, drug) { return sum+drug.$Price }, 0)
-     debugEmail('createInvoice has no $Total', '#'+order.$OrderId, order.$Total, order)
-   }
-
-   if ( ! order.$Fee) {
-     order.$Fee = order.$IsNew ? 6 : order.$Total
-     debugEmail('createInvoice has no $Fee', '#'+order.$OrderId, order.$Fee, order)
-   }
-
-   if (order.$Due == null) { //$Due might be $0 so do null check instead
-
-     order.$Due = order.$Fee
-
-     if (order.$Card) order.$Due = 0
-     else if (order.$Coupon && order.$Coupon.slice(0, 6) != "track_") order.$Due = 0
-
-     debugEmail('createInvoice has no $Due', '#'+order.$OrderId, order.$Due, order)
+   if ( ! order.$Total || ! order.$Fee || order.$Due == null) { //$Due might be $0 so do null check instead
+     debugEmail('createInvoice has no $Total, $Fee, or $Due', '#'+order.$OrderId, order.$Total, order.$Fee, order.$Due, order)
+     setPriceFeesDue(order)
    }
 
    var template  = fileByName("Order Summary v4")
@@ -84,7 +84,7 @@ function createInvoice(orderID) { //This is undefined when called from Menu
 
    invoice.saveAndClose()
 
-   return {invoice:invoice, fee:order.$Fee}
+   return invoice
 }
 
 function getInvoiceName(orderId, orderChanged) {
