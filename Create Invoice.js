@@ -44,7 +44,7 @@ function updateInvoice() {
   order = sheet.rowByKey() //When null, we should get active row. Get Order Ourselves because this is manually called by user and can't pass a parameter
 
   Log('Update Invoice Called', order)
-  
+
   setPriceFeesDue(order) //User may have changed $Days and $Prices so recalculate totals
 
   sheet.setCellByKeys(order.$OrderId, '$Total', order.$Total)
@@ -52,6 +52,8 @@ function updateInvoice() {
   sheet.setCellByKeys(order.$OrderId, '$Due', order.$Due)
 
   createInvoice(order)
+
+  SpreadsheetApp.flush() //Let's see these additions right away so user doesn't have to wait
 }
 
 function createInvoice(order) { //This is undefined when called from Menu
