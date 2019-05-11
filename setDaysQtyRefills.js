@@ -210,19 +210,6 @@ function setRefills(drug) {
   drug.$Refills = +(drug.$RefillsTotal - drug.$Qty/denominator).toFixed(2)
   if (drug.$Refills < .1) drug.$Refills = 0
 }
-/*
-function OLDsetRefills(drug) {
-  //This part is pulled from the CP_FillRx and CP_RefillRx SPs
-  //See order #5307 - new script qty 90 w/ 1 refill dispensed as qty 45.  This basically switches the refills from 1 to 2, so after the 1st dispense there should still be one refill left
-  var refillAdj = (drug.$DaysSupply || drug.$DispenseQty) ? 1 : drug.$WrittenQty/drug.$Qty
-  drug.$Refills = +(drug.$RefillsTotal*refillAdj - 1).toFixed(2)
-  if (drug.$Refills < .1) drug.$Refills = 0
-}
-*/
-
-function setPrice(drug) {
-  drug.$Price = +Math.max(drug.$Days * drug.$MonthlyPrice / 30, drug.$Days ? 1 : 0).toFixed(0) //Minimum price of $1 (CK suggestion).  2019-01-28 Changed $Excluded to $Days because of Order 8235 and 8291
-}
 
 function parseSig(drug) {
 
