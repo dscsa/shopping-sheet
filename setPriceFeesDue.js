@@ -4,8 +4,8 @@ function setPriceFeesDue(order) {
 
   if (order.$Coupon && order.$Coupon.slice(0, 6) != "track_") order.$Due = 0
   else if (order.$Card) {
-    var start = Utilities.formatDate(new Date(scriptId.getFullYear(), scriptId.getMonth() + 1, 1), "ET", "mm/dd/yy")
-    var stop  = Utilities.formatDate(new Date(scriptId.getFullYear(), scriptId.getMonth() + 1, 7), "ET", "mm/dd/yy")
+    var start = Utilities.formatDate(new Date(scriptId.getFullYear(), scriptId.getMonth() + 1, 1), "ET", "MM/dd/yy")
+    var stop  = Utilities.formatDate(new Date(scriptId.getFullYear(), scriptId.getMonth() + 1, 7), "ET", "MM/dd/yy")
 
     order.$BilledAt = start+'-'+stop
     order.$Due = 0
