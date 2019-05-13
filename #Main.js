@@ -79,7 +79,7 @@ function mainLoop(email) {
 
   var drugs     = sheet.colByKey('$Drugs')
   var tracking  = sheet.colByKey('$Tracking')
-  var fee       = sheet.colByKey('$Fee') //cannot be auto-calculated. this is governed by an in sheet formula
+  var fee       = sheet.colByKey('$Fee')
   var status    = sheet.colByKey('$Status')
 
   Log('Drug IDs', Object.keys(drugs))
@@ -95,10 +95,6 @@ function mainLoop(email) {
     setStatus(order, status[orderId])
 
     Log('Order ID from Report', orderId, order.$Status)
-
-    if (orderId == '11350' || orderId == '11349') {
-       //debugEmail('Main DEBUG', order, isTrackingNumber(order.$Tracking, order), drugs[orderId] == null, tracking[orderId], didStatusChange(status[orderId], order.$Status))
-    }
 
     if (tracking[orderId])
       Log("Don't do anything if there is already a tracking number", orderId, tracking[orderId], status[orderId])
@@ -172,13 +168,14 @@ function mainLoop(email) {
      if ( ! invoice)
       return debugEmail('Warning shipped order has no invoice!', invoice, order)
 
+     order.$Fee = fee[order.$OrderId] //Don't think $Fee would ever be set here
+     order.$Tracking = trackingFormula(order.$Tracking)
+
      orderShippedNotification(order, invoice, drugs[order.$OrderId])
 
      updateWebformShipped(order, invoice)
 
      deleteShoppingLists(order.$OrderId)
-
-     order.$Tracking = trackingFormula(order.$Tracking)
 
      try {
         shipped.updateRow(order)
