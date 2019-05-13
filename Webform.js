@@ -13,6 +13,16 @@ function updateWebformShipped(order, invoice) {
       shipping_lines:[{method_id:'flat_rate', total:order.$Fee}] //TODO if run multiple times this will always append the new rate (cumulative) rather than replacing old values.
     }
 
+    if (order.$Coupon) {
+      woocommerceOrder.status = 'shipped-coupon'
+    } else if (order.$Card) {
+      woocommerceOrder.status = 'shipped-autopay'
+      woocommerceOrder.payment_method = 'stripe'
+    } else {
+      woocommerceOrder.status = 'shipped-unpaid'
+      woocommerceOrder.payment_method = 'cheque'
+    }
+
     //Order was already created (1) by user when registering, or (2) by status update when rx recieved
     updateWebformOrder(order.$OrderId, woocommerceOrder)
 }
