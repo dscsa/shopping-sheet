@@ -14,7 +14,7 @@ function setPriceFeesDue(order) {
 
 function setFee(order) {
   setTotal(order)
-  return order.$Fee = order.$IsNew ? 6 : order.$Total
+  return order.$Fee = order.$New ? 6 : order.$Total
 }
 
 function setTotal(order) {
