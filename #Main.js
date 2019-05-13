@@ -169,13 +169,14 @@ function mainLoop(email) {
       return debugEmail('Warning shipped order has no invoice!', invoice, order)
 
      order.$Fee = fee[order.$OrderId] //Don't think $Fee would ever be set here
-     order.$Tracking = trackingFormula(order.$Tracking)
 
      orderShippedNotification(order, invoice, drugs[order.$OrderId])
 
      updateWebformShipped(order, invoice)
 
      deleteShoppingLists(order.$OrderId)
+
+     order.$Tracking = trackingFormula(order.$Tracking) //Wrap in hyperlinkformula
 
      try {
         shipped.updateRow(order)
