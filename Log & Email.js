@@ -1,11 +1,11 @@
 function debugEmail() {
-  var subject = 'v4 Debug '+getCaller()
+  var subject = 'v4 Debug '+getCaller()+getEmailQuota()
   var body = '<pre>'+argArray(arguments).join('\n\n')+'</pre>'
   sendEmail(subject, body.split('\n'))
 }
 
 function infoEmail() {
-  var subject = 'v4 Info '+getCaller()
+  var subject = 'v4 Info '+getCaller()+getEmailQuota()
   var body = '<pre>'+argArray(arguments).join('\n\n')+'</pre>'
   sendEmail(subject, body.split('\n'))
 }
@@ -37,6 +37,10 @@ function getCaller() {
   } catch (err) {
     return err.stack.split('\n')[2].trim()
   }
+}
+
+function getEmailQuota() {
+  return " "+(1500 - MailApp.getRemainingDailyQuota())+" of 1500"
 }
 
 var overQuota = 0
@@ -85,7 +89,7 @@ function sendEmail(to, subject, body, attachments) {
     })
   } catch (e) {
     //TODO confirm this by checking if error matches "Email quota likely reached Exception: Service invoked too many times for one day: email."  "
-    Log('Email Not Sent: Quota likely reached', e)
+    Log('Email Not Sent: Quota likely reached', e.message, e.stack, e)
     overQuota++
   }
 }

@@ -26,7 +26,7 @@ function createShoppingLists(order, drugs) {
 
   var orderID = order.$OrderId
 
-  infoEmail('createShoppingLists', order, new Error().stack) //debug v2 shopping for meds after they are already dispensed
+  //infoEmail('createShoppingLists', order, new Error().stack) //debug v2 shopping for meds after they are already dispensed
 
   var ss   = openSpreadsheet('Shopping List #'+orderID, 'Shopping Lists')
   var errs = []

@@ -324,5 +324,5 @@ function addDrugDetails(order) {
     Log(order.$OrderId, order.$Drugs[i].$Name, "getSyncDays")
   }
 
-  infoEmail('setDaysQtyRefills', order)
+  //infoEmail('setDaysQtyRefills', order)
 }
