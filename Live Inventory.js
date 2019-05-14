@@ -50,7 +50,7 @@ function _setV2info(drug) {
     emailBody.push(['Consider updating v2 order for '+drug.$v2, drug.$v2+' ('+drug.$Name+') is '+drug.$Stock+' but is ordered only if it has a quantity > '+v2info['order.minQty']+' and expires more than '+v2info['order.minDays']+' days from now']) ///only send if max inventory is not the issue
 
   if (emailBody.length && drug.$IsDispensed)
-    sendEmail('Consider updating v2 Drug Orders', emailBody.concat(v2info))
+    debugEmail('Consider updating v2 Drug Orders', emailBody, v2info)
 }
 
 function excludeFromOrder(drug, order) {
