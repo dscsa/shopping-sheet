@@ -104,14 +104,11 @@ function excludeFromOrder(drug, order) {
   if ( ! drug.$InOrder && drug.$NextRefill == 'N/A')
     return 'is past due.  Please request 2 weeks in advance'
 
-  if (new Date(drug.$NextRefill) - new Date(order.$OrderAdded) > maxMedSyncTime(drug)) {
+  if (new Date(order.$OrderAdded) - new Date(drug.$LastRefill) <= 10*24*60*60*1000)
+    return 'was filled recently and not due again until '+drug.$NextRefill
 
-    if (new Date(order.$OrderAdded) - new Date(drug.$LastRefill) <= 10*24*60*60*1000)
-      return 'was filled recently and not due again until '+drug.$NextRefill
-
+  if (new Date(drug.$NextRefill) - new Date(order.$OrderAdded) > maxMedSyncTime(drug))
     return 'is due for a refill on '+drug.$NextRefill
-  }
-
 
   if (drug.$TotalQty < 2000 && drug.$Qty > drug.$DispenseQty && drug.$Qty > 2.5*drug.$RepackQty)
     return 'was prescribed in an unusually high qty and needs to be reviewed by a pharmacist'
