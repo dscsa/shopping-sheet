@@ -28,6 +28,9 @@ function mergeDoc(template, name, folder, order) {
 //Flatten drug array into the data object by prepending index
 function flattenOrder(order) {
  Log('order', order)
+
+ order = JSON.parse(JSON.stringify(order)) //Copy order so we don't mess it up for everyone else
+
  for (var i in order.$Drugs) {
 
    for (var j in order.$Drugs[i]) {
