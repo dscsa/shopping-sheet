@@ -212,7 +212,14 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
 
   s.setCellByKeys = function(rowKey, colKey, val) {
     //Log('setCellByKeys')
-    return setValue(s.getRange(s.cellRangeByKeys(rowKey, colKey)), val)
+    var range = s.cellRangeByKeys(rowKey, colKey)
+
+    try {
+      var rangeVals = s.getRange(range)
+    } catch(e) {
+      throw new Error('Cannot get range '+sheetNameOrUrl+'!'+range)
+    }
+    return setValue(rangeVals, val)
   }
 
   //Private Helper
