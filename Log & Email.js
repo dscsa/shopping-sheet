@@ -40,7 +40,7 @@ function getCaller() {
 }
 
 function getEmailQuota() {
-  return " "+(1500 - MailApp.getRemainingDailyQuota())+" of 1500"
+  return " "+(1501 - MailApp.getRemainingDailyQuota())+" of 1500"
 }
 
 var overQuota = 0
@@ -64,7 +64,7 @@ function sendEmail(to, subject, body, attachments) {
 
     mainCache.put(to, msgHistory, 4*60*60)
 
-    if (prevMessage)
+    if (prevMessage && to != 'kiah@sirum.org')
       return debugEmail('Stop email spam', msgHistory)
 
     if ( ! LIVE_MODE) to = ''

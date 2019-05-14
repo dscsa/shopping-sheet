@@ -62,7 +62,7 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
   })
 
   if (isGaPines)
-    sendEmail('adam@sirum.org,kiah@sirum.org,support@goodpill.org', "Potential GA Pines Order #"+order.$OrderId, "Potential GA Pines Order #"+order.$OrderId+". "+isGaPines)
+    sendEmail('kiah@sirum.org', "Potential GA Pines Order #"+order.$OrderId, "Potential GA Pines Order #"+order.$OrderId+". "+isGaPines)
 
   if ( ! order.$Drugs.length) return
 
