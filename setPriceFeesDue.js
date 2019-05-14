@@ -2,7 +2,10 @@ function setPriceFeesDue(order) {
   order.$Due = setFee(order)
   order.$BilledAt = "N/A"
 
-  if (order.$Coupon && order.$Coupon.slice(0, 6) != "track_") order.$Due = 0
+  if (order.$Coupon && order.$Coupon.slice(0, 6) != "track_") {
+    order.$Fee = order.$Total
+    order.$Due = 0
+  }
   else if (order.$Card) {
     var start = Utilities.formatDate(new Date(scriptId.getFullYear(), scriptId.getMonth() + 1, 1), "ET", "MM/dd")
     var stop  = Utilities.formatDate(new Date(scriptId.getFullYear(), scriptId.getMonth() + 1, 7), "ET", "MM/dd/yy")

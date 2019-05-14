@@ -60,10 +60,6 @@ function createInvoice(order) { //This is undefined when called from Menu
 
    var sheet = getSheet(null, 'A', 2) //allow to work for archived shopping sheets as well
 
-   order = flattenOrder(order)
-
-   //debugEmail('flatten order', orderID, order)
-
    if (order.$OrderId != +order.$OrderId)
      throw Error('Order Id does not appear to be valid')
 
@@ -71,6 +67,10 @@ function createInvoice(order) { //This is undefined when called from Menu
      Log('createInvoice has no $Total, $Fee, or $Due', '#'+order.$OrderId, order.$Total, order.$Fee, order.$Due, order)
      setPriceFeesDue(order)
    }
+
+   order = flattenOrder(order)
+
+   debugEmail('flatten order', order.$OrderId, order)
 
    var template  = fileByName("Order Summary v4")
    var invoice   = makeCopy(template, getInvoiceName(order.$OrderId, order.$OrderChanged), "Published")
