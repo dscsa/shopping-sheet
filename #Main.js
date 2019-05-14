@@ -36,7 +36,7 @@ function triggerShopping() {
   } catch (e) {
     //Log(e, e.message, e.stack)
     clearCacheLock()
-    debugEmail('triggerShopping error', e, e.stack, mainCache)
+    debugEmail('triggerShopping error', 'scriptId', scriptId, e, e.stack, mainCache)
   }
 }
 
