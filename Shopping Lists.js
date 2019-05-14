@@ -122,12 +122,12 @@ function shopV2(drug, orderID) {
   var unsortedNDCs = groupByNdc(rows, drug)
   var sortedNDCs   = sortNDCs(unsortedNDCs, longExp)
 
-  infoEmail('shopV2', drug.$Name, v2name, 'orderID', '#'+orderID, 'minQty', minQty, 'minDays', minDays, 'drugStock', drugStock, 'url:', url, 'rows:', rows, 'sortedNDCs', sortedNDCs)
+  Log('shopV2', drug.$Name, v2name, 'orderID', '#'+orderID, 'minQty', minQty, 'minDays', minDays, 'drugStock', drugStock, 'url:', url, 'rows:', rows, 'sortedNDCs', sortedNDCs)
 
   var list = makeList(sortedNDCs, minQty, safety)
   if (list || minDays <= 45) return list
 
-  infoEmail('Shopping Error: Not enough qty found, trying 45 days and no safety', '#'+orderID, drug.$Name, v2name, minQty, minDays, drugStock, url, 'sortedNDCs', sortedNDCs, 'unsortedNDCs', unsortedNDCs, 'rows', rows)
+  debugEmail('Shopping Error: Not enough qty found, trying 45 days and no safety', '#'+orderID, drug.$Name, v2name, minQty, minDays, drugStock, url, 'sortedNDCs', sortedNDCs, 'unsortedNDCs', unsortedNDCs, 'rows', rows)
 
   var list = makeList(sortedNDCs, +(45/minDays*minQty).toFixed(0), 0)
   if (list) return list
@@ -292,7 +292,7 @@ function v2Fetch(url, method, body) {
 
   try {
     var json = UrlFetchApp.fetch(encodeURI(url), opts).getContentText()
-    if (method == 'POST') infoEmail('v2Fetch POST', url, encodeURI(url), json, opts.payload)
+    if (method == 'POST') Log('v2Fetch POST', url, encodeURI(url), json, opts.payload)
     return JSON.parse(json).rows
   } catch (e) {
     debugEmail('Could not fetch v2 Shopping List.  Is site down?', e, url, opts, json)

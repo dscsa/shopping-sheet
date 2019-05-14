@@ -125,15 +125,17 @@ function saveWebformOrder(action, endpoint, woocommerceOrder) {
     var content = response.getContentText()
 
     var parsed = JSON.parse(content)
+    var success = parsed.number || parsed.code == "refill_order_already_exists"
 
-    infoEmail('saveWebformOrder success?', 'action: '+action, 'endpoint: '+endpoint, 'http code: '+response.getResponseCode(), 'headers', response.getHeaders(), 'request', woocommerceOrder, 'response', parsed)
+    if ( ! success)
+      debugEmail('saveWebformOrder success?', 'action: '+action, 'endpoint: '+endpoint, 'http code: '+response.getResponseCode(), 'headers', response.getHeaders(), 'request', woocommerceOrder, 'response', parsed)
 
   } catch (e) {
     //This happens when we try to update an order that does not exist.  We catch this error and create the order
     //I could not figure out how to respond with a good error message to check for this by trying throwing/returning
     //errors from woocommerce but could not get it to work.  SOOOO just assume any error here means that we should try
     //creating the order rather than updating it
-    infoEmail('saveWebformOrder Error.  Most likely trying to update an order that needs to be created', e, e.stack, content, response, action, endpoint, woocommerceOrder)
+    Log('saveWebformOrder Error.  Most likely trying to update an order that needs to be created', e, e.stack, content, response, action, endpoint, woocommerceOrder)
     throw e
   }
 }
