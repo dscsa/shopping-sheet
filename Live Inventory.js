@@ -40,7 +40,7 @@ function _setV2info(drug) {
 
   var emailBody = []
 
-  var qtyThreshold = Math.ceil((+v2info['dispensed.qty']+5*v2info['qty threshold'])/1000)*1000 //qty threshold was too low for warning, want a little buffer.
+  var qtyThreshold = Math.ceil((+v2info['dispensed.qty']+5*v2info['qty threshold'])/2500)*2500 //qty threshold was too low for warning, want a little buffer.
 
   if ( ! drug.$Stock && v2info['order.maxInventory'] && (v2info['order.maxInventory'] > 3500) && (v2info["price / month"] < 20) && (+v2info['order.maxInventory'] > qtyThreshold))
     emailBody.push(['Consider decreasing v2 max inventory for '+drug.$v2+' to '+qtyThreshold, drug.$v2+' ('+drug.$Name+') '+v2info['order.maxInventory']+' > '+v2info['dispensed.qty']+' + 5*'+v2info['qty threshold']])
