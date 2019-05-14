@@ -29,6 +29,7 @@ function mergeDoc(template, name, folder, order) {
 function flattenOrder(order) {
  Log('order', order)
 
+ //Note this destroys any keys that had a value of undefined (e.g, $New)
  order = JSON.parse(JSON.stringify(order)) //Copy order so we don't mess it up for everyone else
 
  for (var i in order.$Drugs) {
@@ -239,7 +240,8 @@ function getIfArg(hasIf, body) {
   var end = body.getStartOffset()
   var arg = hasIf.getElement().getText().slice(start, end)
 
-  var arg2 = arg.replace(/ |null|undefined|0|false/gi, '')
+  //Replace all falsey values with empty string.  We assume unreplaced var strings still present - $XXX - were undefined
+  var arg2 = arg.replace(/ +|null|undefined|0|false|\$\w+/gi, '')
 
   //Log('getIfArg', arg, arg2, ! /^(!.+)?$/.test(arg2))
   //falsey is either empty string or (! and not empty string)
