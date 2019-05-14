@@ -168,7 +168,9 @@ function mainLoop(email) {
      if ( ! invoice)
       return debugEmail('Warning shipped order has no invoice!', invoice, order)
 
-     order.$Fee = fee[order.$OrderId] //Don't think $Fee would ever be set here
+     //Don't change Drugs and Invoice since should already be finalized
+     order.$Drugs = drugs[order.$OrderId]
+     order.$Fee = fee[order.$OrderId]
 
      orderShippedNotification(order, invoice, drugs[order.$OrderId])
 
@@ -183,9 +185,6 @@ function mainLoop(email) {
      } catch (e) {
         shipped.prependRow(order)
      }
-
-     //Drugs and Invoice should already be finalized
-     delete order.$Drugs
 
      sheet.updateRow(order)
 
