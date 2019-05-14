@@ -68,7 +68,7 @@ function createInvoice(order) { //This is undefined when called from Menu
      throw Error('Order Id does not appear to be valid')
 
    if ( ! order.$Total || ! order.$Fee || order.$Due == null) { //$Due might be $0 so do null check instead
-     debugEmail('createInvoice has no $Total, $Fee, or $Due', '#'+order.$OrderId, order.$Total, order.$Fee, order.$Due, order)
+     Log('createInvoice has no $Total, $Fee, or $Due', '#'+order.$OrderId, order.$Total, order.$Fee, order.$Due, order)
      setPriceFeesDue(order)
    }
 
