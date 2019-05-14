@@ -10,7 +10,7 @@ function updateWebformShipped(order, invoice) {
         {key:"invoice_doc_id", value:invoice.getId() || ''},
         {key:"invoice_number", value:order.$OrderId},
       ],
-      shipping_lines:[{method_id:'flat_rate', total:order.$Fee}] //TODO if run multiple times this will always append the new rate (cumulative) rather than replacing old values.
+      shipping_lines:[{method_id:'flat_rate', total:order.$Fee+''}] //Must be a string
     }
 
     if (order.$Coupon) {
@@ -56,7 +56,7 @@ function updateWebformDispensed(order, invoice) {
         {key:"invoice_number", value:order.$OrderId},
         {key:"invoice_doc_id", value:invoice.getId() || ''} //cannot be null otherwise nothing saves
       ],
-      shipping_lines:[{method_id:'flat_rate', total:order.$Fee}] //TODO if run multiple times this will always append the new rate (cumulative) rather than replacing old values.
+      shipping_lines:[{method_id:'flat_rate', total:order.$Fee+''}] //Must be a string
 
     }
 
