@@ -10,7 +10,7 @@ function testShoppingLists() {
 
 //So Cindy doesn't have to unpend things that didn't ship
 function deleteShoppingLists(orderID) {
-  var res = v2Fetch('http://v2.goodpill.org/account/8889875187/pend/'+orderID, 'DELETE')
+  var res = v2Fetch('/account/8889875187/pend/'+orderID, 'DELETE')
 
   var shoppingListFolder   = DriveApp.getFolderById('1PcDYKM_Ky-9zWmCNuBnTka3uCKjU3A0q')
   var shoppingListIterator = shoppingListFolder.getFilesByName('Shopping List #'+orderID)
@@ -91,7 +91,7 @@ function createShoppingLists(order, drugs) {
       ss.getRange('A1:E'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
 
       //Pend after all forseeable errors are accounted for.
-      var res = v2Fetch('http://v2.goodpill.org/account/8889875187/pend/'+orderID+' - '+minQty, 'POST', shopped.pend)
+      var res = v2Fetch('/account/8889875187/pend/'+orderID+' - '+minQty, 'POST', shopped.pend)
 
       infoEmail('V2 Pended', drug.$Name, v2name, '#'+orderID, minQty, shopped.pend, res, drug, order)
 
@@ -116,7 +116,7 @@ function shopV2(drug, orderID) {
   var startkey  = '["8889875187","month","'+minExp[0]+'","'+minExp[1]+'","'+v2name+'"]'
   var endkey    = '["8889875187","month","'+minExp[0]+'","'+minExp[1]+'","'+v2name+'",{}]'
 
-  var url  = 'http://v2.goodpill.org/transaction/_design/inventory.qty-by-generic/_view/inventory.qty-by-generic?reduce=false&include_docs=true&limit=300&startkey='+startkey+'&endkey='+endkey
+  var url  = '/transaction/_design/inventory.qty-by-generic/_view/inventory.qty-by-generic?reduce=false&include_docs=true&limit=300&startkey='+startkey+'&endkey='+endkey
   var rows = v2Fetch(url)
 
   var unsortedNDCs = groupByNdc(rows, drug)
