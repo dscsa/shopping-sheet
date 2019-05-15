@@ -294,7 +294,7 @@ function v2Fetch(url, method, body) {
     var json = UrlFetchApp.fetch(encodeURI('http://52.8.112.88'+url), opts)
   } catch (e) {
     try {
-      debugEmail('Could not fetch v2 Shopping List from Primary (52.8.112.88).  Is the 52.8.112.88 server down?', e, url, opts, json)
+      Log('Could not fetch v2 Shopping List from Primary (52.8.112.88).  Is the 52.8.112.88 server down?', e, url, opts, json)
       var json = UrlFetchApp.fetch(encodeURI('http://52.9.6.78'+url), opts)
     } catch (e) {
       return debugEmail('Could not fetch v2 Shopping List from Primary (52.8.112.88) OR Secondary (52.9.6.78).  Are both v2 servers down?', e, url, opts, json)
