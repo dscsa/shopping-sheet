@@ -270,13 +270,22 @@ function mainLoop(email) {
 }
 
 function setStatus(order, oldStatus) {
+
+  var isMissingRx  = true
+  var isDispensing = false
+
+  for (var i in order.$Drugs) {
+    isMissingRx  = isMissingRx  && ! order.$Drugs[i].$InOrder
+    isDispensing = isDispensing || order.$Drugs[i].$IsDispensed
+  }
+  
   if (order.$Tracking)
     order.$Status = 'Shipped'
-  else if ( ! order.$Drugs.length)
+  else if (isMissingRx)
     order.$Status = 'Missing Rx'
   else if (order.$OrderDispensed) //drug details might not be run so $Days could be NULL
     order.$Status = 'Dispensed'
-  else if (order.$Drugs.reduce(function(dispensing, drug) { return dispensing || drug.$IsDispensed }, false)) //Solve reshopping for drugs that Cindy is about to dispense. This could also be solved by looking to see if the drug was automatically addded to order or whether Cindy added it herself
+  else if (isDispensing) //Solve reshopping for drugs that Cindy is about to dispense. This could also be solved by looking to see if the drug was automatically addded to order or whether Cindy added it herself
     order.$Status = 'Dispensing'
   else if ( ! order.$Pharmacy.short)
     order.$Status = 'Needs Form'
