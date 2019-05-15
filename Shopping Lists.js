@@ -291,12 +291,20 @@ function v2Fetch(url, method, body) {
   }
 
   try {
-    var json = UrlFetchApp.fetch(encodeURI(url), opts).getContentText()
-    if (method == 'POST') Log('v2Fetch POST', url, encodeURI(url), json, opts.payload)
-    return JSON.parse(json).rows
+    var json = UrlFetchApp.fetch(encodeURI('http://52.8.112.88'+url), opts)
   } catch (e) {
-    debugEmail('Could not fetch v2 Shopping List.  Is site down?', e, url, opts, json)
+    try {
+      debugEmail('Could not fetch v2 Shopping List from Primary (52.8.112.88).  Is the 52.8.112.88 server down?', e, url, opts, json)
+      var json = UrlFetchApp.fetch(encodeURI('http://52.9.6.78'+url), opts)
+    } catch (e) {
+      return debugEmail('Could not fetch v2 Shopping List from Primary (52.8.112.88) OR Secondary (52.9.6.78).  Are both v2 servers down?', e, url, opts, json)
+    }
   }
+
+  json = json.getContentText()
+
+  if (method == 'POST') Log('v2Fetch POST', url, encodeURI(url), json, opts.payload)
+  return JSON.parse(json).rows
 }
 
 function sortList(a, b) {
