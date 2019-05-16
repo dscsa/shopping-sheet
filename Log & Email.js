@@ -100,7 +100,7 @@ function sendEmail(to, subject, body, attachments) {
       cc:cc,
       bcc:bcc,
       subject:subject,
-      htmlBody:body.join('<br>'),
+      htmlBody:body.join ? body.join('<br>') : body,
       attachments:attachments
     })
   } catch (e) {
