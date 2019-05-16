@@ -70,7 +70,7 @@ function createInvoice(order) { //This is undefined when called from Menu
 
    order = flattenOrder(order)
 
-   debugEmail('flatten order', order.$OrderId, order)
+   Log('flatten order', order.$OrderId, order)
 
    var template  = fileByName("Order Summary v4")
    var invoice   = makeCopy(template, getInvoiceName(order.$OrderId, order.$OrderChanged), "Published")
