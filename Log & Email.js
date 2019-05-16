@@ -66,7 +66,7 @@ function sendEmail(to, subject, body, attachments) {
   if ( ! to) {
     bcc = 'adam@sirum.org'
   }
-  if ( ~ to.indexOf('@')) {
+  else if ( ~ to.indexOf('@')) {
 
     var prevMessage = mainCache.get(to) || ''
     var msgHistory  = prevMessage+'<br>'+scriptId.toJSON()+': '+subject+'<br>'+body
