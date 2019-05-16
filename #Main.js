@@ -15,24 +15,23 @@ function onOpen() {
 function triggerShopping() {
 
   try {
-    var start = new Date()
-    if ( ! (start.getMinutes() % 3)) { //run every 3 minutes
-      mainLoop(true)
 
-      var lock = LockService.getScriptLock();
+    mainLoop(true)
 
-      if ( ! lock.tryLock(1000)) return
+    var lock = LockService.getScriptLock();
 
-      var clinicPortal = SpreadsheetApp.getActiveSpreadsheet()
-        .getSheetByName('Clinic Portal')
-        .getRange('A3')
-        .getDisplayValues()
+    if ( ! lock.tryLock(1000)) return
 
-      if ( ! clinicPortal[0] || ! clinicPortal[0][0])
-        debugEmail('clinicPortal Error', clinicPortal)
+    var clinicPortal = SpreadsheetApp.getActiveSpreadsheet()
+      .getSheetByName('Clinic Portal')
+      .getRange('A3')
+      .getDisplayValues()
 
-      lock.releaseLock()
-    }
+    if ( ! clinicPortal[0] || ! clinicPortal[0][0])
+      debugEmail('clinicPortal Error', clinicPortal)
+
+    lock.releaseLock()
+
   } catch (e) {
     //Log(e, e.message, e.stack)
     clearCacheLock()
@@ -278,7 +277,7 @@ function setStatus(order, oldStatus) {
     isMissingRx  = isMissingRx  && ! order.$Drugs[i].$InOrder
     isDispensing = isDispensing || order.$Drugs[i].$IsDispensed
   }
-  
+
   if (order.$Tracking)
     order.$Status = 'Shipped'
   else if (isMissingRx)
