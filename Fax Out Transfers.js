@@ -67,14 +67,21 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
   if ( ! order.$Drugs.length) return
 
   var fax = mergeDoc("Transfer Out Fax v1", "Transfer #"+order.$OrderId, "Transfer Outs", order)
+  var pdf = fax.getAs(MimeType.PDF)
 
-  var res = sendSFax('18882987726', fax.getAs(MimeType.PDF))
-
-  var success = res.isSuccess ? "Faxed" : "Error"
+  if (order.$Pharmacy.fax) {
+    var res = sendSFax(order.$Pharmacy.fax, pdf)
+    var success = res.isSuccess ? "External" : "Error External"
+    sendEmail('adam@sirum.org,cindy@goodpill.org', success + ' Transfer Out Fax', 'OrderId: '+orderId+'. See the <a href="'+fax.getUrl()+'">fax here</a>')
+  } else {
+    var res = sendSFax('18882987726', pdf)
+    var success = res.isSuccess ? "Internal" : "Error Internal"
+  }
 
   fax.setName(success + ": Transfer #"+order.$OrderId)
 
-  debugEmail(success + ': Transfer Out Fax', 'OrderId', orderId, 'isSuccess', res.isSuccess, 'res', res, 'order', order)
+  if ( ! res.isSuccess)
+    debugEmail(success + ' Transfer Out Fax', 'OrderId', orderId, 'isSuccess', res.isSuccess, fax.getUrl(), 'res', res, 'order', order)
 }
 
 function getToken(){

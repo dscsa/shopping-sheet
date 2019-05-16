@@ -62,13 +62,16 @@ function sendEmail(to, subject, body, attachments) {
     var prevMessage = mainCache.get(to) || ''
     var msgHistory  = prevMessage+'<br>'+scriptId.toJSON()+': '+subject+'<br>'+body
 
-    //Override cache if this email is a shipped email and the previous email was not
     var wasShipped  = ~ prevMessage.indexOf('items has shipped')
     var  isShipped  = ~ msgHistory.indexOf('items has shipped')
 
+    //Override cache if this email is a shipped email and the previous email was not
+    var noCacheIfShipped  = wasShipped ? true : ! isShipped
+    var noCacheIfInternal = ! ~ to.indexOf('@sirum.org') && ! ~ to.indexOf('@goodpill.org')
+
     mainCache.put(to, msgHistory, 4*60*60)
 
-    if (prevMessage && to != 'kiah@sirum.org' && (wasShipped ? true : ! isShipped))
+    if (prevMessage && noCacheIfShipped && noCacheIfInternal)
       return debugEmail('Stop email spam', msgHistory)
 
     if ( ! LIVE_MODE) to = ''
