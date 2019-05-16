@@ -108,7 +108,10 @@ function sendSFax(toFax, blob){
 
   toFax = LIVE_MODE ? toFax : '18882987726'
 
-  var url   = "https://api.sfaxme.com/api/SendFax?token=" + encodeURIComponent(token) + "&ApiKey=" + encodeURIComponent(SFAX_KEY) + "&RecipientName=" + encodeURIComponent('Good Pill Pharmacy - Active')  + "&RecipientFax=" + encodeURIComponent(toFax) //+ '&SenderFaxNumber=18557916085' //"&OptionalParams=" + encodeURIComponent('SenderFaxNumber=18557916085')
+  var url = "https://api.sfaxme.com/api/SendFax?token=" + encodeURIComponent(token) + "&ApiKey=" + encodeURIComponent(SFAX_KEY) + "&RecipientName=" + encodeURIComponent('Good Pill Pharmacy - Active')  + "&RecipientFax=" + encodeURIComponent(toFax)
+
+  if (toFax != '18882987726') //Have external faxes come from Good Pill and gointo our sent folder
+    url += "&OptionalParams=" + encodeURIComponent('SenderFaxNumber=18882987726')
 
   var opts  = {
     method:'POST',
