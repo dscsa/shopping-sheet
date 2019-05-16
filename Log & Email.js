@@ -1,11 +1,25 @@
 function debugEmail() {
-  var subject = 'v4 Debug '+getCaller()+getEmailQuota()
+
+  var quota = MailApp.getRemainingDailyQuota()
+
+  if (quota < 200) {
+    return Log.apply(this, arguments)
+  }
+
+  var subject = 'v4 Debug '+getCaller()+" "+(1501 - quota)+" of 1500"
   var body = '<pre>'+argArray(arguments).join('\n\n')+'</pre>'
   sendEmail(subject, body.split('\n'))
 }
 
 function infoEmail() {
-  var subject = 'v4 Info '+getCaller()+getEmailQuota()
+
+  var quota = MailApp.getRemainingDailyQuota()
+
+  if (quota < 300) {
+    return Log.apply(this, arguments)
+  }
+
+  var subject = 'v4 Info '+getCaller()+" "+(1501 - quota)+" of 1500"
   var body = '<pre>'+argArray(arguments).join('\n\n')+'</pre>'
   sendEmail(subject, body.split('\n'))
 }
@@ -39,17 +53,12 @@ function getCaller() {
   }
 }
 
-function getEmailQuota() {
-  return " "+(1501 - MailApp.getRemainingDailyQuota())+" of 1500"
-}
-
-var overQuota = 0
 function sendEmail(to, subject, body, attachments) {
 
 
   Log('sendEmail', to, subject, body)
 
-  if (overQuota > 1) return Log('Skipping email since likely over quota and email failures are time-consuming')
+  if (MailApp.getRemainingDailyQuota() < 1) return Log('Skipping email since likely over quota and email failures are time-consuming')
 
   var  cc = ''
   var bcc = ''
@@ -96,7 +105,7 @@ function sendEmail(to, subject, body, attachments) {
     })
   } catch (e) {
     //TODO confirm this by checking if error matches "Email quota likely reached Exception: Service invoked too many times for one day: email."  "
-    Log('Email Not Sent: Quota likely reached', e.message, e.stack, e)
-    overQuota++
+    Log('Email Not Sent', e.message, e.stack, e)
+    throw e
   }
 }
