@@ -82,8 +82,9 @@ function trackingURL(trackingNumber) {
   return url+trackingNumber
 }
 
-function trackingLink(tracking) {
-  return '<a href="'+trackingURL(tracking)+'">'+tracking+'</a>'
+//Convert gsheet hyperlink formula to an html link
+function trackingLink(trackingFormula) {
+  return trackingFormula.replace('=HYPERLINK(', '<a href=').replace(', "', '>').replace('")', '</a>')
 }
 
 function trackingFormula(tracking) {

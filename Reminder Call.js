@@ -126,36 +126,8 @@ function cancelFutureCalls(order, type) {
   }
 
   //if (events.length)
-  infoEmail('cancelFutureCalls', start, stop, opts, 'reason '+reason, 'email:', email, events.length+' events:', events.reduce(eventDetails, ''), order, new Error().stack)
+  infoEmail('cancelFutureCalls', start, stop, opts, 'type '+type, 'email:', email, events.length+' events:', events.reduce(eventDetails, ''), order, new Error().stack)
 }
-
-
-/*
-function removeFutureCalls(order, start, reason) {
-
-  if ( ! LIVE_MODE) return
-
-  var testing = cancelFutureCalls(order, reason) //testing this out first
-
-  var now = addTime(15/60, null) //actually 15 minutes in the future (just in case we already added some calls 5 minutes out, lets give a little 15min buffer)
-  if ( ! start || start < now) start = now //Don't delete past calls because ReminderCall would have already sent them out and we want to accurately reflect what happened
-
-  var stop    = addTime(24*6, start) //stop date seems to be required by Google.  Most calls happen within 3 days (Transfer Failed, Missing eRx, except 0 Refills remaining) but use 6 to be safe.  Want to keep 0 Refill calls should be more than 6 days out
-  var opts    = { search:order.$Patient.first + ' ' + order.$Patient.last }
-  var events  = CalendarApp.getDefaultCalendar().getEvents(start, stop, opts)
-  var eventsString  = events.reduce(eventDetails, '') //cannot get data from JSON.stringify(events)
-
-  if (events.length || testing)
-    debugEmail('removeFutureCalls', 'reason', reason, 'now', now, 'start', start, 'stop', stop, 'opts', opts, 'events', eventsString, 'canceled', testing, 'order', order)
-
-  Log('deleting future calls', events.length, 'events for ', order.$Patient.first + ' ' + order.$Patient.last, 'between', start, stop)
-
-  //TODO this currently erases Order Shipped too.  Do we want to delete Order Shipped events if we delete and then reload an event after it shipped
-  //We could easily go .getLocation() and skip it if it contains order shipped. https://developers.google.com/apps-script/reference/calendar/calendar-event
-  for (var i in events)
-    events[i].deleteEvent()
-}
-*/
 
 function setNewRowCalls(order) {
 
