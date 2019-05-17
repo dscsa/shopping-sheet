@@ -60,12 +60,16 @@ function updateWebformDispensed(order, invoice) {
 
     }
 
-    if (order.$Coupon) {
+    if (order.$Coupon && order.$Coupon.slice(0, 6) != "track_") {
       woocommerceOrder.status = 'shipped-coupon'
       woocommerceOrder.coupon_lines = [{code:order.$Coupon}]
     } else if (order.$Card) {
       woocommerceOrder.status = 'shipped-autopay'
       woocommerceOrder.payment_method = 'stripe'
+
+      var nextMonth = new Date(scriptId.getFullYear(), scriptId.getMonth() + 1, 1)
+      newCallEvent(order, nextMonth, 'AutoPay Notice', removeDelimiters(order.$Card+' $'+order.$Fee+'.00 between '+order.$BilledAt), order.$OrderId)
+
     } else {
       woocommerceOrder.status = 'shipped-unpaid'
       woocommerceOrder.payment_method = 'cheque'
