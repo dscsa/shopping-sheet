@@ -10,7 +10,7 @@ function getCallTime(order, hoursToAdd, dayOnly) {
 function scheduleCalls(order, type, firstName, lastName, keepFutureCalls) {
 
   if ( ! keepFutureCalls)
-    cancelFutureCalls(order, 'scheduleCalls '+type) //just in case we are re-adding an order after a user deleted it
+    cancelFutureCalls(order, type) //just in case we are re-adding an order after a user deleted it
 
   var calls = ['$FirstCall', '$SecondCall', '$ThirdCall', '$FourthCall']
   for (var i in calls) {
@@ -57,7 +57,7 @@ function addTime(hoursToAdd, date, dayOnly) {
 }
 
 //TODO  Transfer failed should be drug specific (this is hard)
-function cancelFutureCalls(order, reason) {
+function cancelFutureCalls(order, type) {
 
   if ( ! LIVE_MODE) return
 
@@ -71,7 +71,12 @@ function cancelFutureCalls(order, reason) {
     var location = events[j].getLocation()
     var title = events[j].getTitle()
 
-    if ( ~ location.indexOf('New Patient')) {
+    if ( ~ location.indexOf(type)) {
+      events[j].deleteEvent()
+      email.push('Deleting DUPLICATE EVENT 'type+' '+title+' '+location)
+    }
+
+    else if ( ~ location.indexOf('New Patient')) {
       events[j].deleteEvent()
       email.push('Deleting New Patient: '+title+' '+location)
     }
@@ -84,6 +89,11 @@ function cancelFutureCalls(order, reason) {
     else if ( ~ location.indexOf('Transfer Failed')) {
       events[j].deleteEvent()
       email.push('Deleting Transfer Failed: '+title+' '+location)
+    }
+
+    else if ( ~ location.indexOf('Order Updated')) {
+      events[j].deleteEvent()
+      email.push('Deleting Order Updated: '+title+' '+location)
     }
 
     else if ( ~ location.indexOf('Order Updated')) {
@@ -116,7 +126,7 @@ function cancelFutureCalls(order, reason) {
   }
 
   //if (events.length)
-  infoEmail('cancelFutureCalls', start, stop, opts, 'reason '+reason, 'email:', email, events.length+' events:', events.reduce(eventDetails, ''), order)
+  infoEmail('cancelFutureCalls', start, stop, opts, 'reason '+reason, 'email:', email, events.length+' events:', events.reduce(eventDetails, ''), order, new Error().stack)
 }
 
 
