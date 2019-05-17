@@ -70,7 +70,7 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
   var pdf = fax.getAs(MimeType.PDF)
 
   if (order.$Pharmacy.fax) {
-    var res = sendSFax(order.$Pharmacy.fax, pdf)
+    var res = sendSFax('1'+order.$Pharmacy.fax, pdf)
     var success = res.isSuccess ? "External" : "Error External"
     sendEmail('adam@sirum.org,cindy@goodpill.org', success + ' Transfer Out Fax', 'OrderId: '+orderId+'. See the <a href="'+fax.getUrl()+'">fax here</a>')
   } else {
