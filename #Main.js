@@ -171,8 +171,6 @@ function mainLoop(email) {
      order.$Drugs = drugs[order.$OrderId]
      order.$Fee = fee[order.$OrderId]
 
-     orderShippedNotification(order, invoice, drugs[order.$OrderId])
-
      updateWebformShipped(order, invoice)
 
      deleteShoppingLists(order.$OrderId)
@@ -187,6 +185,7 @@ function mainLoop(email) {
 
      sheet.updateRow(order)
 
+     orderShippedNotification(order, invoice, drugs[order.$OrderId])
   }
 
   function statusChanged(order) {
