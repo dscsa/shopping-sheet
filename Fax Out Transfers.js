@@ -74,7 +74,7 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     if (faxTo.length == 10) faxTo = '1'+faxTo
     var res = sendSFax(faxTo, pdf)
     var success = res.isSuccess ? "External" : "Error External"
-    sendEmail('adam@sirum.org,cindy@goodpill.org', success + ' Transfer Out Fax', 'OrderId: '+orderId+'. See the <a href="'+fax.getUrl()+'">fax here</a>')
+    sendEmail('adam@sirum.org,cindy@goodpill.org', success + ' Transfer Out Fax', res.message+'. OrderId: '+orderId+'. See the <a href="'+fax.getUrl()+'">fax here</a>')
   } else {
     var res = sendSFax('18882987726', pdf)
     var success = res.isSuccess ? "Internal" : "Error Internal"
