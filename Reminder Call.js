@@ -73,7 +73,7 @@ function cancelFutureCalls(order, type) {
 
     if ( ~ location.indexOf(type)) {
       events[j].deleteEvent()
-      email.push('Deleting DUPLICATE EVENT 'type+' '+title+' '+location)
+      email.push('Deleting DUPLICATE EVENT '+type+' '+title+' '+location)
     }
 
     else if ( ~ location.indexOf('New Patient')) {
