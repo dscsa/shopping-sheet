@@ -50,8 +50,8 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     var nameMatch = ~ gaPinesLNames.indexOf(drug.$ProviderName.split(' ')[1])
     var npiMatch  = ~ gaPinesNpis.indexOf(drug.$Npi)
 
-    if (nameMatch && npiMatch) isGaPines = 'NAME AND NPI MATCH: '+drug.$ProviderName+' '+drug.$Npi
-    else if (nameMatch) isGaPines = 'NAME MATCH: '+drug.$ProviderName
+    if (nameMatch && npiMatch) isGaPines = 'PROVIDER AND NPI MATCH: '+drug.$ProviderName+' '+drug.$Npi
+    else if (nameMatch) isGaPines = 'PROVIDER MATCH: '+drug.$ProviderName
     else if (npiMatch) isGaPines = 'NPI MATCH: '+drug.$Npi
 
     if ( ! drug.$InOrder || drug.$IsRefill) return false
