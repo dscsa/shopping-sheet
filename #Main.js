@@ -1,76 +1,34 @@
-var LIVE_MODE = true  //set to false to turn off emails and text reminders.  Remember to turn it back on again!
+var LIVE_MODE = false  //set to false to turn off emails and text reminders.  Remember to turn it back on again!
 var mainCache = CacheService.getScriptCache();
 var scriptId  = new Date() //A unique id per script run
 
-// Use this code for Google Docs, Forms, or new Sheets.
-function onOpen() {
-  SpreadsheetApp.getUi() // Or DocumentApp or FormApp.
-      .createMenu('Shopping')
-      .addItem('Refresh Shopping Sheet', 'updateShopping')
-      .addItem('Update Order Invoice', 'updateInvoice')
-      .addItem('Transfer Out', 'createTransferFax')
-      .addToUi();
-}
-
+//This is run by aksecure@sirum.org so that:
+//1) GmailApp can be used to send emails as if aksecure is the support account, since it has a gmail alias
+//2) So that we can "protect" the sheets from the support@goodpill.org user while this script runs.  (A user can't remove their own privledges)
 function triggerShopping() {
 
   try {
-
-    mainLoop(true)
-
-    var lock = LockService.getScriptLock();
-
-    if ( ! lock.tryLock(1000)) return
-
-    var clinicPortal = SpreadsheetApp.getActiveSpreadsheet()
-      .getSheetByName('Clinic Portal')
-      .getRange('A3')
-      .getDisplayValues()
-
-    if ( ! clinicPortal[0] || ! clinicPortal[0][0])
-      debugEmail('clinicPortal Error', clinicPortal)
-
-    lock.releaseLock()
-
+    var unlock = lock()
+    mainLoop()
+    unlock()
   } catch (e) {
-    //Log(e, e.message, e.stack)
-    clearCacheLock()
+    unlock()
     debugEmail('triggerShopping error', 'scriptId', scriptId, e, e.stack, mainCache)
   }
 }
 
-function clearCacheLock() {
-  if (mainCache.remove) mainCache.remove('updateShoppingLock')
-}
-
 function updateShopping() {
   try {
+    var unlock = lock()
     mainLoop()
+    unlock()
   } catch (e) {
-    clearCacheLock()
+    unlock()
     throw e //Since this was run manually, show the error to the user
   }
 }
 
-function mainLoop(email) {
-
-  var lock = LockService.getScriptLock();
-
-  console.log('updateShopping', scriptId)
-
-  if ( ! lock.tryLock(1000)) {
-    var err = 'Refresh Shopping Sheet is already running! '+scriptId.toJSON()
-    console.log(err, scriptId)
-    Logger.log(err)
-    return
-  }
-
-  var updateShoppingLock = mainCache.get('updateShoppingLock')
-
-  if (updateShoppingLock)
-    return debugEmail('updateShoppingLock was set even though getScriptLock succeeded', 'Locked at:', updateShoppingLock, 'Failed at:', scriptId.toJSON())
-
-  mainCache.put('updateShoppingLock', scriptId.toJSON(), 30*60)
+function mainLoop() {
 
   var sheet     = getSheet('Shopping', 'A', 2)
   var shipped   = getSheet('Shipped', 'A', 2)
@@ -114,9 +72,6 @@ function mainLoop(email) {
   SpreadsheetApp.flush() //Recommended before releasing lock
 
   Log('Refresh Shopping Sheet Completed')
-
-  mainCache.remove('updateShoppingLock')
-  lock.releaseLock()
 
   /* Hoisted Helper Functions that need access to the sheet and other local variables */
 
@@ -329,4 +284,54 @@ function addDrugDetails(order) {
   }
 
   //infoEmail('setDaysQtyRefills', order)
+}
+
+// Use this code for Google Docs, Forms, or new Sheets.
+function onOpen() {
+  SpreadsheetApp.getUi() // Or DocumentApp or FormApp.
+      .createMenu('Shopping')
+      .addItem('Refresh Shopping Sheet', 'updateShopping')
+      .addItem('Update Order Invoice', 'updateInvoice')
+      .addItem('Transfer Out', 'createTransferFax')
+      .addItem('Unlock', 'unlockScript')
+      .addToUi();
+}
+
+//ScriptLock, CacheLock (ScriptLock was not always working!), and Protect Sheets from User Edits
+function lock() {
+
+  var lock = LockService.getScriptLock();
+
+  if ( ! lock.tryLock(1000)) return Log('Scipt is Locked '+scriptId.toJSON())
+
+  var updateShoppingLock = mainCache.get('updateShoppingLock')
+
+  if (updateShoppingLock)
+    return debugEmail('updateShoppingLock was set even though getScriptLock succeeded', 'Locked at:', updateShoppingLock, 'Failed at:', scriptId.toJSON())
+
+  mainCache.put('updateShoppingLock', scriptId.toJSON(), 30*60)
+
+  var shopping = SpreadsheetApp.getSheetByName('Shopping')
+  var shipped = SpreadsheetApp.getSheetByName('Shipped')
+
+  var protectShopping = shopping.protect().setDescription('Autoprotect Shopping Sheet: '+scriptId)
+  var protectShipped  =  shipped.protect().setDescription('Autoprotect Shipped Sheet: '+scriptId)
+
+  protectShopping.removeEditor('support@goodpill.org');
+  protectShipped.removeEditor('support@goodpill.org');
+
+  if (protectShopping.canDomainEdit()) protectShopping.setDomainEdit(false)
+  if (protectShipped.canDomainEdit()) protectShipped.setDomainEdit(false)
+
+  return function unlock() {
+    if (protectShopping.remove) protectShopping.remove()
+    if (protectShipped.remove) protectShipped.remove()
+    if (mainCache.remove) mainCache.remove('updateShoppingLock')
+    if (lock.releaseLock) lock.releaseLock()
+  }
+}
+
+//TODO, add unprotect sheets as well
+function unlockScript() {
+  if (mainCache.remove) mainCache.remove('updateShoppingLock')
 }

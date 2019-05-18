@@ -94,17 +94,19 @@ function sendEmail(to, subject, body, attachments) {
   }
 
   var opts = {
-    name:'Good Pill Pharmacy',
-    to:to,
-    cc:cc,
-    bcc:bcc,
-    subject:subject,
-    htmlBody:body.join ? body.join('<br>') : body,
-    attachments:attachments
-  }
+      from:'support@goodpill.org',
+      name:'Good Pill Pharmacy',
+      to:to,
+      cc:cc,
+      bcc:bcc,
+      subject:subject,
+      htmlBody:body.join ? body.join('<br>') : body,
+      attachments:attachments
+    }
 
   try {
-    MailApp.sendEmail(opts)
+    GmailApp.sendEmail(to, subject, '', opts)
+    //MailApp.sendEmail(opts)
   } catch (e) {
     //TODO confirm this by checking if error matches "Email quota likely reached Exception: Service invoked too many times for one day: email."  "
     Log('Email Not Sent', e.message, e.stack, e, opts)
