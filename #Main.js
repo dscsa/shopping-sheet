@@ -1,4 +1,4 @@
-var LIVE_MODE = false  //set to false to turn off emails and text reminders.  Remember to turn it back on again!
+var LIVE_MODE = true  //set to false to turn off emails and text reminders.  Remember to turn it back on again!
 var mainCache = CacheService.getScriptCache();
 var scriptId  = new Date() //A unique id per script run
 
@@ -9,10 +9,12 @@ function triggerShopping() {
 
   try {
     var unlock = lock()
-    mainLoop()
-    unlock()
+    if (unlock) {
+      mainLoop()
+      unlock()
+    }
   } catch (e) {
-    unlock()
+    if (unlock) unlock()
     debugEmail('triggerShopping error', 'scriptId', scriptId, e, e.stack, mainCache)
   }
 }
@@ -20,10 +22,12 @@ function triggerShopping() {
 function updateShopping() {
   try {
     var unlock = lock()
-    mainLoop()
-    unlock()
+    if (unlock) {
+      mainLoop()
+      unlock()
+    }
   } catch (e) {
-    unlock()
+    if (unlock) unlock()
     throw e //Since this was run manually, show the error to the user
   }
 }
@@ -311,12 +315,13 @@ function lock() {
 
   mainCache.put('updateShoppingLock', scriptId.toJSON(), 30*60)
 
-  var shopping = SpreadsheetApp.getSheetByName('Shopping')
-  var shipped = SpreadsheetApp.getSheetByName('Shipped')
+  var shopping = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Shopping')
+  var shipped = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Shipped')
 
   var protectShopping = shopping.protect().setDescription('Autoprotect Shopping Sheet: '+scriptId)
   var protectShipped  =  shipped.protect().setDescription('Autoprotect Shipped Sheet: '+scriptId)
 
+  //Note this won't work if user is support@goodpill.org (e.g. "Refresh Shopping Sheet" is called by User from Menu)
   protectShopping.removeEditor('support@goodpill.org');
   protectShipped.removeEditor('support@goodpill.org');
 
