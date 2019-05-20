@@ -18,7 +18,9 @@ function orderShippedNotification(order, invoice, drugs) {
 
   var numFills  = drugs.length - unfilled.length
 
-  var subject = 'Your order of '+numFills+' items has shipped'
+  var subject = numFills
+    ? 'Your order of '+numFills+' items has shipped'
+    : 'Your order has shipped' //If it's a makeup order then items must be 0
 
   if (false) { //unfilled.length) { Remove until we get this correct
     warning.push('The following medications were NOT filled:<br>'+unfilled.join('<br>'))
