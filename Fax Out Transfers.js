@@ -70,7 +70,7 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
   var pdf = fax.getAs(MimeType.PDF)
 
   if (order.$Pharmacy.fax) {
-    var faxTo = order.$Pharmacy.fax.replace(/[^\D]/, '')
+    var faxTo = order.$Pharmacy.fax.replace(/\D/g, '')
     if (faxTo.length == 10) faxTo = '1'+faxTo
     var res = sendSFax(faxTo, pdf)
     var success = res.isSuccess ? "External" : "Error External"
