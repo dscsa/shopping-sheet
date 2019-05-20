@@ -25,9 +25,9 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
       //UPDATE: 13607 had scriptNo change but it was same drug which did (but should not) trigger an Order Update Email
       var scriptChanged = newDrug.$ScriptNo != oldDrug.$ScriptNo
       var gcnChanged    = newDrug.$Gcn && oldDrug.$Gcn && newDrug.$Gcn != oldDrug.$Gcn //Eliminate Gcn == 0 errors
-      var nameChanged   = newDrug.$Name.replace(/\^ *|\* */g, '') != oldDrug.$Name.replace(/\^ *|\* */g, '')
+      //var nameChanged   = (! newDrug.$Gcn || ! oldDrug.$Gcn) && newDrug.$Name.replace(/\^ *|\* */g, '').toUpperCase() != oldDrug.$Name.replace(/\^ *|\* */g, '').toUpperCase //Only if no GCN available
 
-      if (scriptChanged && (nameChanged || gcnChanged)) continue
+      if (scriptChanged && gcnChanged) continue
 
       drugAdded = false //Match found so this is NOT a new drug
 
