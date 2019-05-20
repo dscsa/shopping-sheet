@@ -22,10 +22,12 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
       //Used to use GCN comparison but in rare cases Cindy would add two scripts of the same GCN into an order and then
       //didDrugChange would get triggered on every run because the refills would keep switching back and forth
       //UPDATE: Same problem with scriptNO but more rare. Order 13257 had same script number but different names
+      //UPDATE: 13607 had scriptNo change but it was same drug which did (but should not) trigger an Order Update Email
       var scriptChanged = newDrug.$ScriptNo != oldDrug.$ScriptNo
-      var nameChanged = newDrug.$Name.replace(/\^ *|\* */g, '') != oldDrug.$Name.replace(/\^ *|\* */g, '')
+      var gcnChanged    = newDrug.$Gcn && oldDrug.$Gcn && newDrug.$Gcn != oldDrug.$Gcn //Eliminate Gcn == 0 errors
+      var nameChanged   = newDrug.$Name.replace(/\^ *|\* */g, '') != oldDrug.$Name.replace(/\^ *|\* */g, '')
 
-      if (scriptChanged || nameChanged) continue
+      if (scriptChanged && (nameChanged || gcnChanged)) continue
 
       drugAdded = false //Match found so this is NOT a new drug
 
