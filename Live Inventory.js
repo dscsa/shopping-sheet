@@ -158,6 +158,7 @@ function liveInventoryByGcn(drug) {
     var minQtys       = sheet.colByKey('order.minQty')
     var minDays       = sheet.colByKey('order.minDays')
     var maxInventory  = sheet.colByKey('order.maxInventory')
+    var repackQty     = sheet.colByKey('order.repackQty')
 
     for (var gcns in genericNames) {
       gcns = gcns.split(',')
@@ -172,7 +173,8 @@ function liveInventoryByGcn(drug) {
           'price / month':monthlyPrices[gcns],
           'order.minQty':minQtys[gcns],
           'order.minDays':minDays[gcns],
-          'order.maxInventory':maxInventory[gcns]
+          'order.maxInventory':maxInventory[gcns],
+          'order.repackQty':repackQty[gcns]
         }
       }
     }
