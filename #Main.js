@@ -28,6 +28,7 @@ function updateShopping() {
     }
   } catch (e) {
     if (unlock) unlock()
+    debugEmail('updateShopping error', 'scriptId', scriptId, e, e.stack, mainCache)
     throw e //Since this was run manually, show the error to the user
   }
 }
