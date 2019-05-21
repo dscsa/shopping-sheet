@@ -98,7 +98,7 @@ function setDaysQtyRefills(drug, order) {
   if (drug.$IsDispensed)
     useDispensed(drug)
 
-  else if ( ~ drug.$Name.indexOf(' INH') && drug.$WrittenQty > 1)
+  else if ( ~ drug.$Name.indexOf(' INH'))
     useInhaler(drug)
 
   //TODO should we just get rid of useRefill Completely.  Seems like a VERY narrow use case
@@ -162,10 +162,21 @@ function useRefill(drug) {
 
 //Inhalers might come with qty 18 (# of inhales/puffs rather than 1 so ignore these).  Not sure if these hardcoded assumptions are correct?  Cindy could need to dispense two inhalers per month?  Or one inhaler lasts more than a month?
 function useInhaler(drug) {
-   drug.$Days    = 30
-   drug.$Qty     = 1
-   drug.$Refills = +(drug.$RefillsTotal - 1).toFixed(2)
-   drug.$Type    = "Inhaler"
+
+   if (drug.$DaysSupply){ //Written in inhalers, but assume that the writtenQty is equal to 1 month
+     drug.$Days    = drug.$DaysSupply
+     drug.$Qty     = drug.$DispenseQty
+     drug.$Refills = +(drug.$RefillsTotal - 1).toFixed(2)
+     drug.$Type    = "Inhaler Refill"
+   }
+   //Could be written in milliliters since prescriber cannot prescribe over 12 months of inhalers at a time
+   //Convert to Unit of Use by just assuming each inhaler is 30 days
+   else {
+     drug.$Days    = 60
+     drug.$Qty     = 2
+     drug.$Refills = +(drug.$RefillsTotal - 1).toFixed(2)
+     drug.$Type    = "Inhaler New"
+   }
 }
 
 function useEstimate(drug) {
