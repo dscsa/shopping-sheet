@@ -199,7 +199,12 @@ function mainLoop() {
 
       deleteShoppingLists(order.$OrderId)
 
-      shipped.prependRow(order)
+      try {
+        shipped.prependRow(order)
+      } catch (e) {
+        Log('shipped.prependRow failed trying an update instead', e)
+        shipped.updateRow(order)
+      }
     }
   }
 
