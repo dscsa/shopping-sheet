@@ -309,22 +309,14 @@ function getSheet(sheetNameOrUrl, colOfKeys, rowOfKeys) {
 
   s.prependRow = function(row) {
 
-    var lock = LockService.getScriptLock();
-
-    if ( ! lock.tryLock(1000)) {
-      throw new Error('Error: prependRow. Cannot get scriptLock')
-    }
-
     if ( ~ rowKeys.indexOf(row[keyID])) {
       throw new Error('Error: prependRow.  Cannot update row with duplicate key '+JSON.stringify(row, null, " "))
     }
 
     s.insertRowAfter(rowOfKeys)
     rowKeys.splice(rowOfKeys, 0, row[keyID]) //add the new row to rowKeys
+    SpreadsheetApp.flush() //Let's make sure the row is added before we update
     s.updateRow(row, true)
-
-    SpreadsheetApp.flush() //Recommended before releasing lock
-    lock.releaseLock()
   }
 
   return getSheetCache[cacheKey] = s
