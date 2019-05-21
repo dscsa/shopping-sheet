@@ -58,8 +58,6 @@ function sendEmail(to, subject, body, attachments) {
 
   Log('sendEmail', to, subject, body)
 
-  if (MailApp.getRemainingDailyQuota() < 1) return Log('Skipping email since likely over quota and email failures are time-consuming')
-
   var  cc = ''
   var bcc = ''
 
@@ -105,6 +103,10 @@ function sendEmail(to, subject, body, attachments) {
     }
 
   try {
+
+    if (MailApp.getRemainingDailyQuota() < 1) //Put in try because this was throwing an error once in a while "We're sorry, a server error occurred"
+      return Log('Skipping email since likely over quota and email failures are time-consuming')
+
     GmailApp.sendEmail(to, subject, '', opts)
     //MailApp.sendEmail(opts)
   } catch (e) {
