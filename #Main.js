@@ -178,7 +178,7 @@ function mainLoop() {
       var numChanges  = drugsChanged && drugsChanged.split(/REMOVED FROM ORDER|ADDED TO ORDER|ADDED TO PROFILE AND ORDER/).length - 1
       if (numChanges) {
         rxReceivedNotification(order)
-        debugEmail('rxReceivedNotification called because drugs & status both changed', '#'+order.$OrderId, status[order.$OrderId]+' --> '+order.$Status, drugsChanged, order)
+        debugEmail('rxReceivedNotification called because drugs & status both changed', '#'+order.$OrderId, status[order.$OrderId]+' --> '+order.$Status, 'numChanges', numChanges, drugsChanged, order)
       }
 
     }
@@ -221,7 +221,7 @@ function mainLoop() {
     //infoEmail('Drugs changed with no status change', order.$OrderId, status[order.$OrderId],  order.$Status, order, $Drugs, drugs[order.$OrderId])
     var numChanges  = drugsChanged.split(/ADDED TO ORDER|ADDED TO PROFILE AND ORDER/).length - 1 //Did not include REMOVED FROM ORDER because Order #8781.  Because $InOrder drugs may have $Days set to 0 by Live Inventory.
     if (numChanges && order.$Status != "Needs Form") {
-      infoEmail('rxReceivedNotification called because drugs changed', '#'+order.$OrderId, status[order.$OrderId]+' --> '+order.$Status, drugsChanged, 'Current Drugs', order.$Drugs, 'Old Drugs', drugs[order.$OrderId], 'Order', order)
+      infoEmail('rxReceivedNotification called because drugs changed', '#'+order.$OrderId, status[order.$OrderId]+' --> '+order.$Status, 'numChanges', numChanges, drugsChanged, 'Current Drugs', order.$Drugs, 'Old Drugs', drugs[order.$OrderId], 'Order', order)
       rxReceivedNotification(order, numChanges)
     }
 

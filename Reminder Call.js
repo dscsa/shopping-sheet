@@ -38,7 +38,7 @@ function newCallEvent(order, callTime, type, firstName, lastName) {
 
   var eventTitle = phone+' '+(firstName || patient.first.split(' ')[0])+' '+(lastName || patient.last.split(' ')[0]) //in case of first: Adam S, or last: Kircher JR, we need to split so reminder call doesnt get confused.  Not tested if necessary - its possible reminder call is smart enough to make this work
   var location   = {location:type+" #"+order.$OrderId+", "+patient.first+" "+patient.last+".  Created On:"+new Date()}
-  var calendar   = CalendarApp.getDefaultCalendar()
+  var calendar   = CalendarApp.getCalendarById('support@goodpill.org')
 
   //try to always send a text. if it's a landline then remindercall will fail on this, and will then try a voicecall instead
   var textEvent = calendar.createEvent(eventTitle+ " SMS", callTime, endTime, location)
@@ -56,6 +56,25 @@ function addTime(hoursToAdd, date, dayOnly) {
   return date
 }
 
+function testCalendarSearch() {
+
+   var start  = new Date("2019-05-20")
+   var stop   = new Date("2019-08-18")
+   var opts   = { search:"David Jones" }
+   var calendars = CalendarApp.getCalendarById('support@goodpill.org')//CalendarApp.getAllCalendars() //getCalendarsByName('Good Pill Support')
+
+   calendars = Array.isArray(calendars) ? calendars : [calendars]
+
+   for (var i in calendars) {
+     var calendar = calendars[i]
+     Logger.log(calendar.getName()+' '+calendar.getId())
+     var events = calendar.getEvents(start, stop, opts)
+     for (var j in events) {
+        Logger.log(events[j].getTitle()+' '+events[j].getLocation())
+     }
+   }
+}
+
 //TODO  Transfer failed should be drug specific (this is hard)
 function cancelFutureCalls(order, type) {
 
@@ -64,7 +83,7 @@ function cancelFutureCalls(order, type) {
   var start  = addTime(15/60, null) //actually 15 minutes in the future (just in case we already added some calls 5 minutes out, lets give a little 15min buffer)
   var stop   = addTime(24*90, start) //stop date seems to be required by Google.  Everything should happen within 90 days
   var opts   = { search:order.$Patient.first + ' ' + order.$Patient.last }
-  var events = CalendarApp.getDefaultCalendar().getEvents(start, stop, opts)
+  var events = CalendarApp.getCalendarById('support@goodpill.org').getEvents(start, stop, opts)
   var email  = []
 
   for (var j in events) {
@@ -135,9 +154,6 @@ function setNewRowCalls(order) {
   if ( ~ order.$Status.indexOf('Re:') || order.$Status == 'Dispensed' || order.$Status == 'Shipped') //Hyperlink() doesn't start with "Re:"
     return infoEmail('Row likely readded because order is not yet in sheet but is already Shipped, Dispensed, or Shopped', order)
 
-  //For some refills reminders with no drugs were showing up in F9 queue
-  var $IsRefill  = order.$Drugs.reduce(function(res, drug) { return res && drug.$IsRefill }, true)
-
   if ( ! order.$Pharmacy) { //Use Pharmacy name rather than $New to keep us from repinging folks if the row has been readded
     setCallTimes(order)
     scheduleCalls(order, 'New Patient')
@@ -147,6 +163,7 @@ function setNewRowCalls(order) {
   }
   else {
     rxReceivedNotification(order)
+    debugEmail('rxReceivedNotification called because setNewRowCalls', '#'+order.$OrderId, order.$Status, order)
   }
 }
 

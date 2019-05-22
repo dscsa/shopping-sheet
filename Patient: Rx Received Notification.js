@@ -139,7 +139,7 @@ function rxReceivedNotification(order, numChanges) {
   if ( ! emailSubject)
     return infoEmail('No emailSubject for rxReceivedNotification, likely because we are requesting autorequesting refills from the doctor', order, 'notOrdered', notOrdered, 'medSynced', medSynced, 'inStockRefills', inStockRefills, 'rxReceivedWillFill', rxReceivedWillFill, 'rxReceivedNoFill', rxReceivedNoFill)//don't contact or update for empty orders
 
-  infoEmail('Patient rxReceivedNotification', emailBody.join('<br><br>').replace(/ undefined/g, ''), order, 'notOrdered', notOrdered, 'medSynced', medSynced, 'inStockRefills', inStockRefills, 'rxReceivedWillFill', rxReceivedWillFill, 'rxReceivedNoFill', rxReceivedNoFill)
+  infoEmail('Patient rxReceivedNotification', 'numChanges', numChanges, emailBody.join('<br><br>').replace(/ undefined/g, ''), order, 'notOrdered', notOrdered, 'medSynced', medSynced, 'inStockRefills', inStockRefills, 'rxReceivedWillFill', rxReceivedWillFill, 'rxReceivedNoFill', rxReceivedNoFill)
 
   //emailAddress = 'adam@sirum.org'
   sendEmail(emailAddress, emailSubject, [ //
