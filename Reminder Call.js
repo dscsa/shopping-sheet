@@ -37,7 +37,7 @@ function newCallEvent(order, callTime, type, firstName, lastName) {
   var endTime = addTime(0.5, callTime) //creates a calendar even that is 30 minutes long, just so it's easily visible on the calendar UI
 
   var eventTitle = phone+' '+(firstName || patient.first.split(' ')[0])+' '+(lastName || patient.last.split(' ')[0]) //in case of first: Adam S, or last: Kircher JR, we need to split so reminder call doesnt get confused.  Not tested if necessary - its possible reminder call is smart enough to make this work
-  var location   = {location:type+" #"+order.$OrderId+", "+patient.first+" "+patient.last+".  Created On:"+new Date()}
+  var location   = {location:type+" #"+order.$OrderId+", "+patient.first+" "+patient.last+" "+patient.birth_date+".  Created On:"+new Date()}
   var calendar   = CalendarApp.getCalendarById('support@goodpill.org')
 
   //try to always send a text. if it's a landline then remindercall will fail on this, and will then try a voicecall instead
