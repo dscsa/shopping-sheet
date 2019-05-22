@@ -178,7 +178,7 @@ function mainLoop() {
       var numChanges  = drugsChanged && drugsChanged.split(/REMOVED FROM ORDER|ADDED TO ORDER|ADDED TO PROFILE AND ORDER/).length - 1
       if (numChanges) {
         rxReceivedNotification(order)
-        debugEmail('rxReceivedNotification called because drugs & status both changed', '#'+order.$OrderId, status[order.$OrderId]+' --> '+order.$Status, 'numChanges', numChanges, drugsChanged, order)
+        infoEmail('rxReceivedNotification called because drugs & status both changed', '#'+order.$OrderId, status[order.$OrderId]+' --> '+order.$Status, 'numChanges', numChanges, drugsChanged, order)
       }
 
     }

@@ -163,7 +163,7 @@ function setNewRowCalls(order) {
   }
   else {
     rxReceivedNotification(order)
-    debugEmail('rxReceivedNotification called because setNewRowCalls', '#'+order.$OrderId, order.$Status, order)
+    infoEmail('rxReceivedNotification called because setNewRowCalls', '#'+order.$OrderId, order.$Status, order)
   }
 }
 
