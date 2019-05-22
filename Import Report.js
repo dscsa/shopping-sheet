@@ -116,6 +116,7 @@ function normalizeDrug(row) {
       ordered:row.ordered_script_no,
       high_refills:row.oldest_script_high_refills,
       with_refills:row.oldest_script_with_refills,
+      oldest:row.oldest_active_script,
       newest:row.newest_script
     }
   }

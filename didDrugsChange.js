@@ -27,11 +27,21 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
       var gcnChanged    = newDrug.$Gcn && oldDrug.$Gcn && newDrug.$Gcn != oldDrug.$Gcn //Eliminate Gcn == 0 errors
       //var nameChanged   = (! newDrug.$Gcn || ! oldDrug.$Gcn) && newDrug.$Name.replace(/\^ *|\* */g, '').toUpperCase() != oldDrug.$Name.replace(/\^ *|\* */g, '').toUpperCase //Only if no GCN available
 
-      if (scriptChanged && gcnChanged) continue
+      if (scriptChanged && gcnChanged) continue //This is the wrong drug, keep moving
 
       drugAdded = false //Match found so this is NOT a new drug
 
-      if ( ! scriptChanged || ! gcnChanged) continue //Assume this is the same drug so that we don't send a drugAdded Message
+
+      //3 Possibilities
+      //#1 scriptChanged && ! gcnChanged
+      //#2 ! scriptChanged && gcnChanged
+      //#3 ! scriptChanged && ! gcnChanged
+
+      if (scriptChanged) continue //#1 We have multiple scripts for same drug and we just switching between them.  Drug is not added so Order Updates won't be triggered
+
+      if (gcnChanged) debugEmail('GCN Changed but ScriptNo did not', changes, '$Status', $Status, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs) //#2 GCN changed without a scriptChange is weird, but keep going
+
+      //Now this is #2 and #3 ONLY
 
       if (oldDrug.$InOrder && ! newDrug.$InOrder) //Can't do this "|| (oldDrug.$Days > 0 && newDrug.$Days === 0)" because setDaysQtyRefills has not run yet so newDrug.$Days might be null because it hasn't been set yet
         changes.push(oldDrug.$Name+' -> '+newDrug.$Name+' REMOVED FROM ORDER '+oldDrug.$InOrder+' -> '+newDrug.$InOrder)
