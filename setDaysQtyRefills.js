@@ -134,8 +134,9 @@ function useRefill(drug) {
    var tooHigh = lowStock && (drug.$DaysSupply > 75)
    var tooLow  = ! lowStock && (drug.$DaysSupply < 60)
    var stockChanged = tooHigh || tooLow  //If this was med synced or didn't have a lot left on Rx then adjust back to our regular qtys
+   var refillsLeft  = drug.$RefillsLeft || (drug.$RefillsTotal ? 1 : 0)
 
-   var leftoverQty = (drug.$WrittenQty*drug.$RefillsLeft) % drug.$DispenseQty //Modulus so we only do refill quantity if we can keep qty the same without an leftover qty on RX. This is because CK would have preferred Order 1151 to go back up to 90 days rather than a Refill of 60 Days (set because of Med Sync)
+   var leftoverQty = (drug.$WrittenQty*refillsLeft) % drug.$DispenseQty //Modulus so we only do refill quantity if we can keep qty the same without an leftover qty on RX. This is because CK would have preferred Order 1151 to go back up to 90 days rather than a Refill of 60 Days (set because of Med Sync)
    var dailyQty    = drug.$DispenseQty/drug.$DaysSupply
 
    if (drug.$DaysSupply < 45 && dailyQty < 4) { //don't do a refill of something supershort like 15 or 30 days if not a a really high qty per day
@@ -154,7 +155,7 @@ function useRefill(drug) {
      return
    }
 
-   drug.$Qty         = Math.min(drug.$DispenseQty, drug.$WrittenQty*drug.$RefillsLeft)
+   drug.$Qty         = Math.min(drug.$DispenseQty, drug.$WrittenQty*refillsLeft)
    drug.$Days        = Math.round(drug.$DaysSupply * drug.$Qty / drug.$DispenseQty)
    drug.$Refills     = drug.$Refills || +(drug.$RefillsTotal - drug.$Qty/drug.$WrittenQty).toFixed(2) //Refills AFTER it is dispensed.  Default is Rx Expiring
    drug.$Type        = "Refill"
@@ -189,7 +190,8 @@ function useEstimate(drug) {
 
   parsed.numDaily = parsed.numDosage * parsed.freqNumerator / parsed.freqDemoninator / parsed.frequency
 
-  var qty_before_dispensed = drug.$WrittenQty * drug.$RefillsLeft
+  var refillsLeft = drug.$RefillsLeft || (drug.$RefillsTotal ? 1 : 0)
+  var qty_before_dispensed = drug.$WrittenQty * refillsLeft
   var days_before_dispensed = Math.round(qty_before_dispensed/parsed.numDaily, 0)
 
   var stdDays = (drug.$Stock && drug.$TotalQty < 1000) ? 45 : 90 //Only do 45 day if its Low Stock AND less than 1000 Qty.  Cindy noticed we had 8000 Amlodipine but we were filling in 45 day supplies
