@@ -162,25 +162,16 @@ function mainLoop() {
       debugEmail('Error, statusChanged() should not be called once dispensed or shipped',  status[order.$OrderId]+' -> '+order.$Status, drugsChanged, 'Current Order', order, 'Old Order', sheet.rowByKey(order.$OrderId))
     }
 
-    //Skip updating drugs if their status is complete or they are unchanged
-    if ( ! drugsChanged && status[order.$OrderId] != 'Needs Form') { //"Needs Form" will have all 0 days so need to make sure drugs update once registration complete
+    //Since drugs were changed we need to add drug details back in
+    addDrugDetails(order)// This call is expensive, avoid calling when possible
 
-      order.$Drugs = drugs[order.$OrderId] //drug details are set on the old drugs but not the new ones
+    drugsChanged = JSON.stringify(drugsChanged, null, ' ') //hacky way for us to search for partial matches with indexOf (see below)
 
-    } else {
-
-      //Since drugs were changed we need to add drug details back in
-      addDrugDetails(order)// This call is expensive, avoid calling when possible
-
-      drugsChanged = JSON.stringify(drugsChanged, null, ' ') //hacky way for us to search for partial matches with indexOf (see below)
-
-      //Don't renotify on small changes like QTY, DAYS, REFILLS.  Only when adding or subtracting drugs
-      var numChanges  = drugsChanged && drugsChanged.split(/REMOVED FROM ORDER|ADDED TO ORDER|ADDED TO PROFILE AND ORDER/).length - 1
-      if (numChanges) {
-        rxReceivedNotification(order)
-        infoEmail('rxReceivedNotification called because drugs & status both changed', '#'+order.$OrderId, status[order.$OrderId]+' --> '+order.$Status, 'numChanges', numChanges, drugsChanged, order)
-      }
-
+    //Don't renotify on small changes like QTY, DAYS, REFILLS.  Only when adding or subtracting drugs
+    var numChanges  = drugsChanged && drugsChanged.split(/REMOVED FROM ORDER|ADDED TO ORDER|ADDED TO PROFILE AND ORDER/).length - 1
+    if (numChanges) {
+      rxReceivedNotification(order)
+      infoEmail('rxReceivedNotification called because drugs & status both changed', '#'+order.$OrderId, status[order.$OrderId]+' --> '+order.$Status, 'numChanges', numChanges, drugsChanged, order)
     }
 
     if (order.$Status == 'Shopping') //Must be called *AFTER* drug details are set
