@@ -49,8 +49,11 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
       else if (newDrug.$InOrder && ! oldDrug.$InOrder) //Can't do this "|| (newDrug.$Days > 0 && oldDrug.$Days === 0)" because setDaysQtyRefills has not run yet so newDrug.$Days might not be 0 yet
         changes.push(oldDrug.$Name+' -> '+newDrug.$Name+' ADDED TO ORDER'+oldDrug.$InOrder+' -> '+newDrug.$InOrder)
 
-      else if ((newDrug.$RefillsLeft != oldDrug.$RefillsLeft) || (newDrug.$RefillsTotal != oldDrug.$RefillsTotal)) //"else if" because refills_left often change when adding a drug to an order - no need to double count
-        changes.push(newDrug.$Name+' REFILLS CHANGED RefillsLeft:'+oldDrug.$RefillsLeft+' -> '+newDrug.$RefillsLeft+' RefillsTotal: '+oldDrug.$RefillsTotal+' -> '+newDrug.$RefillsTotal)
+      else if (newDrug.$RefillsLeft != oldDrug.$RefillsLeft) //"else if" because refills_left often change when adding a drug to an order - no need to double count
+        changes.push(newDrug.$Name+' REFILLS CHANGED RefillsLeft:'+oldDrug.$RefillsLeft+' -> '+newDrug.$RefillsLeft)
+
+      else if (newDrug.$RefillsTotal && ! oldDrug.$RefillsTotal) //"else if" because refills_left often change when adding a drug to an order - no need to double count
+        changes.push(newDrug.$Name+' NEW SCRIPT WITH REFILLS: RefillsTotal: '+oldDrug.$RefillsTotal+' -> '+newDrug.$RefillsTotal)
 
       if (newDrug.$Autofill.rx == 0 && oldDrug.$Autofill.rx == 1) //Can't do this "|| (newDrug.$Days > 0 && oldDrug.$Days === 0)" because setDaysQtyRefills has not run yet so newDrug.$Days might not be 0 yet
         changes.push(newDrug.$Name+' AUTOFILL TURNED OFF')
