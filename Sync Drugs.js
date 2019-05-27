@@ -12,6 +12,13 @@ function minMedSyncDays(drug) {
   return (drug.$IsRefill == 1 ? 11 : 3)
 }
 
+function roundDate(date, drug) {
+  date = date.split('-')
+  var roundBy = maxMedSyncDays(drug)
+  Math.floor(date[2]/roundBy)*roundBy
+  return date.join('-')
+}
+
 //This does not affect drugs Not In Order with NextRefill <= MED_SYNC_DAYS.  That is handled in Live Inventory's OutOfStock.
 //This function is for drugs that are In Order with NextRefill > MED_SYNC_DAYS, so that we can adject their quantities appropriately
 //DON'T sync drugs NOT IN ORDER (ie early) because Guardians won't add the extra days to the old refill date, it will just set the refill date to today so they will just get extra medicine.  For example Drug 1 on Jan 1 for 90 days.  You DONT want to add Drug 2 to the Order even though its due on Feb and you can add it for only 60 days, altough qty wise this works (both Drug 1 & 2 should be due in April 1st) because Guardian will set fill date for Drug 2 as Jan 1 and refill date will still be set to Jan 1st + 60 days = March 1st.
@@ -54,7 +61,7 @@ function getSyncDate(order) {
 
     //$LastFill == "" means we have N/A for next_fill but still want to count it as a potential sync date. #11272 3 new surescipts were being synced to only 2 old sure scripts
     if (newDays >= 30 && newDays <= 120 && drug.$Autofill.rx) {
-      var nextFill = drug.$NextRefill
+      var nextFill = roundDate(drug.$NextRefill, drug)
       syncDates[nextFill] = syncDates[nextFill] || 0
       syncDates[nextFill]++
 
