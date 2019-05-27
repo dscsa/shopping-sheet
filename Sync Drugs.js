@@ -71,7 +71,7 @@ function getSyncDate(order) {
   order.$Patient.syncDates = syncDates
 
   //Don't sync unless syncDate has more than current order
-  if (syncDates.inOrder < syncDate[1])
+  if (syncDates.inOrder <= syncDate[1])
     order.$Patient.syncDate  = syncDate
 }
 
