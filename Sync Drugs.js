@@ -4,7 +4,7 @@
 
 //These are based on MSSQL SP of 3 days and 7 day buffer for 1st fills
 function maxMedSyncDays(drug) {
-  return 14
+  return 15
 }
 
 //These are based on MSSQL SP of 3 days and 10 day buffer for 1st fills
@@ -12,10 +12,13 @@ function minMedSyncDays(drug) {
   return (drug.$IsRefill == 1 ? 11 : 3)
 }
 
-function roundDate(date, drug) {
+function roundDate(date, roundBy) {
   date = date.split('-')
-  var roundBy = maxMedSyncDays(drug)
-  Math.floor(date[2]/roundBy)*roundBy
+
+  date[2] = Math.floor(date[2]/roundBy)*roundBy+1
+
+  date[2] = ('0'+date[2]).slice(-2)
+
   return date.join('-')
 }
 
@@ -32,7 +35,7 @@ function getSyncDate(order) {
   var orderAdded = new Date(order.$OrderAdded)/1000/60/60/24
 
   var syncDates = { inOrder:0 }
-  var syncDate  = []
+  var syncDate  = ['', 0] //fixed JS quirk when using ">" with undefined
 
   //Count how many drugs have each NextFill date
   for (var i in order.$Drugs) {
@@ -41,16 +44,16 @@ function getSyncDate(order) {
 
     //Only keep "MAY MEDSYNC" in order if there is at least one other script to be filled
     //Assuming drug order sorted by InOrder == true first
-    if (drug.$Status == 'NOACTION_MAY_MEDSYNC' && ! syncDates.inOrder){
+    if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && ! syncDates.inOrder){
       drug.$Days = 0
       setDrugStatus(drug, 'NOACTION_NOT_DUE')
     }
-    else if (drug.$Status == 'NOACTION_MAY_MEDSYNC' && syncDates.inOrder) {
+    else if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && syncDates.inOrder) {
       order.$Patient.medsync = true
       drug.$Name = drug.$Name.replace('*', '^')
       syncDates.inOrder++
     }
-    else if (drug.$Status == 'NOACTION_WAS_MEDSYNC') {
+    else if (hasDrugStatus(drug, 'NOACTION_WAS_MEDSYNC')) {
       order.$Patient.medsync = true
       syncDates.inOrder++
     }
@@ -61,7 +64,7 @@ function getSyncDate(order) {
 
     //$LastFill == "" means we have N/A for next_fill but still want to count it as a potential sync date. #11272 3 new surescipts were being synced to only 2 old sure scripts
     if (newDays >= 30 && newDays <= 120 && drug.$Autofill.rx) {
-      var nextFill = roundDate(drug.$NextRefill, drug)
+      var nextFill = roundDate(drug.$NextRefill, maxMedSyncDays(drug)) //TODO we actually care about how "close" dates are. Right now 2019-05-13 would round to 2019-05-01 and 2019-05-16 would round to 2019-05-15 even though they should be grouped together
       syncDates[nextFill] = syncDates[nextFill] || 0
       syncDates[nextFill]++
 
@@ -79,7 +82,9 @@ function getSyncDate(order) {
 
   //Don't sync unless syncDate has more than current order
   if (syncDates.inOrder <= syncDate[1])
-    order.$Patient.syncDate  = syncDate
+    order.$Patient.syncDate = syncDate
+  else
+    order.$Patient.syncDebug = syncDate
 }
 
 function setSyncDays(order, drug) {

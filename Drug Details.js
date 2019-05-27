@@ -67,12 +67,8 @@ function useDispensed(drug) {
    drug.$Days      = +drug.$DaysSupply
    drug.$Qty       = Math.round(drug.$DispenseQty) //Rounding because Order #4225 had some long decimals.
    drug.$Type      = "Dispensed"
-   drug.$Refills   = +(drug.$RefillsTotal).toFixed(2)
 
-   if (drug.$Refills < .1) {
-     drug.$Refills = 0
-     setDrugStatus(drug, 'ACTION_LAST_REFILL')
-   }
+   setRefills(drug, drug.$RefillsTotal)
 }
 
 //Inhalers might come with qty 18 (# of inhales/puffs rather than 1 so ignore these).  Not sure if these hardcoded assumptions are correct?  Cindy could need to dispense two inhalers per month?  Or one inhaler lasts more than a month?
@@ -95,12 +91,7 @@ function useInhaler(drug) {
    drug.$Type = "Inhaler New"
   }
 
-  drug.$Refills = +(drug.$RefillsTotal - 1).toFixed(2)
-
-  if (drug.$Refills < .1) {
-    drug.$Refills = 0
-    setDrugStatus(drug, 'ACTION_LAST_REFILL')
-  }
+  setRefills(drug, drug.$RefillsTotal - 1)
 }
 
 function useEstimate(drug) {
@@ -145,7 +136,6 @@ function useEstimate(drug) {
   else if (days_before_dispensed <= stdDays+30) {
     drug.$Days = days_before_dispensed
     drug.$Type = "Estimate Finish Rx"
-    setDrugStatus(drug, 'NOACTION_LOW_REFILL')
   }
   else {
     drug.$Days = stdDays
@@ -157,13 +147,17 @@ function useEstimate(drug) {
   //This part is pulled from the CP_FillRx and CP_RefillRx SPs
   //See order #5307 - new script qty 90 w/ 1 refill dispensed as qty 45.  This basically switches the refills from 1 to 2, so after the 1st dispense there should still be one refill left
   var denominator    = drug.$IsRefill ? drug.$DispenseQty : drug.$WrittenQty //DispenseQty will be pulled from previous Rxs.  We want to see if it has been set specifically for this Rx.
-  drug.$Refills = +(drug.$RefillsTotal - drug.$Qty/denominator).toFixed(2)
+  setRefills(drug, drug.$RefillsTotal - drug.$Qty/denominator)
+}
 
-  if (drug.$Refills < .1) {
-    drug.$Refills = 0
-    setDrugStatus(drug, 'ACTION_LAST_REFILL')
+function setRefills(drug, refills) {
+
+  if (refills < .1) {
+    refills = 0
+    if ( ! drug.$Status) setDrugStatus(drug, 'ACTION_LAST_REFILL')
   }
 
+  drug.$Refills = +refills.toFixed(2)
 }
 
 function setStatus(drug) {

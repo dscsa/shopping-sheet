@@ -112,8 +112,13 @@ function setDrugStatus(drug, key, lang) {
   drug.$Status = drug.$Status
     ? key + ' < ' + drug.$Status
     : key //Keep Status History for Debugging
-    
+
   drug.$Msg    = drugStatus[key][lang]
     .replace('$NextRefill', drug.$NextRefill)
     .replace('$RxChanged', drug.$RxChanged.slice(0, 10))
+}
+
+//IndexOf() because a overwritten status counts as well, not just the latest one
+function hasDrugStatus(drug, status) {
+  return drug.$Status && ~ drug.$Status.indexOf(status)
 }
