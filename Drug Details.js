@@ -20,7 +20,7 @@
 //calculations to be only for the orders that we are actually adding or updating
 function addDrugDetails(order, caller) {
 
-  debugEmail('addDrugDetails by '+caller, order)
+  if (caller != 'addOrder') debugEmail('addDrugDetails by '+caller, order)
 
   for (var i in order.$Drugs) {
     setV2info(order.$Drugs[i])

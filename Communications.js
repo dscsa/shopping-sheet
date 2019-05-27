@@ -53,10 +53,10 @@ function orderShippedNotice(order, invoice) {
   var message  = ''
 
   if (groups.FILLED.length)
-    message += '<br><br>Your Order includes the following medications:<br>'+groups.FILLED.join(';<br>')
+    message += '<br><br>Your Order includes the following medications:<br>'+groups.FILLED.join(';<br>')+';'
 
   if (groups.FILL_ACTION.length+groups.NOFILL_ACTION.length)
-    message += '<br><br>Please take action on the following medications:<br>'+groups.FILL_ACTION.concat(groups.NOFILL_ACTION).sort(sortByMsg).join(';<br>')
+    message += '<br><br>Please take action on the following medications:<br>'+groups.FILL_ACTION.concat(groups.NOFILL_ACTION).sort(sortByMsg).join(';<br>')+';'
 
   var email = { email:'adam@sirum.org' }
   var text  = { sms:'6507992817' }
@@ -95,10 +95,10 @@ function refillReminderNotice(order, groups) {
   var message      = ''
 
   if (groups.NO_REFILLS.length)
-    message += '<br><br>Please contact to get a new Rx for the following medications:<br>'+groups.NO_REFILLS.join(';<br>')
+    message += '<br><br>Please contact to get a new Rx for the following medications:<br>'+groups.NO_REFILLS.join(';<br>')+';'
 
   if (groups.NO_AUTOFILL.length)
-    message += '<br><br>The following medications will NOT be filled automatically and must be requested 2 weeks in advance:<br>'+groups.NO_AUTOFILL.join(';<br>')
+    message += '<br><br>The following medications will NOT be filled automatically and must be requested 2 weeks in advance:<br>'+groups.NO_AUTOFILL.join(';<br>')+';'
 
   var email = { email:'adam@sirum.org' }
   var text  = { sms:'6507992817' }
@@ -172,10 +172,10 @@ function orderUpdatedNotice(order, drugsChanged) {
   var subject = ! drugsChanged
     ? 'We are starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'
     : 'Update for Order #'+order.$OrderId+' of '+numFills+' items.'
-  var message = '<br><br>Your order will have the following once we confirm their availability:<br>'+groups.FILLED.join(';<br>')
+  var message = '<br><br>Your order will have the following once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
 
   if (numNoFills)
-    message += '<br><br>Below are prescription(s) that we have but are not going to fill right now:<br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).sort(sortByMsg).join(';<br>')
+    message += '<br><br>Below are prescription(s) that we have but are not going to fill right now:<br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).sort(sortByMsg).join(';<br>')+';'
 
   var suffix = [
     "Note: if this is correct, there is no need to do anything. If you want to change or delay this order, please let us know as soon as possible. If delaying, please specify the date on which you want it filled, otherwise if you don't, we will delay it 3 weeks by default.",
