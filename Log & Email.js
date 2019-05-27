@@ -6,7 +6,7 @@ function debugEmail() {
     return Log.apply(this, arguments)
   }
 
-  var subject = 'v4 Debug '+getCaller()+" "+(1501 - quota)+" of 1500"
+  var subject = 'v6 Debug '+getCaller()+" "+(1501 - quota)+" of 1500"
   var body = '<pre>'+argArray(arguments).join('\n\n')+'</pre>'
   sendEmail(subject, body.split('\n'))
 }
@@ -19,7 +19,7 @@ function infoEmail() {
     return Log.apply(this, arguments)
   }
 
-  var subject = 'v4 Info '+getCaller()+" "+(1501 - quota)+" of 1500"
+  var subject = 'v6 Info '+getCaller()+" "+(1501 - quota)+" of 1500"
   var body = '<pre>'+argArray(arguments).join('\n\n')+'</pre>'
   sendEmail(subject, body.split('\n'))
 }
@@ -79,7 +79,7 @@ function sendEmail(to, subject, body, attachments) {
     mainCache.put(to, msgHistory, 4*60*60)
 
     if (prevMessage && noCacheIfShipped && noCacheIfInternal)
-      return debugEmail('Stop email spam', msgHistory)
+      return debugEmail('Stop email spam', 'to', to, msgHistory)
 
     if ( ! LIVE_MODE) to = ''
     bcc = 'adam@sirum.org'
@@ -97,7 +97,7 @@ function sendEmail(to, subject, body, attachments) {
       to:to,
       cc:cc,
       bcc:bcc,
-      subject:subject,
+      subject:'v6 '+subject,
       htmlBody:body.join ? body.join('<br>') : body,
       attachments:attachments
     }

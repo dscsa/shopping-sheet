@@ -39,8 +39,10 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
 
       if (scriptChanged) continue //#1 We have multiple scripts for same drug and we just switching between them.  Drug is not added so Order Updates won't be triggered
 
-      if (gcnChanged) debugEmail('GCN Changed but ScriptNo did not', changes, '$Status', $Status, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs) //#2 GCN changed without a scriptChange is weird, but keep going
-
+      if (gcnChanged) {
+        debugEmail('GCN Changed but ScriptNo did not', changes, '$Status', $Status, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs) //#2 GCN changed without a scriptChange is weird, but keep going
+        continue
+      }
       //Now this is #2 and #3 ONLY
 
       if (oldDrug.$InOrder && ! newDrug.$InOrder) //Can't do this "|| (oldDrug.$Days > 0 && newDrug.$Days === 0)" because setDaysQtyRefills has not run yet so newDrug.$Days might be null because it hasn't been set yet

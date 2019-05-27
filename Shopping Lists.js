@@ -79,6 +79,8 @@ function createShoppingLists(order, drugs) {
       return debugEmail('Shopping Error: Could not be shopped because not enough qty found - tabs/caps/X00? (2)', drug.$Stock, drug.$Msg, '#'+orderID, v2name, minQty, minDays, drug)
     }
 
+    return //Still Debugging v6 for Now
+
     try {
       ss.insertSheet(v2name) //This will fail if sheet already exists, which prevents us from repending stock (when we delete a row to start a new sheet)
 

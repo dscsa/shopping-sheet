@@ -1,0 +1,114 @@
+//4 Categories ACTION/NOACTION (determined here) and FILLING/NOT_FILLING (determined if $Days > 0)
+
+//1) FILLING NO ACTION
+//2) FILLING ACTION
+//3) NOT FILLING ACTION
+//4) NOT FILLING NO ACTION
+
+var drugStatus = {
+
+//NO ACTION BY USER NECESSARY
+
+    NOACTION_MAY_MEDSYNC: {
+      EN:'may be Med Synced to this Order *',
+      ES:''
+    },
+    NOACTION_WAS_MEDSYNC: {
+      EN:'was Med Synced to this Order *',
+      ES:''
+    },
+    NOACTION_MEDSYNC_TO_DATE: {
+      EN:'was Med Synced to $NextRefill *',
+      ES:''
+    },
+    NOACTION_RX_OFF_AUTOFILL:{
+      EN:'has autorefill off but was requested to be filled',
+      ES:''
+    },
+    NOACTION_RECENT_FILL:{
+      EN:'was filled recently and not due again until $NextRefill',
+      ES:''
+    },
+    NOACTION_NOT_DUE:{
+      EN:'is due for a refill on $NextRefill',
+      ES:''
+    },
+    NOACTION_CHECK_SIG:{
+      EN:'was prescribed in an unusually high qty and needs to be reviewed by a pharmacist',
+      ES:''
+    },
+    NOACTION_MISSING_GCN:{
+      EN:'needs to be checked to determine if it is available',
+      ES:''
+    },
+    NOACTION_LOW_STOCK:{
+      EN:'is short filled because this drug is low in stock.',
+      ES:''
+    },
+    NOACTION_LOW_REFILL:{
+      EN:'is short filled because this Rx had limited refills.',
+      ES:''
+    },
+    NOACTION_NOT_OFFERED:{
+      EN:'is not currently offered and was transferred to your local pharmacy',
+      ES:''
+    },
+    NOACTION_TRANSFERRED:{
+      EN:'was transferred out and can be filled at your backup pharmacy',
+      ES:''
+    },
+
+//ACTION BY USER REQUIRED BEFORE (RE)FILL
+
+    ACTION_EXPIRING:{
+      EN:'will expire soon, ask your doctor for a new Rx',
+      ES:''
+    },
+    ACTION_LAST_REFILL:{
+      EN:'has no more refills, contact your doctor',
+      ES:''
+    },
+    ACTION_NO_REFILLS:{
+      EN:'is out of refills, contact your doctor',
+      ES:''
+    },
+    ACTION_EXPIRED:{
+      EN:'has expired, ask your doctor for a new Rx',
+      ES:''
+    },
+    ACTION_EXPIRING:{
+      EN:'will expire soon, ask your doctor for a new Rx',
+      ES:''
+    },
+    ACTION_CHECK_BACK:{
+      EN:'is unavailable for new RXs at this time, check back later.',
+      ES:''
+    },
+    ACTION_PAST_DUE:{
+      EN:'is past due, please request 2 weeks in advance',
+      ES:''
+    },
+    ACTION_RX_OFF_AUTOFILL:{
+      EN:'has autorefill turned off, request 2 weeks in advance',
+      ES:''
+    },
+    ACTION_PAT_OFF_AUTOFILL:{
+      EN:'was requested but you have turned all medications off autorefill',
+      ES:''
+    },
+    ACTION_NEEDS_FORM:{
+      EN:'cannot be filled until patient registration is complete',
+      ES:''
+    }
+}
+
+function setDrugStatus(drug, key, lang) {
+
+  lang = lang || 'EN'
+
+  if ( ! drugStatus[key] || ! drugStatus[key][lang])
+    throw new Error(key+' drug status not defined')
+
+  drug.$Msg    = drugStatus[key][lang]
+  drug.$Status = drug.$Status ? key + ' < ' + drug.$Status : key //Keep Status History for Debugging
+}

@@ -1,45 +1,8 @@
 
 function createTransferFax(orderId) { //This is undefined when called from Menu
 
-  var gaPinesNpis = [
-    "1023494135",
-    "1962993519",
-    "1356747570",
-    "1225534670",
-    "1205334737",
-    "1689611618",
-    "1730398496",
-    "1467632851",
-    "1700254364",
-    "1417461831",
-    "1497111207",
-    "1861745994",
-    "1558389940",
-    "1609395110"
-  ]
-
-  var gaPinesLNames = [
-    "Anderson",
-    "Abt",
-    "Stoyle",
-    "Alligood",
-    "Edelen",
-    "Lehman",
-    "Sun",
-    "Drury",
-    "Battle",
-    "Rudolf-Watson",
-    "Barrow",
-    "McCoy",
-    "Dickson",
-    "Thompson",
-    "Harris"
-  ]
-
   var sheet = getSheet('Shopping', 'A', 2) //allow to work for archived shopping sheets as well
   order = sheet.rowByKey(orderId)    //Defaults to getting active row if OrderID is undefined
-
-  var isGaPines = order.$Coupon == 'georgiapinescsb' ? 'COUPON MATCH: georgiapinescsb': false
 
   //TODO we should not rely on "transferred" magic (and user-facing!) string.  Need to mark this in the json.
   if ( ! order.$Drugs.filter) {
@@ -47,12 +10,6 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
   }
 
   order.$Drugs = order.$Drugs.filter(function(drug) {
-    var nameMatch = ~ gaPinesLNames.indexOf(drug.$ProviderName.split(' ')[1])
-    var npiMatch  = ~ gaPinesNpis.indexOf(drug.$Npi)
-
-    if (nameMatch && npiMatch) isGaPines = 'PROVIDER AND NPI MATCH: '+drug.$ProviderName+' '+drug.$Npi
-    else if (nameMatch) isGaPines = 'PROVIDER MATCH: '+drug.$ProviderName
-    else if (npiMatch) isGaPines = 'NPI MATCH: '+drug.$Npi
 
     if ( ! drug.$InOrder || drug.$IsRefill) return false
 
@@ -60,9 +17,6 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
 
     return drug.$Msg && ~ drug.$Msg.indexOf('transferred')
   })
-
-  if (isGaPines)
-    sendEmail('kiah@sirum.org', "Potential GA Pines Order #"+order.$OrderId, "Potential GA Pines Order #"+order.$OrderId+". "+isGaPines)
 
   if ( ! order.$Drugs.length) return
 

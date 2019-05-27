@@ -66,12 +66,13 @@ function normalizeDrugs(report) {
 function normalizeDrug(row) {
 
   var dispenseDate = +row.is_refill ? row.dispense_date : row.orig_disp_date //See Order 10062.  Seems that orig_disp_date may get set before dispense date causing a mismatch.  Correct for that here.
-
+  var isRegistered = row.user_def_1.slice(1, -1) //Use presence of backup pharmacy as proxy for registration
   //Changed threshold from 4 days to 2 days because of order 11265, which showed as dispensing with the same meds that we had shipped out
-  var $IsDispensed = row.ship_date ? !!row.in_order : (row.in_order && (new Date() - new Date(dispenseDate) < 3*24*60*60*1000))  //See Order #8590.  Risperidone 2mg was dispensed but it didn't register here and so because it was out of refills was excluded from the order //Order 10862 was shipped within 4 days of 10698, so showed Levothroxine and Metoprolol as dispensed even though they were in order 10698 and not 10862.  However for 11640 a 2 day difference caused it to not be on invoice sheet, so getting it to 3 days since 2 is too little and 4 is too much
-  var $InOrder = $IsDispensed || (row.in_order && +row.refills_total)   //Even if its "in the order" it could be a pending or denied surescript refill request (order 7236) so need to make sure refills are available
-  var $InOrderNotDispensed = row.in_order && ! $IsDispensed
-  var $RefillsLeft = +($InOrderNotDispensed ? +row.refills_left : +row.refills_total).toFixed(2) //if not in order or already shipped use total refills not just the last dispensed to avoid erroneous out of refills warning
+  //See Order #8590.  Risperidone 2mg was dispensed but it didn't register here and so because it was out of refills was excluded from the order //Order 10862 was shipped within 4 days of 10698, so showed Levothroxine and Metoprolol as dispensed even though they were in order 10698 and not 10862.  However for 11640 a 2 day difference caused it to not be on invoice sheet, so getting it to 3 days since 2 is too little and 4 is too much
+  var $IsDispensed = row.ship_date ? !!row.in_order : (row.in_order && (new Date() - new Date(dispenseDate) < 3*24*60*60*1000))
+  var $InOrder     = $IsDispensed || (row.in_order && +row.refills_total)   //Even if its "in the order" it could be a pending or denied surescript refill request (order 7236) so need to make sure refills are available
+  var $RefillsLeft = ($InOrder && ! $IsDispensed) ? +row.refills_left : +row.refills_total //if not in order or already shipped use total refills not just the last dispensed to avoid erroneous out of refills warning
+  var $NextRefill  = row.autofill_date ? row.autofill_date : row.refill_date
 
   row.drug = {
     $Name:($InOrder ? '' : '* ')+row.drug_name.slice(1, -1).trim(), //remove quotes that protect commas,
@@ -82,11 +83,13 @@ function normalizeDrug(row) {
     $Price:null,       //placeholder for JSON ordering.
     $FirstRefill:row.orig_disp_date,
     $LastRefill:dispenseDate,
-    $NextRefill:'N/A',
+    $NextRefill:$NextRefill.slice(0, 10),
+    $DaysSinceRefill:Math.floor((toDate(row.order_added) - new Date(dispenseDate))/1000/60/60/24),
+    $DaysToRefill:Math.floor((toDate($NextRefill) - toDate(row.order_added))/1000/60/60/24),
     $Stock:undefined,  //placeholder for JSON ordering.
     $SyncBy:undefined, //placeholder for JSON ordering.
     $RefillsOrig:+(+row.refills_orig).toFixed(2),
-    $RefillsLeft:$RefillsLeft, //if not in order or already shipped use total refills not just the last dispensed to avoid erroneous out of refills warning
+    $RefillsLeft:+$RefillsLeft.toFixed(2), //if not in order or already shipped use total refills not just the last dispensed to avoid erroneous out of refills warning
     $RefillsTotal:+(+row.refills_total).toFixed(2),
     $AutofillDate:row.autofill_date && row.autofill_date.slice(0, 10),
     $RefillDate:row.refill_date && row.refill_date.slice(0,10),
@@ -110,8 +113,11 @@ function normalizeDrug(row) {
     $ScriptStatus:row.script_status,
     $ScriptSource:row.rx_source,
     $RxChanged:row.rx_changed,
-    $RxExpires:toDate(row.expire_date),
-    $Autofill:{rx:+row.rx_autofill, patient:+row.pat_autofill},
+    $RxExpires:row.expire_date.slice(0,10),
+    $Autofill:{
+      rx: isRegistered ? +row.rx_autofill : null,
+      patient:isRegistered ? +row.pat_autofill : null
+    },
     $Scripts:{
       ordered:row.ordered_script_no,
       high_refills:row.oldest_script_high_refills,
@@ -119,71 +125,6 @@ function normalizeDrug(row) {
       oldest:row.oldest_active_script,
       newest:row.newest_script
     }
-  }
-
-  if (row.drug.$RxExpires.getTime) {
-    row.drug.$RxWritten = new Date(row.drug.$RxExpires.getTime())
-    row.drug.$RxWritten.setMonth(row.drug.$RxWritten.getMonth() - 12)
-    row.drug.$RxWritten = row.drug.$RxWritten.toJSON().slice(0, 10)
-  } else {
-    row.drug.$RxWritten = typeof row.drug.$RxExpires + ' ' + row.drug.$RxExpires
-    if (row.drug.$RxExpires) debugEmail('$RxWritten', row.drug.$RxExpires, row.expire_date)
-  }
-
-  if (row.script_status == 'Transferred Out') { //Or expired?
-    row.drug.$Msg = 'Transferred Out'
-    row.drug.$NextRefill = 'Transferred Out'
-  }
-  else if ( ! row.drug.$RefillsTotal) {
-    row.drug.$NextRefill = 'No Refills'
-    if ($InOrderNotDispensed) row.drug.$Msg = ' is in order but has no refills' //Could be a pending or denied surescript refill request (order 7236) so need to make sure refills are available
-  }
-  /*
-  HOPEFULLY FIXED WITH THE var dispenseDate change above
-  else if ( ! row.drug.$RefillsLeft) {
-    row.drug.$LastRefill = new Date().toJSON().slice(0, 10) //Refills are deducted before $LastRefill date is updated.  Making it look like a drug with out any refills is in order.    //estimateNextRefill(drug)
-    //This can happen if last refill was just dispensed AND if Cindy adds a 0 refills rx in order to request a sure script
-    //sendEmail('adam.kircher@gmail.com', 'Last Refill Just Dispensed?', [JSON.stringify(row, null, '  ')])
-  }
-  */
-  else if (row.drug.$RxExpires - toDate(row.order_added) < 0) {
-    row.drug.$Refills = row.drug.$NextRefill = 'Rx Expired'
-    row.drug.$Msg = 'has expired, ask your doctor for a new Rx'
-  }
-  else if (row.drug.$AutofillDate) {  //We will fill even if autofill is off when this is set
-    row.drug.$NextRefill = row.drug.$AutofillDate
-    row.drug.$DaysUntilRefill = new Date(row.drug.$NextRefill) - toDate(row.order_added)
-    if (row.drug.$DaysUntilRefill > minMedSyncTime(row.drug) && row.drug.$DaysUntilRefill < maxMedSyncTime(row.drug)) {
-
-      var verb = row.drug.$InOrder ? ' will be' : ' may be'
-
-      row.drug.$SyncBy = 0 //show that this med was medsynced
-      row.drug.$Msg  = 'due on '+row.drug.$NextRefill+verb+' Med Synced to this Order *'
-    }
-  }
-  else if (row.user_def_1.slice(1, -1) && ( ! +row.rx_autofill || ! +row.pat_autofill)) { //Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
-    row.drug.$NextRefill = 'AutoRefill Off'
-
-    if ($InOrder) row.drug.$Msg = 'has autorefill off but was just requested to be filled'  //Someone called in to request a med off autofill or a doctor sent one in (not sure if we should send the latter but better safe than sorry???).  Keeping second option ambiguous right now: to add "requessted by your doctor" we would need to check date_written.  Checking FirstRefill is giving us some false postives (e.g "requested by your doctor" but should be "by you")
-  }
-  else if (row.drug.$RefillDate >= toDate(row.order_added).toJSON().slice(0, 10)) { //else if (row.drug.$LastRefill) estimateNextRefill(drug)
-    row.drug.$NextRefill = row.drug.$RefillDate
-    row.drug.$DaysUntilRefill = new Date(row.drug.$NextRefill) - toDate(row.order_added)
-    if (row.drug.$DaysUntilRefill > minMedSyncTime(row.drug) && row.drug.$DaysUntilRefill < maxMedSyncTime(row.drug)) {
-
-      var verb = row.drug.$InOrder ? ' will be' : ' may be'
-
-      row.drug.$SyncBy = 0 //show that this med was medsynced
-      row.drug.$Msg = 'due on '+row.drug.$NextRefill+verb+' Med Synced to this Order *'
-    }
-  }
-  else if (row.drug.$RxExpires - toDate(row.order_added) <= Math.max(45, row.drug.$DaysSupply)*24*60*60*1000) { //This needs to be after AutoFill Off because of #10662
-    row.drug.$Refills = row.drug.$NextRefill = 'Rx Expiring'
-    row.drug.$Msg = 'will expire soon, ask your doctor for a new Rx'
-  }
-
-  if (row.invoice_nbr == '11350' || row.invoice_nbr == '11349') {
-    //debugEmail('WHAT IS GOING ON', '#'+row.invoice_nbr, row.drug.$Autofill, {rx:row.rx_autofill, patient:row.pat_autofill}, row)
   }
 }
 
@@ -225,27 +166,6 @@ function groupByOrder(report) {
 
   return group
 }
-
-//If not in order, don't show if there is a similar drug (even different strengths) already in the order
-//For this to work drugs need to be sorted with not included drugs being last, which is not in the report
-/*function addDrugtoOrder(group, drug) {
-
-  if ( ! drug.$Gcn) {
-    drug.$Stock = 'No GCN'
-    if (drug.$ScriptNo) debugEmail('No Gcn Error', drug)
-    return //Missing Rx Orders
-  }
-
-  if ( ! drug.$InOrder) {
-    var needle = drug.$v2.replace(/ [\d.]+/, '')
-    for (var i in group.$Drugs) {
-      if (needle == group.$Drugs[i].$v2.replace(/ [\d.]+/, '')) return
-    }
-  }
-
-  //if (group.$OrderId == 4367) debugEmail('addDrugtoOrder', drug.$v2, needle, group.$Drugs)
-  group.$Drugs.push(drug)
-}*/
 
 function newGroup(row) {
   var pharmacyInfo = row.user_def_2.slice(1, -1).split(',')

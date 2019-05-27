@@ -66,10 +66,7 @@ function updateWebformDispensed(order, invoice) {
     } else if (order.$Card) {
       woocommerceOrder.status = 'shipped-autopay'
       woocommerceOrder.payment_method = 'stripe'
-
-      var nextMonth = new Date(scriptId.getFullYear(), scriptId.getMonth() + 1, 1)
-      newCallEvent(order, nextMonth, 'AutoPay Notice', removeDelimiters(order.$Card+' $'+order.$Fee+'.00 between '+order.$BilledAt), order.$OrderId)
-
+      autopayReminderNotice(order)
     } else {
       woocommerceOrder.status = 'shipped-unpaid'
       woocommerceOrder.payment_method = 'cheque'
