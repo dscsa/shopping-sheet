@@ -6,7 +6,7 @@ function debugEmail() {
     return Log.apply(this, arguments)
   }
 
-  var subject = 'v6 Debug '+getCaller()+" "+(1501 - quota)+" of 1500"
+  var subject = 'v6 Debug '+getCaller()+" "+(1501 - quota)+" of 1500. Elapsed secs "+Math.floor((new Date() - scriptId)/1000)
   var body = '<pre>'+argArray(arguments).join('\n\n')+'</pre>'
   sendEmail(subject, body.split('\n'))
 }
@@ -19,7 +19,7 @@ function infoEmail() {
     return Log.apply(this, arguments)
   }
 
-  var subject = 'v6 Info '+getCaller()+" "+(1501 - quota)+" of 1500"
+  var subject = 'v6 Info '+getCaller()+" "+(1501 - quota)+" of 1500. Elapsed secs "+Math.floor((new Date() - scriptId)/1000)
   var body = '<pre>'+argArray(arguments).join('\n\n')+'</pre>'
   sendEmail(subject, body.split('\n'))
 }

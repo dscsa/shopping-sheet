@@ -7,7 +7,7 @@ function groupDrugs(order) {
 
   var group = {
     FILL_ACTION:[],
-    FILL_NOTACTION:[],
+    FILL_NOACTION:[],
     NOFILL_ACTION:[],
     NOFILL_NOACTION:[],
     FILLED:[],
@@ -21,7 +21,7 @@ function groupDrugs(order) {
     var name   = drug.$Name.replace(/[*^] /, '') //Get rid of the asterick we use for internal purposes that marks them as not in the order.
 
     var fill   = drug.$Days ? 'FILL_' : 'NOFILL_'
-    var action = drug.$Status.split('_')[0] //ACTION OR NOACTION
+    var action = (drug.$Status || 'NOACTION').split('_')[0] //ACTION OR NOACTION
 
     group[fill+action].push(name+' '+drug.$Msg)
 
@@ -164,22 +164,22 @@ function orderUpdatedNotice(order, drugsChanged) {
 
   var groups     = groupDrugs(order)
   var numFills   = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
-  var numNoFills = groups.NOFILL_ACTION.length+groups.NOFILL_NOACTION.length
+  var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
 
   ///It's depressing to get updates if nothing is being filled
   if ( ! numFills) return debugEmail('orderUpdateNotice NOT sent', 'drugsChanged', drugsChanged, 'numFills', numFills, order, groups)
 
   var subject = ! drugsChanged
-    ? 'We are starting to prepare Order #'+order.$OrderId+' of '+numFills+' items.'
+    ? 'We are starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'
     : 'Update for Order #'+order.$OrderId+' of '+numFills+' items.'
-  var message = '<br><br>We are preparing Order #'+order.$OrderId+' with the following once we confirm their availability:<br>'+groups.FILLED.join(';<br>')
+  var message = '<br><br>Your order will have the following once we confirm their availability:<br>'+groups.FILLED.join(';<br>')
 
   if (numNoFills)
     message += '<br><br>Below are prescription(s) that we have but are not going to fill right now:<br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).sort(sortByMsg).join(';<br>')
 
   var suffix = [
     "Note: if this is correct, there is no need to do anything. If you want to change or delay this order, please let us know as soon as possible. If delaying, please specify the date on which you want it filled, otherwise if you don't, we will delay it 3 weeks by default.",
-    order.$Partient.medsync ? '* The goal of Med Sync is to syncronize your refill dates so that we can consolidate as many of your medications as possible into a single order, rather than sending your medications in separate orders. For this reason, this Rx may be filled for a fewer number of days in this Order before resuming to a normal number of days.' : ''
+    order.$Patient.medsync ? '* The goal of Med Sync is to syncronize your refill dates so that we can consolidate as many of your medications as possible into a single order, rather than sending your medications in separate orders. For this reason, this Rx may be filled for a fewer number of days in this Order before resuming to a normal number of days.' : ''
   ].join('<br><br>')
 
 

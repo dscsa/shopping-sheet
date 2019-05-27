@@ -58,7 +58,7 @@ function mainLoop() {
 
     if (order.$Status == 'Shipped') return //Don't readd old order that may have been randomly updated e.g, 8850 on 02/07/2019
 
-    addDrugDetails(order)
+    addDrugDetails(order, 'addOrder')
 
     if (order.$Status == 'Shopping') //Must be called *AFTER* drug details are set
       order.$Status = createShoppingLists(order, order.$Drugs)
@@ -79,7 +79,7 @@ function mainLoop() {
     }
     else {
       updateWebformReceived(order.$OrderId, order.$Patient.guardian_id, 'processing') //take it out of awaiting-rx or awaiting-transfer
-      orderUpdatedNotice(order, true)
+      orderUpdatedNotice(order)
       infoEmail('orderUpdatedNotice called because setNewRowCalls', '#'+order.$OrderId, order.$Status, order)
     }
 
@@ -145,7 +145,7 @@ function mainLoop() {
     }
 
     //Since drugs were changed we need to add drug details back in
-    addDrugDetails(order)// This call is expensive, avoid calling when possible
+    addDrugDetails(order, 'statusChanged')// This call is expensive, avoid calling when possible
 
     orderUpdatedNotice(order, drugsChanged)
 
@@ -180,7 +180,9 @@ function mainLoop() {
 
     if ( ! drugsChanged) return
 
-    addDrugDetails(order)  //this will prevent NULLs from appearing but is not necessary for functionality since when status updates details will get added then
+    order.$Patient.changes = drugsChanged
+
+    addDrugDetails(order, 'drugsChanged')  //this will prevent NULLs from appearing but is not necessary for functionality since when status updates details will get added then
 
     orderUpdatedNotice(order, drugsChanged)
 

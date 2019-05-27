@@ -40,7 +40,7 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
       if (scriptChanged) continue //#1 We have multiple scripts for same drug and we just switching between them.  Drug is not added so Order Updates won't be triggered
 
       if (gcnChanged) {
-        debugEmail('GCN Changed but ScriptNo did not', changes, '$Status', $Status, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs) //#2 GCN changed without a scriptChange is weird, but keep going
+        if (new Date().getMinutes() < 10) debugEmail('GCN Changed but ScriptNo did not', changes, '$Status', $Status, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs) //#2 GCN changed without a scriptChange is weird, but keep going
         continue
       }
       //Now this is #2 and #3 ONLY

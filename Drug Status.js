@@ -54,7 +54,7 @@ var drugStatus = {
       ES:''
     },
     NOACTION_TRANSFERRED:{
-      EN:'was transferred out and can be filled at your backup pharmacy',
+      EN:'was transferred out to your local pharmacy on $RxChanged',
       ES:''
     },
 
@@ -65,7 +65,7 @@ var drugStatus = {
       ES:''
     },
     ACTION_LAST_REFILL:{
-      EN:'has no more refills, contact your doctor',
+      EN:'has no more refills',
       ES:''
     },
     ACTION_NO_REFILLS:{
@@ -109,6 +109,11 @@ function setDrugStatus(drug, key, lang) {
   if ( ! drugStatus[key] || ! drugStatus[key][lang])
     throw new Error(key+' drug status not defined')
 
+  drug.$Status = drug.$Status
+    ? key + ' < ' + drug.$Status
+    : key //Keep Status History for Debugging
+    
   drug.$Msg    = drugStatus[key][lang]
-  drug.$Status = drug.$Status ? key + ' < ' + drug.$Status : key //Keep Status History for Debugging
+    .replace('$NextRefill', drug.$NextRefill)
+    .replace('$RxChanged', drug.$RxChanged.slice(0, 10))
 }

@@ -18,7 +18,9 @@
 
 //While we could do this in group by order, this saves expensive lookups and
 //calculations to be only for the orders that we are actually adding or updating
-function addDrugDetails(order) {
+function addDrugDetails(order, caller) {
+
+  debugEmail('addDrugDetails by '+caller, order)
 
   for (var i in order.$Drugs) {
     setV2info(order.$Drugs[i])
@@ -39,8 +41,6 @@ function addDrugDetails(order) {
     setSyncDays(order, order.$Drugs[i])
     Log(order.$OrderId, order.$Drugs[i].$Name, "getSyncDays")
   }
-
-  //infoEmail('setDaysQtyRefills', order)
 }
 
 function setDrugIsPended(drug) {
@@ -57,6 +57,9 @@ function setDaysQtyRefills(drug) {
 
   else
     useEstimate(drug)
+
+  if ( ! drug.$Days && ~ ['MANUAL', 'WEBFORM'].indexOf(drug.$AddedToOrderBy))
+    debugEmail('Manually added drug in Order but no days!  Why is this?', drug) //Most likely an autopopulated Rx that is not due yet)
 }
 
 function useDispensed(drug) {
@@ -117,7 +120,7 @@ function useEstimate(drug) {
   var refillsLeft = drug.$RefillsLeft || (drug.$RefillsTotal ? 1 : 0) //Assume we will switch to a script with refills if one is available
   var qty_before_dispensed  = drug.$WrittenQty * refillsLeft
   var days_before_dispensed = Math.round(qty_before_dispensed/parsed.numDaily, 0)
-  var days_limited_totalqty = ! drug.$IsPended && Math.round(drug.$TotalQty/parsed.numDaily, 0)
+  var days_limited_totalqty = drug.$IsPended ? Math.round(drug.$TotalQty/parsed.numDaily, 0) : Infinity
 
   var stdDays = (drug.$Stock && drug.$TotalQty < 1000) ? 45 : 90 //Only do 45 day if its Low Stock AND less than 1000 Qty.  Cindy noticed we had 8000 Amlodipine but we were filling in 45 day supplies
 
@@ -215,11 +218,11 @@ function setStatus(drug) {
       set0Days(drug)
       setDrugStatus(drug, 'ACTION_PAST_DUE')
     }
-    else if (drug.$DaysToRefill > maxMedSyncDays(drug) && drug.$DaysSinceRefill < minMedSyncDays(drug)) {
+    else if (drug.$DaysSinceRefill < maxMedSyncDays(drug)) {
       set0Days(drug)
       setDrugStatus(drug, 'NOACTION_RECENT_FILL')
     }
-    else if (drug.$DaysToRefill > maxMedSyncDays(drug) && drug.$DaysSinceRefill >= minMedSyncDays(drug)) {
+    else if (drug.$DaysToRefill > maxMedSyncDays(drug)) {
       set0Days(drug)
       setDrugStatus(drug, 'NOACTION_NOT_DUE')
     }
@@ -239,9 +242,6 @@ function setStatus(drug) {
     else if ( ! drug.$InOrder && drug.$DaysToRefill < maxMedSyncDays(drug)) {
       setDrugStatus(drug, 'NOACTION_MAY_MEDSYNC')
     }
-
-    if ( ! drug.$Days && drug.$AddedToOrderBy != "HL7")
-      debugEmail('Manually added drug in Order but no days!  Why is this?', drug) //Most likely an autopopulated Rx that is not due yet)
 }
 
 function set0Days(drug) {
