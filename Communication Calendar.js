@@ -3,44 +3,44 @@ function orderShippedEvent(order, email, text) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Shipped: '+patientLabel+'.  Created On:'+new Date()
 
-  cancelEvents(patientLabel, ['Order Shipped', 'Order Failed'])
+  var cancel = cancelEvents(patientLabel, ['Order Shipped', 'Order Failed'])
 
-  debugEmail('orderShippedEvent', email, text, order)
+  debugEmail('orderShippedEvent', email, text, order, cancel)
 
-  newEvent(eventTitle, newCommArrr(email, text))
+  newEvent(eventTitle, newCommArr(email, text))
 }
 
 function refillReminderEvent(order, email, text, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Refill Reminder: '+patientLabel+'.  Created On:'+new Date()
 
-  cancelEvents(patientLabel, ['Refill Reminder'])
+  var cancel = cancelEvents(patientLabel, ['Refill Reminder'])
 
-  debugEmail('refillReminderEvent', email, text, hoursToWait, hourOfDay, order)
+  debugEmail('refillReminderEvent', email, text, hoursToWait, hourOfDay, order, cancel)
 
-  newEvent(eventTitle, newCommArrr(email, text), hoursToWait, hourOfDay)
+  newEvent(eventTitle, newCommArr(email, text), hoursToWait, hourOfDay)
 }
 
 function autopayReminderEvent(order, email, text, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Autopay Reminder: '+patientLabel+'.  Created On:'+new Date()
 
-  cancelEvents(patientLabel, ['Autopay Reminder'])
+  var cancel = cancelEvents(patientLabel, ['Autopay Reminder'])
 
-  debugEmail('autopayReminderEvent', email, text, hoursToWait, hourOfDay, order)
+  debugEmail('autopayReminderEvent', email, text, hoursToWait, hourOfDay, order, cancel)
 
-  newEvent(eventTitle, newCommArrr(email, text), hoursToWait, hourOfDay)
+  newEvent(eventTitle, newCommArr(email, text), hoursToWait, hourOfDay)
 }
 
 function orderUpdatedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Updated: '+patientLabel+'.  Created On:'+new Date()
 
-  cancelEvents(patientLabel, ['Order Updated'])
+  var cancel = cancelEvents(patientLabel, ['Order Updated'])
 
-  debugEmail('orderUpdatedEvent', email, text, hoursToWait, order)
+  debugEmail('orderUpdatedEvent', email, text, hoursToWait, order, cancel)
 
-  newEvent(eventTitle, newCommArrr(email, text), hoursToWait)
+  newEvent(eventTitle, newCommArr(email, text), hoursToWait)
 }
 
 function needsFormEvent(order, email, text, hoursToWait, hourOfDay) {
@@ -50,7 +50,7 @@ function needsFormEvent(order, email, text, hoursToWait, hourOfDay) {
 
   debugEmail('needsFormEvent', email, text, hoursToWait, hourOfDay, order)
 
-  newEvent(eventTitle, newCommArrr(email, text), hoursToWait, hourOfDay)
+  newEvent(eventTitle, newCommArr(email, text), hoursToWait, hourOfDay)
 }
 
 function orderFailedEvent(order, email, text, hoursToWait, hourOfDay) {
@@ -58,16 +58,22 @@ function orderFailedEvent(order, email, text, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Failed: '+patientLabel+'.  Created On:'+new Date()
 
-  cancelEvents(patientLabel, ['Order Failed'])
+  var cancel = cancelEvents(patientLabel, ['Order Failed'])
 
-  debugEmail('orderFailedEvent', email, text, hoursToWait, hourOfDay, order)
+  debugEmail('orderFailedEvent', email, text, hoursToWait, hourOfDay, order, cancel)
 
-  newEvent(eventTitle, newCommArrr(email, text), hoursToWait, hourOfDay)
+  newEvent(eventTitle, newCommArr(email, text), hoursToWait, hourOfDay)
 }
 
-function newCommArrr(email, text) {
+function newCommArr(email, text) {
+
+  if ( ! LIVE_MODE) {
+    email.email = 'adam@sirum.org'
+    text.sms    = '6507992817'
+  }
 
   email.from = 'support@goodpill.org'
+  email.subject = 'v6 '+email.subject //v6 Debugging
 
   //addCallFallback
   var call = JSON.parse(JSON.stringify(text))
@@ -85,8 +91,6 @@ function newCommArrr(email, text) {
 //2) you want to batch changes into set intervals so that you don't spam users (Order Update Emails)
 //(optional) The 24-based hour of the day.  In case you want the communication to go out at a certain time of day
 function newEvent(eventTitle, commArr, hoursToWait, hourOfDay) {
-
-  if ( ! LIVE_MODE) return
 
   var eventStart = addHours(hoursToWait || 0)
 
@@ -174,15 +178,15 @@ function cancelEvents(patientLabel, typeArr) {
 
   if ( ! LIVE_MODE) return
 
-  var log   = []
+  var cancel = []
   var events = searchEvents(patientLabel, typeArr)
 
   for (var i in events) {
     events[i].deleteEvent()
-    log.push(['deleted an event', eventString(events[i])])
+    cancel.push(['deleted an event', eventString(events[i])])
   }
 
-  debugEmail('cancelEvents', patientLabel, typeArr, log)
+  return cancel
 }
 
 function eventString(events) {

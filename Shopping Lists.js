@@ -10,6 +10,11 @@ function testShoppingLists() {
 
 //So Cindy doesn't have to unpend things that didn't ship
 function deleteShoppingLists(orderID) {
+
+  return //V6 Debugging
+
+  if ( ! LIVE_MODE) return debugEmail('deleteShoppingLists canceled because LIVE MODE OFF')
+
   var res = v2Fetch('/account/8889875187/pend/'+orderID, 'DELETE')
 
   var shoppingListFolder   = DriveApp.getFolderById('1PcDYKM_Ky-9zWmCNuBnTka3uCKjU3A0q')
@@ -80,6 +85,8 @@ function createShoppingLists(order, drugs) {
     }
 
     return //Still Debugging v6 for Now
+
+    if ( ! LIVE_MODE) return debugEmail('createShoppingList canceled because LIVE MODE OFF')
 
     try {
       ss.insertSheet(v2name) //This will fail if sheet already exists, which prevents us from repending stock (when we delete a row to start a new sheet)

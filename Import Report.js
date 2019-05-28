@@ -85,7 +85,7 @@ function normalizeDrug(row) {
     $LastRefill:dispenseDate,
     $NextRefill:$NextRefill.slice(0, 10),
     $DaysSinceRefill:Math.floor((toDate(row.order_added) - new Date(dispenseDate))/1000/60/60/24),
-    $DaysToRefill:Math.floor((toDate($NextRefill) - toDate(row.order_added))/1000/60/60/24),
+    $DaysToRefill:$NextRefill ? Math.floor((toDate($NextRefill) - toDate(row.order_added))/1000/60/60/24) : '',
     $Stock:undefined,  //placeholder for JSON ordering.
     $SyncBy:undefined, //placeholder for JSON ordering.
     $RefillsOrig:+(+row.refills_orig).toFixed(2),

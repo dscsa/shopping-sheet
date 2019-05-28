@@ -116,7 +116,7 @@ function updateWebformOrder(orderId, woocommerceOrder, address) {
 
 function saveWebformOrder(action, endpoint, woocommerceOrder) {
 
-  return
+  return //V6 Debugging
 
   if ( ! LIVE_MODE) return debugEmail('saveWebformOrder canceled because LIVE MODE OFF', action, endpoint, woocommerceOrder)
 

@@ -45,18 +45,18 @@ function groupDrugs(order) {
 //by building commication arrays based on github.com/dscsa/communication-calendar
 function orderShippedNotice(order, invoice) {
 
-  var groups   = groupDrugs(order)
+  var groups = groupDrugs(order)
   refillReminderNotice(order, groups)
 
   var numFills = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
-  var subject  = 'Your order '+(numFills ? ' of '+numFills+' items' : '')+'has shipped and should arrive in 3-5 days.'
+  var subject  = 'Your order '+(numFills ? 'of '+numFills+' items ' : '')+'has shipped and should arrive in 3-5 days.'
   var message  = ''
 
   if (groups.FILLED.length)
-    message += '<br><br>Your Order includes the following medications:<br>'+groups.FILLED.join(';<br>')+';'
+    message += '<br>These Rxs are on the way:<br>'+groups.FILLED.join(';<br>')+';'
 
   if (groups.FILL_ACTION.length+groups.NOFILL_ACTION.length)
-    message += '<br><br>Please take action on the following medications:<br>'+groups.FILL_ACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
+    message += '<br><br>We cannot fill these Rxs without your help:<br>'+groups.FILL_ACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
   var email = { email:'adam@sirum.org' }
   var text  = { sms:'6507992817' }
@@ -95,10 +95,10 @@ function refillReminderNotice(order, groups) {
   var message      = ''
 
   if (groups.NO_REFILLS.length)
-    message += '<br><br>Please contact to get a new Rx for the following medications:<br>'+groups.NO_REFILLS.join(';<br>')+';'
+    message += '<br>We need a new Rx for the following:<br>'+groups.NO_REFILLS.join(';<br>')+';'
 
   if (groups.NO_AUTOFILL.length)
-    message += '<br><br>The following medications will NOT be filled automatically and must be requested 2 weeks in advance:<br>'+groups.NO_AUTOFILL.join(';<br>')+';'
+    message += '<br><br>These Rxs will NOT be filled automatically and must be requested 2 weeks in advance:<br>'+groups.NO_AUTOFILL.join(';<br>')+';'
 
   var email = { email:'adam@sirum.org' }
   var text  = { sms:'6507992817' }
@@ -109,7 +109,7 @@ function refillReminderNotice(order, groups) {
   email.message = [
     'Hello,',
     '',
-    'We wanted to give you a friendly reminder: '+subject,
+    'A friendly reminder that '+subject.slice(0, 1).toLowerCase()+subject.slice(1),
     message,
     '',
     'Thanks!',
@@ -172,10 +172,11 @@ function orderUpdatedNotice(order, drugsChanged) {
   var subject = ! drugsChanged
     ? 'We are starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'
     : 'Update for Order #'+order.$OrderId+' of '+numFills+' items.'
-  var message = '<br><br>Your order will have the following once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
+
+  var message = 'These Rxs will be included once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
 
   if (numNoFills)
-    message += '<br><br>Below are prescription(s) that we have but are not going to fill right now:<br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).join(';<br>')+';'
+    message += '<br><br>These Rxs we have but are not going to fill right now:<br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).join(';<br>')+';'
 
   var suffix = [
     "Note: if this is correct, there is no need to do anything. If you want to change or delay this order, please let us know as soon as possible. If delaying, please specify the date on which you want it filled, otherwise if you don't, we will delay it 3 weeks by default.",
@@ -307,8 +308,8 @@ function trackingURL(trackingNumber) {
 }
 
 //Convert gsheet hyperlink formula to an html link
-function trackingLink(trackingFormula) {
-  return trackingFormula.replace('=HYPERLINK(', '<a href=').replace(', "', '>').replace('")', '</a>')
+function trackingLink(tracking) {
+  return '<a href="'+trackingURL(tracking)+'">'+tracking+'</a>'
 }
 
 function trackingFormula(tracking) {

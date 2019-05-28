@@ -117,6 +117,8 @@ function mainLoop() {
 
      deleteShoppingLists(order.$OrderId)
 
+     orderShippedNotice(order, invoice)
+
      order.$Tracking = trackingFormula(order.$Tracking) //Wrap in hyperlinkformula
 
      try {
@@ -126,8 +128,6 @@ function mainLoop() {
      }
 
      sheet.updateRow(order)
-
-     orderShippedNotice(order, invoice)
   }
 
   function statusChanged(order) {
