@@ -32,74 +32,64 @@ function roundDate(date, roundBy) {
 
 //SYNC to the date with the most drugs witth (30-120 days), not the date that is the furtest away. This is because CK said if 5 drugs in order and one drug due 30 days from now, rather than sync those 5 to 30 days, she would rather fill all those at 90 and then sync the next drug when it gets filled to 60 days
 //In other words she only wants to sync when numDrugsBeingSynced < numDrugsSyncedTo
-function getSyncDate(order) {
+function setSyncDate(order, drug) {
 
-  var syncDates = { inOrder:0 }
-  var syncDate  = ['', 0] //fixed JS quirk when using ">" with undefined
+  var p = order.$Patient
+  var syncDates = p.syncDates = p.syncDates || { inOrder:0 }
+  var syncDate  = p.syncDate  = p.syncDate  || ['', 0] //fixed JS quirk when using ">" with undefined
 
   //Count how many drugs have each NextFill date
-  for (var i in order.$Drugs) {
+  //Only keep "MAY MEDSYNC" in order if there is at least one other script to be filled
+  //Assuming drug order sorted by InOrder == true first
+  if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && ! syncDates.inOrder){
+    drug.$Days = 0
+    setDrugStatus(drug, 'NOACTION_NOT_DUE')
+  }
+  else if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && syncDates.inOrder) {
+    p.medsync = true
+    drug.$Name = drug.$Name.replace('*', '^')
+    syncDates.inOrder++
+  }
+  else if (hasDrugStatus(drug, 'NOACTION_WAS_MEDSYNC')) {
+    p.medsync = true
+    syncDates.inOrder++
+  }
+  else if (drug.$Days)
+    syncDates.inOrder++
 
-    var drug = order.$Drugs[i]
-
-    //Only keep "MAY MEDSYNC" in order if there is at least one other script to be filled
-    //Assuming drug order sorted by InOrder == true first
-    if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && ! syncDates.inOrder){
-      drug.$Days = 0
-      setDrugStatus(drug, 'NOACTION_NOT_DUE')
-    }
-    else if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && syncDates.inOrder) {
-      order.$Patient.medsync = true
-      drug.$Name = drug.$Name.replace('*', '^')
-      syncDates.inOrder++
-    }
-    else if (hasDrugStatus(drug, 'NOACTION_WAS_MEDSYNC')) {
-      order.$Patient.medsync = true
-      syncDates.inOrder++
-    }
-    else if (drug.$Days)
-      syncDates.inOrder++
-
-    if (drug.$Days) {
-      var newDays  = drug.$Days
-      var nextFill = addHours(drug.$Days*24, drug.$NextRefill).toJSON().slice(0, 10)
-    }
-    else {
-      var newDays  = drug.$DaysToRefill
-      var nextFill = drug.$NextRefill
-    }
-
-    //$LastFill == "" means we have N/A for next_fill but still want to count it as a potential sync date. #11272 3 new surescipts were being synced to only 2 old sure scripts
-    if (newDays >= 30 && newDays <= 120 && drug.$Autofill.rx) {
-      var nextFill = roundDate(nextFill, 7) //TODO we actually care about how "close" dates are. Right now 2019-05-13 would round to 2019-05-01 and 2019-05-16 would round to 2019-05-15 even though they should be grouped together
-      syncDates[nextFill] = syncDates[nextFill] || 0
-      syncDates[nextFill]++
-
-      //Keep Track of the Most Common Date, if a tie chose the furthest out
-      var moreCommon = syncDates[nextFill] > syncDate[1]
-      var futherOut  = (syncDates[nextFill] == syncDate[1]) && nextFill > syncDate[0]
-      if (moreCommon || futherOut) {
-        syncDate[0] = nextFill
-        syncDate[1] = syncDates[nextFill]
-      }
-    }
+  if (drug.$Days) {
+    var newDays  = drug.$Days
+    var nextFill = addHours(drug.$Days*24, drug.$NextRefill).toJSON().slice(0, 10)
+  }
+  else {
+    var newDays  = drug.$DaysToRefill
+    var nextFill = drug.$NextRefill
   }
 
-  order.$Patient.syncDates = syncDates
+  //$LastFill == "" means we have N/A for next_fill but still want to count it as a potential sync date. #11272 3 new surescipts were being synced to only 2 old sure scripts
+  if (newDays >= 30 && newDays <= 120 && drug.$Autofill.rx) {
+    var nextFill = roundDate(nextFill, 7) //TODO we actually care about how "close" dates are. Right now 2019-05-13 would round to 2019-05-01 and 2019-05-16 would round to 2019-05-15 even though they should be grouped together
+    syncDates[nextFill] = syncDates[nextFill] || 0
+    syncDates[nextFill]++
 
-  //Don't sync unless syncDate has more than current order
-  if (syncDates.inOrder <= syncDate[1])
-    order.$Patient.syncDate = syncDate
-  else
-    order.$Patient.syncDebug = syncDate
+    //Keep Track of the Most Common Date, if a tie chose the furthest out
+    var moreCommon = syncDates[nextFill] > syncDate[1]
+    var futherOut  = (syncDates[nextFill] == syncDate[1]) && nextFill > syncDate[0]
+    if (moreCommon || futherOut) {
+      syncDate[0] = nextFill
+      syncDate[1] = syncDates[nextFill]
+    }
+  }
 }
 
 function setSyncDays(order, drug) {
 
-  if (drug.$IsDispensed || ! drug.$Days || ! order.$Patient.syncDate) return
+  var p = order.$Patient
+
+  if (drug.$IsDispensed || ! drug.$Days || ! p.syncDates.inOrder <= p.syncDate[1]) return
 
   var oldDays = drug.$Days
-  var newDays = (new Date(order.$Patient.syncDate[0]) - new Date(order.$OrderAdded))/1000/60/60/24
+  var newDays = (new Date(p.syncDate[0]) - new Date(order.$OrderAdded))/1000/60/60/24
 
   newDays = Math.ceil((newDays-5)/15)*15   //Cindy wants us to round up to the nearest 15 days.  For rounding to 15, I don't want an equal Math.round() since I would want to error on giving people more than less but not quite just Math.ceil(), instead I do Math.ceil(x-5) because I want 66-80 -> 75, and 81-95 -> 90
 
@@ -111,7 +101,7 @@ function setSyncDays(order, drug) {
   drug.$SyncBy = newDays - oldDays
   drug.$Qty    = Math.round(drug.$Days * drug.$Qty/oldDays)
 
-  order.$Patient.medsync = true
-  drug.$NextRefill = order.$Patient.syncDate[0]
+  p.medsync = true
+  drug.$NextRefill = p.syncDate[0]
   setDrugStatus(drug, 'NOACTION_MEDSYNC_TO_DATE')
 }

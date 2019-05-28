@@ -32,17 +32,22 @@ function addDrugDetails(order, caller) {
 
     setDaysQtyRefills(order.$Drugs[i])
     Log(order.$OrderId, order.$Drugs[i].$Name, "setDaysQtyRefills")
+
+    setSyncDate(order, order.$Drugs[i])
+    Log(order.$OrderId, order.$Drugs[i].$Name, "setSyncDate")
   }
 
-  getSyncDate(order)
   order.$Drugs.sort(sortDrugs) //Must be called before setSyncDays
 
   for (var i in order.$Drugs) {
     setSyncDays(order, order.$Drugs[i])
     Log(order.$OrderId, order.$Drugs[i].$Name, "getSyncDays")
+
+    setPriceTotal(order, order.$Drugs[i]) //Must call this after $Day and $MonthlyPrice are finalized
+    Log(order.$OrderId, order.$Drugs[i].$Name, "setPriceTotal")
   }
 
-  setPriceFeesDue(order) //Must call this after $Day and $MonthlyPrice are set
+  setFeeDue(order)
 }
 
 //$Days (InOrder) > Group Message > Name

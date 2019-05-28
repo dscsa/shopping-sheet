@@ -33,9 +33,17 @@ function didStatusChange(oldStatus, newStatus) {
   return oldStatus && ! ~ oldStatus.indexOf(newStatus || null)
 }
 
-function setPriceFeesDue(order) {
-  order.$Due = setFee(order)
-  order.$BilledAt = "N/A"
+function setPriceTotal(order, drug) {
+  drug.$Price  = +Math.max(drug.$Days * drug.$MonthlyPrice / 30, drug.$Days ? 1 : 0).toFixed(0) || 0 //Minimum price of $1 (CK suggestion).  2019-01-28 Changed $Excluded to $Days because of Order 8235 and 8291
+
+  order.$Total = (order.$Total || 0) + drug.$Price
+}
+
+function setFeeDue(order) {
+
+  order.$Fee = order.$New ? 6 : order.$Total
+
+  order.$Due = order.$Fee
 
   if (order.$Coupon && order.$Coupon.slice(0, 6) != "track_") {
     order.$Fee = order.$Total
@@ -48,17 +56,4 @@ function setPriceFeesDue(order) {
     order.$BilledAt = start+'-'+stop
     order.$Due = 0
   }
-}
-
-function setFee(order) {
-  setTotal(order)
-  return order.$Fee = order.$New ? 6 : order.$Total
-}
-
-function setTotal(order) {
-  return order.$Total = order.$Drugs.reduce(function(sum, drug) { return sum + setPrice(drug) }, 0)
-}
-
-function setPrice(drug) {
-  return drug.$Price = +Math.max(drug.$Days * drug.$MonthlyPrice / 30, drug.$Days ? 1 : 0).toFixed(0) || 0 //Minimum price of $1 (CK suggestion).  2019-01-28 Changed $Excluded to $Days because of Order 8235 and 8291
 }
