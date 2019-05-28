@@ -113,7 +113,7 @@ function getPatientLabel(order) {
 }
 
 function addHours(hours, date) {
-  var copy = date ? new Date(date.getTime()) : new Date()
+  var copy = date ? new Date(date.getTime ? date.getTime() : date) : new Date()
   copy.setTime(copy.getTime() + hours*60*60*1000)
   return copy
 }

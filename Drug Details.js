@@ -34,13 +34,36 @@ function addDrugDetails(order, caller) {
     Log(order.$OrderId, order.$Drugs[i].$Name, "setDaysQtyRefills")
   }
 
-  setPriceFeesDue(order) //Must call this after $Day and $MonthlyPrice are set
   getSyncDate(order)
+  order.$Drugs.sort(sortDrugs) //Must be called before setSyncDays
 
   for (var i in order.$Drugs) {
     setSyncDays(order, order.$Drugs[i])
     Log(order.$OrderId, order.$Drugs[i].$Name, "getSyncDays")
   }
+
+  setPriceFeesDue(order) //Must call this after $Day and $MonthlyPrice are set
+}
+
+//$Days (InOrder) > Group Message > Name
+function sortDrugs(a, b) {
+
+  if (a.$Days && ! b.$Days) return -1
+  if (b.$Days && ! a.$Days) return 1
+
+  var msgA = a.$Msg || ''
+  var msgB = b.$Msg || ''
+
+  if(msgA < msgB) { return -1 }
+  if(msgB < msgA) { return  1 }
+
+  var nameA = a.$Name.replace(/^[*^] /, '')
+  var nameB = b.$Name.replace(/^[*^] /, '')
+
+  if (nameA < nameB) return -1
+  if (nameB < nameA) return 1
+
+  return 0
 }
 
 function setDrugIsPended(drug) {
@@ -108,16 +131,10 @@ function useEstimate(drug) {
 
   parsed.numDaily = parsed.numDosage * parsed.freqNumerator / parsed.freqDemoninator / parsed.frequency
 
-  var refillsLeft = drug.$RefillsLeft || (drug.$RefillsTotal ? 1 : 0) //Assume we will switch to a script with refills if one is available
-  var qty_before_dispensed  = drug.$WrittenQty * refillsLeft
-  var days_before_dispensed = Math.round(qty_before_dispensed/parsed.numDaily, 0)
-  var days_limited_totalqty = drug.$IsPended ? Math.round(drug.$TotalQty/parsed.numDaily, 0) : Infinity
+  var days_before_dispensed = Math.round(drug.$RemainingQty/parsed.numDaily, 0)
+  var days_limited_totalqty = drug.$IsPended ? Infinity : Math.round(drug.$TotalQty/parsed.numDaily, 0)
 
   var stdDays = (drug.$Stock && drug.$TotalQty < 1000) ? 45 : 90 //Only do 45 day if its Low Stock AND less than 1000 Qty.  Cindy noticed we had 8000 Amlodipine but we were filling in 45 day supplies
-
-  //TODO Include Medicine Sync inside of Math.min()
-  //High Supply: If <= 120 (90+30) then dispense all at once.  If >= 120 then split it into two fills.
-  //Low Supply: If <= 75 (45+30) then dispense all at once).  If > 75 then split into two fills
 
   if (days_limited_totalqty <= Math.min(days_before_dispensed, stdDays)) {
 
@@ -133,20 +150,22 @@ function useEstimate(drug) {
     drug.$Type = "Estimate Limited Qty"
     setDrugStatus(drug, 'NOACTION_LOW_STOCK')
   }
+
   else if (days_before_dispensed <= stdDays+30) {
     drug.$Days = days_before_dispensed
     drug.$Type = "Estimate Finish Rx"
   }
+
   else {
     drug.$Days = stdDays
     drug.$Type = "Estimate Std Days"
   }
 
-  drug.$Qty = +Math.min(drug.$Days * parsed.numDaily, qty_before_dispensed).toFixed(0) //Math.min added on 2019-01-02 because Order 9240 Promethizine had $Qty 42 > qty_before_dispensed Qty 40 because of rounding
+  drug.$Qty = +Math.min(drug.$Days * parsed.numDaily, drug.$RemainingQty).toFixed(0) //Math.min added on 2019-01-02 because Order 9240 Promethizine had $Qty 42 > qty_before_dispensed Qty 40 because of rounding
 
   //This part is pulled from the CP_FillRx and CP_RefillRx SPs
   //See order #5307 - new script qty 90 w/ 1 refill dispensed as qty 45.  This basically switches the refills from 1 to 2, so after the 1st dispense there should still be one refill left
-  var denominator    = drug.$IsRefill ? drug.$DispenseQty : drug.$WrittenQty //DispenseQty will be pulled from previous Rxs.  We want to see if it has been set specifically for this Rx.
+  var denominator = drug.$IsRefill ? drug.$DispenseQty : drug.$WrittenQty //DispenseQty will be pulled from previous Rxs.  We want to see if it has been set specifically for this Rx.
   setRefills(drug, drug.$RefillsTotal - drug.$Qty/denominator)
 }
 

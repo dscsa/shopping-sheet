@@ -87,13 +87,3 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
      return changes
   }
 }
-
-function sortDrugs(a, b) {
-  if (a.$Name[0] != '*' && b.$Name[0] == '*') return -1
-  if (a.$Name[0] == '*' && b.$Name[0] != '*') return 1
-  if (a.$Name[0] != '^' && b.$Name[0] == '^') return -1
-  if (a.$Name[0] == '^' && b.$Name[0] != '^') return 1
-  if (a.$Name < b.$Name) return -1
-  if (b.$Name < a.$Name) return 1
-  return 0
-}

@@ -56,7 +56,7 @@ function orderShippedNotice(order, invoice) {
     message += '<br><br>Your Order includes the following medications:<br>'+groups.FILLED.join(';<br>')+';'
 
   if (groups.FILL_ACTION.length+groups.NOFILL_ACTION.length)
-    message += '<br><br>Please take action on the following medications:<br>'+groups.FILL_ACTION.concat(groups.NOFILL_ACTION).sort(sortByMsg).join(';<br>')+';'
+    message += '<br><br>Please take action on the following medications:<br>'+groups.FILL_ACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
   var email = { email:'adam@sirum.org' }
   var text  = { sms:'6507992817' }
@@ -175,7 +175,7 @@ function orderUpdatedNotice(order, drugsChanged) {
   var message = '<br><br>Your order will have the following once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
 
   if (numNoFills)
-    message += '<br><br>Below are prescription(s) that we have but are not going to fill right now:<br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).sort(sortByMsg).join(';<br>')+';'
+    message += '<br><br>Below are prescription(s) that we have but are not going to fill right now:<br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).join(';<br>')+';'
 
   var suffix = [
     "Note: if this is correct, there is no need to do anything. If you want to change or delay this order, please let us know as soon as possible. If delaying, please specify the date on which you want it filled, otherwise if you don't, we will delay it 3 weeks by default.",
@@ -291,16 +291,6 @@ function orderFailedNotice(order) {
   ].join('<br>')
 
   orderFailedEvent(order, email, text, 5*24, 16)
-}
-
-function sortByMsg(drug1, drug2) {
-
-  var msg1 = drug1.match(/[a-z].*/)
-  var msg2 = drug2.match(/[a-z].*/)
-
-  if(msg1 < msg2) { return -1 }
-  if(msg1 > msg2) { return  1 }
-  return 0
 }
 
 function trackingURL(trackingNumber) {

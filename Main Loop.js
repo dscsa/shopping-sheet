@@ -25,8 +25,6 @@ function mainLoop() {
 
     order.$RowChanged = scriptId
 
-    report[orderId].$Drugs.sort(sortDrugs)
-
     setOrderStatus(order, status[orderId])
 
     Log('Order ID from Report', orderId, order.$Status)
