@@ -27,16 +27,16 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     var faxTo = order.$Pharmacy.fax.replace(/\D/g, '')
     if (faxTo.length == 10) faxTo = '1'+faxTo
     var res = sendSFax(faxTo, pdf)
-    var success = res.isSuccess ? "External" : "Error External"
+    var success = res && res.isSuccess ? "External" : "Error External"
     sendEmail('adam@sirum.org,cindy@goodpill.org', success + ' Transfer Out Fax', res.message+'. OrderId: '+orderId+'. See the <a href="'+fax.getUrl()+'">fax here</a>')
   } else {
     var res = sendSFax('18882987726', pdf)
-    var success = res.isSuccess ? "Internal" : "Error Internal"
+    var success = res && res.isSuccess ? "Internal" : "Error Internal"
   }
 
   fax.setName(success + ": Transfer #"+order.$OrderId)
 
-  if ( ! res.isSuccess)
+  if (res && ! res.isSuccess)
     debugEmail(success + ' Transfer Out Fax', 'OrderId', orderId, 'isSuccess', res.isSuccess, fax.getUrl(), 'res', res, 'order', order)
 }
 
@@ -60,8 +60,8 @@ function getToken(){
 //https://stackoverflow.com/questions/24340340/urlfetchapp-upload-file-multipart-form-data-in-google-apps-script
 function sendSFax(toFax, blob){
 
-  return {isSuccess:false} //v6 debugging
-  if ( ! LIVE_MODE) return {isSuccess:false}
+  return //v6 debugging
+  if ( ! LIVE_MODE) return
 
   var token = getToken()
   //var blob  = DriveApp.getFileById("1lyRpFl0GiEvj5Ixu-BwTvQB-sw6lt3UH").getBlob()

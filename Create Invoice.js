@@ -45,7 +45,10 @@ function updateInvoice() {
 
   Log('Update Invoice Called', order)
 
-  setPriceFeesDue(order) //User may have changed $Days and $Prices so recalculate totals
+  for (var i in order.$Drugs)
+    setPriceTotal(order, order.$Drugs[i])
+
+  setFeeDue(order) //User may have changed $Days and $Prices so recalculate totals
 
   sheet.setCellByKeys(order.$OrderId, '$Total', order.$Total)
   sheet.setCellByKeys(order.$OrderId, '$Fee', order.$Fee)
@@ -69,6 +72,8 @@ function createInvoice(order) { //This is undefined when called from Menu
    }
 
    order = flattenOrder(order)
+
+   if ( ! LIVE_MODE) return debugEmail('createInvoice canceled because LIVE MODE OFF', order)
 
    Log('flatten order', order.$OrderId, order)
 

@@ -141,19 +141,23 @@ function useEstimate(drug) {
 
   var stdDays = (drug.$Stock && drug.$TotalQty < 1000) ? 45 : 90 //Only do 45 day if its Low Stock AND less than 1000 Qty.  Cindy noticed we had 8000 Amlodipine but we were filling in 45 day supplies
 
-  if (days_limited_totalqty <= Math.min(days_before_dispensed, stdDays)) {
+  infoEmail('useEstimate', 'isLimited', days_limited_totalqty < Math.min(days_before_dispensed, stdDays), 'parsed', parsed, 'days_before_dispensed', days_before_dispensed, 'days_limited_totalqty', days_limited_totalqty, 'stdDays', stdDays, 'drug.$IsRefill', drug.$IsRefill, 'drug.$TotalQty', drug.$TotalQty, 'drug.$MonthlyPrice', drug.$MonthlyPrice, drug)
+
+  if (days_limited_totalqty < Math.min(days_before_dispensed, stdDays)) {
 
     var transfer = ! drug.$IsRefill && drug.$TotalQty < 90 && drug.$MonthlyPrice < 20
 
     if (transfer) {
       set0Days(drug)
       setDrugStatus(drug, 'NOACTION_TRANSFERRED')
+      debugEmail('Low Quantity Transfer', parsed, 'days_before_dispensed', days_before_dispensed, 'days_limited_totalqty', days_limited_totalqty, 'stdDays', stdDays, 'drug.$IsRefill', drug.$IsRefill, 'drug.$TotalQty', drug.$TotalQty, 'drug.$MonthlyPrice', drug.$MonthlyPrice, drug)
       return
     }
 
     drug.$Days = days_limited_totalqty
     drug.$Type = "Estimate Limited Qty"
     setDrugStatus(drug, 'NOACTION_LOW_STOCK')
+    debugEmail('Low Quantity Hold', parsed, 'days_before_dispensed', days_before_dispensed, 'days_limited_totalqty', days_limited_totalqty, 'stdDays', stdDays, 'drug.$IsRefill', drug.$IsRefill, 'drug.$TotalQty', drug.$TotalQty, 'drug.$MonthlyPrice', drug.$MonthlyPrice, drug)
   }
 
   else if (days_before_dispensed <= stdDays+30) {
@@ -231,7 +235,7 @@ function setStatus(drug) {
       set0Days(drug)
       setDrugStatus(drug, 'ACTION_PAST_DUE')
     }
-    else if (drug.$DaysSinceRefill < maxMedSyncDays(drug)) {
+    else if (drug.$DaysSinceRefill && drug.$DaysSinceRefill < maxMedSyncDays(drug)) {
       set0Days(drug)
       setDrugStatus(drug, 'NOACTION_RECENT_FILL')
     }
