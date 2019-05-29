@@ -97,7 +97,7 @@ var drugStatus = {
       ES:''
     },
     ACTION_NEEDS_FORM:{
-      EN:'cannot be filled until patient registration is complete',
+      EN:'waiting on you to register',
       ES:''
     }
 }

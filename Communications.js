@@ -216,8 +216,8 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
 
   ///It's depressing to get updates if nothing is being filled
   if (numFills) {
-    var subject = "Please take 5mins to register so that we can fill your Rxs."
-    var message = "Welcome to Good Pill!  We are excited to fill your 1st order."
+    var subject = "Welcome to Good Pill!  We are excited to fill your 1st order."
+    var message = "Please take 5mins to register so that we can fill your Rxs."
   }
   else {
     var subject = "Welcome to Good Pill! We are so sorry but we can't fill the Rxs that we received from your doctor"
