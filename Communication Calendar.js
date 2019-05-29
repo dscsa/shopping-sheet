@@ -1,7 +1,7 @@
 function orderShippedEvent(order, email, text) {
 
   var patientLabel = getPatientLabel(order)
-  var eventTitle   = order.$OrderId+' Order Shipped: '+patientLabel+'.  Created On:'+new Date()
+  var eventTitle   = order.$OrderId+' Order Shipped: '+patientLabel+'.  Created:'+new Date()
 
   var cancel = cancelEvents(patientLabel, ['Order Shipped', 'Order Failed'])
 
@@ -12,7 +12,7 @@ function orderShippedEvent(order, email, text) {
 
 function refillReminderEvent(order, email, text, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
-  var eventTitle   = order.$OrderId+' Refill Reminder: '+patientLabel+'.  Created On:'+new Date()
+  var eventTitle   = order.$OrderId+' Refill Reminder: '+patientLabel+'.  Created:'+new Date()
 
   var cancel = cancelEvents(patientLabel, ['Refill Reminder'])
 
@@ -23,7 +23,7 @@ function refillReminderEvent(order, email, text, hoursToWait, hourOfDay) {
 
 function autopayReminderEvent(order, email, text, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
-  var eventTitle   = order.$OrderId+' Autopay Reminder: '+patientLabel+'.  Created On:'+new Date()
+  var eventTitle   = order.$OrderId+' Autopay Reminder: '+patientLabel+'.  Created:'+new Date()
 
   var cancel = cancelEvents(patientLabel, ['Autopay Reminder'])
 
@@ -34,7 +34,7 @@ function autopayReminderEvent(order, email, text, hoursToWait, hourOfDay) {
 
 function orderUpdatedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
-  var eventTitle   = order.$OrderId+' Order Updated: '+patientLabel+'.  Created On:'+new Date()
+  var eventTitle   = order.$OrderId+' Order Updated: '+patientLabel+'.  Created:'+new Date()
 
   var cancel = cancelEvents(patientLabel, ['Order Updated'])
 
@@ -46,7 +46,7 @@ function orderUpdatedEvent(order, email, text, hoursToWait) {
 function needsFormEvent(order, email, text, hoursToWait, hourOfDay) {
 
   var patientLabel = getPatientLabel(order)
-  var eventTitle   = order.$OrderId+' Needs Form: '+patientLabel+'.  Created On:'+new Date()
+  var eventTitle   = order.$OrderId+' Needs Form: '+patientLabel+'.  Created:'+new Date()
 
   infoEmail('needsFormEvent', eventTitle, email, text, hoursToWait, hourOfDay, order)
 
@@ -56,7 +56,7 @@ function needsFormEvent(order, email, text, hoursToWait, hourOfDay) {
 function orderFailedEvent(order, email, text, hoursToWait, hourOfDay) {
 
   var patientLabel = getPatientLabel(order)
-  var eventTitle   = order.$OrderId+' Order Failed: '+patientLabel+'.  Created On:'+new Date()
+  var eventTitle   = order.$OrderId+' Order Failed: '+patientLabel+'.  Created:'+new Date()
 
   var cancel = cancelEvents(patientLabel, ['Order Failed'])
 

@@ -216,11 +216,11 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
 
   ///It's depressing to get updates if nothing is being filled
   if (numFills) {
-    var subject =  "Please take 5mins to register so that we can fill your Rxs."
+    var subject = "Please take 5mins to register so that we can fill your Rxs."
     var message = "Welcome to Good Pill!  We are excited to fill your 1st order."
   }
   else {
-    var subject =  "Welcome to Good Pill! We are so sorry but we can't fill the Rxs that we received from your doctor"
+    var subject = "Welcome to Good Pill! We are so sorry but we can't fill the Rxs that we received from your doctor"
     var message = "Please register online or give us a call if you want to tranfer these Rxs to your local pharmacy.  Because we rely on donated medicine, we can only fill medications that are on our Formulary"
   }
 
@@ -271,7 +271,7 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
 
 function orderFailedNotice(order) {
 
-  var subject  = "We are having trouble with your Order."
+  var subject  = "Apologies but we are having trouble with your Order."
   var message  = order.$Patient.source == 'Transfer'
     ? "We were unable to transfer the Rxs you requested from "+order.$Pharmacy.short+". This usually happens because we have the wrong pharmacy on file, we are requesting the wrong Rxs, or your Rxs have no refills remaining"
     : "We haven't gotten any Rxs from your doctor yet. You may want to contact your doctor.  If you had meant to create a transfer from your pharmacy instead, please login to your account and place a new 'transfer' order or give us a call."

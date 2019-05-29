@@ -201,7 +201,6 @@ function setStatus(drug) {
       setDrugStatus(drug, 'ACTION_NO_REFILLS')
     }
     else if (drug.$Autofill.patient == null) {//order.$Status == 'Needs Form' was messing up on #11121 since status showed as "Shopping" but this message still appeared
-      set0Days(drug)
       setDrugStatus(drug, 'ACTION_NEEDS_FORM')
     }
     else if (drug.$InOrder && ! drug.$Autofill.patient && ! drug.$ManuallyAdded) { //Drug is in order. Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
