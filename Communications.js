@@ -186,7 +186,6 @@ function orderUpdatedNotice(order, drugsChanged) {
     order.$Patient.medsync ? '* The goal of Med Sync is to syncronize your refill dates so that we can consolidate as many of your medications as possible into a single order, rather than sending your medications in separate orders. For this reason, this Rx may be filled for a fewer number of days in this Order before resuming to a normal number of days.' : ''
   ].join('<br><br>')
 
-
   var text  = { sms:'6507992817', message:subject+message }
   var email = { email:'adam@sirum.org' }
 
@@ -194,10 +193,10 @@ function orderUpdatedNotice(order, drugsChanged) {
   email.message = [
     'Hello,',
     '',
-    'Thanks for choosing Good Pill. '+subject+' We will notify you again once it ships.',
+    subject+' We will notify you again once it ships.',
     message,
     '',
-    (numFills >= numNoFills) ? 'Thanks!' : 'Apologies for any inconvenience,',
+    (numFills >= numNoFills) ? 'Thanks for choosing Good Pill!' : 'Apologies for any inconvenience,',
     'The Good Pill Team',
     '',
     '',
