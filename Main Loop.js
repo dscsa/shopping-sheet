@@ -69,7 +69,7 @@ function mainLoop() {
     }
     else */
 
-    if ( ! order.$Pharmacy) { //Use Pharmacy name rather than $New to keep us from repinging folks if the row has been readded
+    if ( ! order.$Pharmacy.short) { //Use Pharmacy name rather than $New to keep us from repinging folks if the row has been readded
       needsFormNotice(order)
     }
     else if ( ! order.$Drugs.length) { //Patient filled out webform before RXs were sent

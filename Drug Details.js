@@ -186,7 +186,7 @@ function setRefills(drug, refills) {
 
 function setStatus(drug) {
 
-    var timeToExpiry = toDate(drug.$RxExpires) - toDate(drug.$NextRefill)
+    var timeToExpiry  = toDate(drug.$RxExpires) - toDate(drug.$NextRefill)
 
     if (drug.$ScriptStatus == 'Transferred Out') {
       set0Days(drug)
@@ -200,15 +200,15 @@ function setStatus(drug) {
       set0Days(drug)
       setDrugStatus(drug, 'ACTION_NO_REFILLS')
     }
-    else if ( ! drug.$InOrder && ! drug.$Autofill.patient) { //Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
+    else if (drug.$Autofill.patient == null) {//order.$Status == 'Needs Form' was messing up on #11121 since status showed as "Shopping" but this message still appeared
+      set0Days(drug)
+      setDrugStatus(drug, 'ACTION_NEEDS_FORM')
+    }
+    else if (drug.$InOrder && ! drug.$Autofill.patient && ! drug.$ManuallyAdded) { //Drug is in order. Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
       set0Days(drug)
       setDrugStatus(drug, 'ACTION_PAT_OFF_AUTOFILL')
     }
-    else if ( drug.$InOrder && ! drug.$Autofill.patient && ! ~ ['MANUAL', 'WEBFORM'].indexOf(drug.$AddedToOrderBy)) {
-      set0Days(drug)
-      setDrugStatus(drug, 'ACTION_PAT_OFF_AUTOFILL')
-    }
-    else if ( ! drug.$InOrder && ! drug.$Autofill.rx) { //Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
+    else if ( ! drug.$InOrder && ! drug.$Autofill.rx && ! drug.$ManuallyAdded) { //Drug NOT in order. Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
       set0Days(drug)
       setDrugStatus(drug, 'ACTION_RX_OFF_AUTOFILL')
     }
@@ -227,10 +227,6 @@ function setStatus(drug) {
     else if ( ! drug.$IsPended && ! drug.$IsRefill && ['Out of Stock', 'Refills Only'].indexOf(drug.$Stock)) {
       set0Days(drug)
       setDrugStatus(drug, drug.$MonthlyPrice >= 20 ? 'ACTION_CHECK_BACK' : 'NOACTION_TRANSFERRED')
-    }
-    else if (drug.$Autofill.patient == null) {//order.$Status == 'Needs Form' was messing up on #11121 since status showed as "Shopping" but this message still appeared
-      set0Days(drug)
-      setDrugStatus(drug, 'ACTION_NEEDS_FORM')
     }
     else if ( ! drug.$InOrder && drug.$DaysToRefill < 0 && drug.$RefillsTotal > .1) {
       set0Days(drug)

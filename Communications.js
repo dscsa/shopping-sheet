@@ -36,6 +36,9 @@ function groupDrugs(order) {
 
     if (drug.$Days < group.MIN_DAYS)
       group.MIN_DAYS = drug.$Days
+
+    if (drug.$ManuallyAdded)
+      group.MANUALLY_ADDED = true
   }
 
   return group
@@ -65,7 +68,7 @@ function orderShippedNotice(order, invoice) {
     subject+
     ' View it at '+shortLink('https://docs.google.com/document/d/'+invoice.getId()+'/pub?embedded=true')+
     '. Track it at '+shortLink(trackingURL(order.$Tracking))+'. '+
-    message.replace(/(<br>)+/g, ' ')
+    message
 
   email.subject = subject
   email.message = [
@@ -103,7 +106,7 @@ function refillReminderNotice(order, groups) {
   var email = { email:'adam@sirum.org' }
   var text  = { sms:'6507992817' }
 
-  text.message = subject+message.replace(/(<br>)+/g, ' ')
+  text.message = subject+message
 
   email.subject = subject
   email.message = [
@@ -130,7 +133,7 @@ function autopayReminderNotice(order) {
   var email = { email:'adam@sirum.org' }
   var text  = { sms:'6507992817', message:subject+' '+message }
 
-  text.message = subject+message.replace(/(<br>)+/g, ' ')
+  text.message = subject+message
 
   email.subject = subject
   email.message = [
@@ -167,16 +170,16 @@ function orderUpdatedNotice(order, drugsChanged) {
   var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
 
   ///It's depressing to get updates if nothing is being filled
-  if ( ! numFills) return debugEmail('orderUpdateNotice NOT sent', 'drugsChanged', drugsChanged, 'numFills', numFills, order, groups)
+  if ( ! numFills && ! groups.MANUALLY_ADDED) return infoEmail('orderUpdateNotice NOT sent', 'drugsChanged', drugsChanged, 'numFills', numFills, order, groups)
 
   var subject = ! drugsChanged
     ? 'We are starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'
     : 'Update for Order #'+order.$OrderId+' of '+numFills+' items.'
 
-  var message = 'These Rxs will be included once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
+  var message = '<br>These Rxs will be included once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
 
   if (numNoFills)
-    message += '<br><br>These Rxs we have but are not going to fill right now:<br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).join(';<br>')+';'
+    message += '<br><br>We have these Rxs but are not filling them right now:<br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).join(';<br>')+';'
 
   var suffix = [
     "Note: if this is correct, there is no need to do anything. If you want to change or delay this order, please let us know as soon as possible. If delaying, please specify the date on which you want it filled, otherwise if you don't, we will delay it 3 weeks by default.",
@@ -184,15 +187,14 @@ function orderUpdatedNotice(order, drugsChanged) {
   ].join('<br><br>')
 
 
-  var text  = { sms:'6507992817', message:subject+message.replace(/(<br>)+/g, ' ') }
+  var text  = { sms:'6507992817', message:subject+message }
   var email = { email:'adam@sirum.org' }
 
   email.subject = subject
   email.message = [
     'Hello,',
     '',
-    'Thanks for choosing Good Pill Pharmacy. '+subject+' We will notify you again once it ships.',
-    '',
+    'Thanks for choosing Good Pill. '+subject+' We will notify you again once it ships.',
     message,
     '',
     (numFills >= numNoFills) ? 'Thanks!' : 'Apologies for any inconvenience,',
@@ -225,7 +227,7 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
   var email = { email:'adam@sirum.org' }
   var text  = { sms:'6507992817', message:subject+' '+message }
 
-  text.message = subject+message.replace(/(<br>)+/g, ' ')
+  text.message = subject+message
 
   email.subject = subject
   email.message = [
@@ -277,7 +279,7 @@ function orderFailedNotice(order) {
   var email = { email:'adam@sirum.org' }
   var text  = { sms:'6507992817', message:subject+' '+message }
 
-  text.message = subject+message.replace(/(<br>)+/g, ' ')
+  text.message = subject+message
 
   email.subject = subject
   email.message = [

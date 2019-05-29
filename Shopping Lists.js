@@ -84,8 +84,6 @@ function createShoppingLists(order, drugs) {
       return debugEmail('Shopping Error: Could not be shopped because not enough qty found - tabs/caps/X00? (2)', drug.$Stock, drug.$Msg, '#'+orderID, v2name, minQty, minDays, drug)
     }
 
-    return //Still Debugging v6 for Now
-
     if ( ! LIVE_MODE) return debugEmail('createShoppingList canceled because LIVE MODE OFF')
 
     try {
@@ -118,8 +116,8 @@ function shopV2(drug, orderID) {
   var minDays   = drug.$Days
   var drugStock = drug.$Stock
 
-  var minExp   = addTime((+minDays-2*7)*24).toJSON().slice(0, 7).split('-') //Used to use +14 days rather than -14 days as a buffer for dispensing and shipping. But since lots of prepacks expiring I am going to let almost expired things be prepacked
-  var longExp  = addTime((+minDays+6*7)*24).toJSON().slice(0, 7) //2015-05-13 We want any surplus from packing fast movers to be usable for ~6 weeks.  Otherwise a lot of prepacks expire on the shelf
+  var minExp   = addHours((+minDays-2*7)*24).toJSON().slice(0, 7).split('-') //Used to use +14 days rather than -14 days as a buffer for dispensing and shipping. But since lots of prepacks expiring I am going to let almost expired things be prepacked
+  var longExp  = addHours((+minDays+6*7)*24).toJSON().slice(0, 7) //2015-05-13 We want any surplus from packing fast movers to be usable for ~6 weeks.  Otherwise a lot of prepacks expire on the shelf
 
   var safety    = 0.15
   var startkey  = '["8889875187","month","'+minExp[0]+'","'+minExp[1]+'","'+v2name+'"]'

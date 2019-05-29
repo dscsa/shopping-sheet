@@ -60,12 +60,11 @@ function getToken(){
 //https://stackoverflow.com/questions/24340340/urlfetchapp-upload-file-multipart-form-data-in-google-apps-script
 function sendSFax(toFax, blob){
 
-  return //v6 Debugging
+  return {isSuccess:false} //v6 debugging
+  if ( ! LIVE_MODE) return {isSuccess:false}
 
   var token = getToken()
   //var blob  = DriveApp.getFileById("1lyRpFl0GiEvj5Ixu-BwTvQB-sw6lt3UH").getBlob()
-
-  toFax = LIVE_MODE ? toFax : '18882987726'
 
   var url = "https://api.sfaxme.com/api/SendFax?token=" + encodeURIComponent(token) + "&ApiKey=" + encodeURIComponent(SFAX_KEY) + "&RecipientName=" + encodeURIComponent('Good Pill Pharmacy - Active')  + "&RecipientFax=" + encodeURIComponent(toFax)
 

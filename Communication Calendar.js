@@ -5,7 +5,7 @@ function orderShippedEvent(order, email, text) {
 
   var cancel = cancelEvents(patientLabel, ['Order Shipped', 'Order Failed'])
 
-  debugEmail('orderShippedEvent', email, text, order, cancel)
+  infoEmail('orderShippedEvent', eventTitle, email, text, order, cancel)
 
   newEvent(eventTitle, newCommArr(email, text))
 }
@@ -16,7 +16,7 @@ function refillReminderEvent(order, email, text, hoursToWait, hourOfDay) {
 
   var cancel = cancelEvents(patientLabel, ['Refill Reminder'])
 
-  debugEmail('refillReminderEvent', email, text, hoursToWait, hourOfDay, order, cancel)
+  infoEmail('refillReminderEvent', eventTitle, email, text, hoursToWait, hourOfDay, order, cancel)
 
   newEvent(eventTitle, newCommArr(email, text), hoursToWait, hourOfDay)
 }
@@ -27,7 +27,7 @@ function autopayReminderEvent(order, email, text, hoursToWait, hourOfDay) {
 
   var cancel = cancelEvents(patientLabel, ['Autopay Reminder'])
 
-  debugEmail('autopayReminderEvent', email, text, hoursToWait, hourOfDay, order, cancel)
+  infoEmail('autopayReminderEvent', eventTitle, email, text, hoursToWait, hourOfDay, order, cancel)
 
   newEvent(eventTitle, newCommArr(email, text), hoursToWait, hourOfDay)
 }
@@ -38,7 +38,7 @@ function orderUpdatedEvent(order, email, text, hoursToWait) {
 
   var cancel = cancelEvents(patientLabel, ['Order Updated'])
 
-  debugEmail('orderUpdatedEvent', email, text, hoursToWait, order, cancel)
+  infoEmail('orderUpdatedEvent', eventTitle, email, text, hoursToWait, order, cancel)
 
   newEvent(eventTitle, newCommArr(email, text), hoursToWait)
 }
@@ -48,7 +48,7 @@ function needsFormEvent(order, email, text, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Needs Form: '+patientLabel+'.  Created On:'+new Date()
 
-  debugEmail('needsFormEvent', email, text, hoursToWait, hourOfDay, order)
+  infoEmail('needsFormEvent', eventTitle, email, text, hoursToWait, hourOfDay, order)
 
   newEvent(eventTitle, newCommArr(email, text), hoursToWait, hourOfDay)
 }
@@ -60,7 +60,7 @@ function orderFailedEvent(order, email, text, hoursToWait, hourOfDay) {
 
   var cancel = cancelEvents(patientLabel, ['Order Failed'])
 
-  debugEmail('orderFailedEvent', email, text, hoursToWait, hourOfDay, order, cancel)
+  infoEmail('orderFailedEvent', eventTitle, email, text, hoursToWait, hourOfDay, order, cancel)
 
   newEvent(eventTitle, newCommArr(email, text), hoursToWait, hourOfDay)
 }
@@ -76,12 +76,14 @@ function newCommArr(email, text) {
   email.subject = 'v6 '+email.subject //v6 Debugging
 
   //addCallFallback
-  var call = JSON.parse(JSON.stringify(text))
+  text = JSON.stringify(text)
+  text = text.replace(/(<br>){2,}/g, '%0a%0a').replace(/(<br>)+/g, ' ')
+  var call = text = JSON.parse(text)
   call.call = call.sms
   call.sms  = undefined
-  text.fallbacks = [call]
+  //text.fallbacks = [call]
 
-  return [text, email]
+  return [text, email, call]
 }
 
 //commArr as defined by the communication-calendar repository
