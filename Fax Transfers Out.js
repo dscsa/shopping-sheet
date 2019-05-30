@@ -18,7 +18,9 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     return drug.$Msg && ~ drug.$Msg.indexOf('transferred')
   })
 
-  if ( ! order.$Drugs.length) return
+  return //v6 debugging
+
+  if ( ! order.$Drugs.length || ! LIVE_MODE) return
 
   var fax = mergeDoc("Transfer Out Fax v1", "Transfer #"+order.$OrderId, "Transfer Outs", order)
   var pdf = fax.getAs(MimeType.PDF)
@@ -59,9 +61,6 @@ function getToken(){
 //https://stackoverflow.com/questions/26615546/google-apps-script-urlfetchapp-post-file
 //https://stackoverflow.com/questions/24340340/urlfetchapp-upload-file-multipart-form-data-in-google-apps-script
 function sendSFax(toFax, blob){
-
-  return //v6 debugging
-  if ( ! LIVE_MODE) return
 
   var token = getToken()
   //var blob  = DriveApp.getFileById("1lyRpFl0GiEvj5Ixu-BwTvQB-sw6lt3UH").getBlob()

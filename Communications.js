@@ -185,7 +185,10 @@ function orderUpdatedNotice(order, drugsChanged) {
     ? 'We are starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'
     : 'Update for Order #'+order.$OrderId+' of '+numFills+' items.'
 
-  var message = '<br>These Rxs will be included once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
+  var message = ''
+
+  if (numFills)
+    message += '<br>These Rxs will be included once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
 
   if (numNoFills)
     message += '<br><br>We have these Rxs but are not filling them right now:<br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).join(';<br>')+';'

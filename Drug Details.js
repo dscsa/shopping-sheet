@@ -226,7 +226,7 @@ function setStatus(drug) {
       set0Days(drug)
       setDrugStatus(drug, 'NOACTION_NOT_OFFERED')
     }
-    else if ( ! drug.$IsPended && ! drug.$IsRefill && ['Out of Stock', 'Refills Only'].indexOf(drug.$Stock)) {
+    else if ( ! drug.$IsPended && ! drug.$IsRefill && ~ ['Out of Stock', 'Refills Only'].indexOf(drug.$Stock)) {
       set0Days(drug)
       setDrugStatus(drug, drug.$MonthlyPrice >= 20 ? 'ACTION_CHECK_BACK' : 'NOACTION_TRANSFERRED')
     }

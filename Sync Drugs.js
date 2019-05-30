@@ -95,7 +95,7 @@ function setSyncDays(order, drug) {
   if (drug.$IsDispensed || ! drug.$Days || p.syncDates.inOrder > p.syncDate[1]) return
 
   var oldDays = drug.$Days
-  var newDays = (new Date(p.syncDate[0]) - new Date(drug.$NextRefill))/1000/60/60/24
+  var newDays = (new Date(p.syncDate[0]) - new Date(drug.$NextRefill || order.$OrderAdded))/1000/60/60/24
 
   newDays = Math.ceil((newDays-5)/15)*15   //Cindy wants us to round up to the nearest 15 days.  For rounding to 15, I don't want an equal Math.round() since I would want to error on giving people more than less but not quite just Math.ceil(), instead I do Math.ceil(x-5) because I want 66-80 -> 75, and 81-95 -> 90
 

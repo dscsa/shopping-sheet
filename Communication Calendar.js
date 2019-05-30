@@ -106,12 +106,15 @@ function formatCall(callJson) {
 
   //Improve Pronounciation
   callJson = callJson
-    .replace(/;|\./g, '....') //can't do commas without testing for inside quotes because that is part of json syntax
-    .replace(/(<br>)+|(%0a)+/g, '........')
+    .replace(/;|\./g, '<pause>') //can't do commas without testing for inside quotes because that is part of json syntax
+    .replace(/(<br>)+|(%0a)+/g, '<pause>')
     .replace(/MG/g, 'milligrams')
     .replace(/MCG/g, 'micrograms')
     .replace(/Rxs/ig, 'prescriptions')
-    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number $1..$2..$3..$4..$5..$6....')
+    .replace(/ ER /ig, 'extended release')
+    .replace(/ DR /ig, 'delayed release')
+    .replace(/ TAB| CAP/ig, '')
+    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number $1$2...$3$4...$5$6...')
 
   try {
     return JSON.parse(callJson)
