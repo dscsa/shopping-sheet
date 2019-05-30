@@ -76,14 +76,39 @@ function newCommArr(email, text) {
   email.subject = 'v6 '+email.subject //v6 Debugging
 
   //addCallFallback
-  text = JSON.stringify(text)
-  text = text.replace(/(<br>){2,}/g, '%0a%0a').replace(/(<br>)+/g, ' ')
-  var call = text = JSON.parse(text)
-  call.call = call.sms
-  call.sms  = undefined
+  var json = JSON.stringify(text)
+
+  text = formatText(json)
+  call = formatCall(json)
+
+  call.message = 'Hi, this is Good Pill Pharmacy....'+call.message
+  call.call    = call.sms
+  call.sms     = undefined
   //text.fallbacks = [call]
 
   return [text, email, call]
+}
+
+function formatText(textJson) {
+
+  textJson = textJson
+    .replace(/(<br>){2,}/g, '%0a%0a')
+    .replace(/(<br>)+/g, ' ')
+
+  return JSON.parse(textJson)
+}
+
+function formatCall(callJson) {
+
+  //Improve Pronounciation
+  callJson = callJson
+    .replace(/(<br>)+|(%0a)+/g, '........')
+    .replace(/;|\.|,/g, '....')
+    .replace(/MG/g, 'milligrams')
+    .replace(/MG/g, 'micrograms')
+    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, '$1..$2..$3..$4..$5..$6....')
+
+  return JSON.parse(callJson)
 }
 
 //commArr as defined by the communication-calendar repository
