@@ -23,8 +23,10 @@ function parseSig(drug) {
       frequency:getFrequency(cleanedSig)
     }
 
-    if (parsed.numDosage && parsed.freqNumerator && parsed.freqDemoninator && parsed.frequency)
+    if (parsed.numDosage && parsed.freqNumerator && parsed.freqDemoninator && parsed.frequency) {
+      parsed.numDaily = parsed.numDosage * parsed.freqNumerator / parsed.freqDemoninator / parsed.frequency
       return parsed
+    }
 
     debugEmail('Could not parse sig', drug.$Sig, '|'+cleanedSig+'|', parsed)
     drug.$Msg = (drug.$Msg || '') + "Sig Parse Error"
@@ -32,7 +34,7 @@ function parseSig(drug) {
 }
 
 function subsituteNumerals(sig) {
-  sig = sig.replace(/[()]/g, '') //get rid of parenthesis // "Take 1 capsule (300 mg total) by mouth 3 (three) times daily."
+  sig = sig.replace(/\(.*?\)/g, '') //get rid of parenthesis // "Take 1 capsule (300 mg total) by mouth 3 (three) times daily."
   sig = sig.replace(/\\/g, '')   //get rid of backslashes
 
   sig = sig.replace(/(^| and | & )(1\/2|one-half) /ig, '.5 ') //Take 1 and 1/2 tablets or Take 1 & 1/2 tablets.  Could combine with next regex but might get complicated
@@ -179,7 +181,8 @@ function testParseSig() {
     //"TAKE 1/2 TO 1 TABLET(S) by mouth EVERY DAY",
     //"TAKE 1/2 TO 2 TABLETS AT BEDTIME FOR SLEEP.",
     //"Take 60 mg daily  1 1\\/2 tablet",
-    "ORAL 1 q8-12h prn muscle spasm"
+    //"ORAL 1 q8-12h prn muscle spasm",
+    "Take 1 tablet (12.5 mg total) by mouth every 12 (twelve) hours"
   ]
 
 

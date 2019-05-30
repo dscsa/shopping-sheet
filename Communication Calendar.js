@@ -136,7 +136,7 @@ function searchEvents(patientLabel, typeArr) {
       var title = event.getTitle()
       return typeArr.reduce(function(match, type) {
           return match || ~ title.indexOf(type)
-      }, null)
+      }, null) //null is neccessary
   })
 
   infoEmail('searchEvents', start, stop, patientLabel, typeArr, matches.length+' of '+events.length,'events:', eventString(events))
