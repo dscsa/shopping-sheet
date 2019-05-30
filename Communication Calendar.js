@@ -95,7 +95,11 @@ function formatText(textJson) {
     .replace(/(<br>){2,}/g, '%0a%0a')
     .replace(/(<br>)+/g, ' ')
 
-  return JSON.parse(textJson)
+  try {
+    return JSON.parse(textJson)
+  } catch (e) {
+    debugEmail('formatText json.parse error', textJson, e)
+  }
 }
 
 function formatCall(callJson) {
@@ -105,10 +109,14 @@ function formatCall(callJson) {
     .replace(/;|\.|,/g, '....')
     .replace(/(<br>)+|(%0a)+/g, '........')
     .replace(/MG/g, 'milligrams')
-    .replace(/MG/g, 'micrograms')
-    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, '$1..$2..$3..$4..$5..$6....')
+    .replace(/MCG/g, 'micrograms')
+    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number $1..$2..$3..$4..$5..$6....')
 
-  return JSON.parse(callJson)
+  try {
+    return JSON.parse(callJson)
+  } catch (e) {
+    debugEmail('formatCall json.parse error', callJson, e)
+  }
 }
 
 //commArr as defined by the communication-calendar repository
