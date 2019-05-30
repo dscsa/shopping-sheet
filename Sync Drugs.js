@@ -101,7 +101,7 @@ function setSyncDays(order, drug) {
 
   var daysLeftInRx = Math.round(drug.$WrittenQty * drug.$RefillsLeft * drug.$Days / drug.$Qty, 0)
 
-  if (newDays == oldDays || newDays > daysLeftInRx) return //debugEmail('Cannot Sync: not enough days left in the Rx', 'newDays', newDays, 'daysLeftInRx', daysLeftInRx, order)
+  if (newDays == oldDays || newDays > daysLeftInRx || oldDays == daysLeftInRx) return //debugEmail('Cannot Sync: not enough days left in the Rx', 'newDays', newDays, 'daysLeftInRx', daysLeftInRx, order)
 
   drug.$Days   = newDays
   drug.$SyncBy = newDays - oldDays

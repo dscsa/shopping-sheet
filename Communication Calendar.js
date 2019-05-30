@@ -5,9 +5,11 @@ function orderShippedEvent(order, email, text) {
 
   var cancel = cancelEvents(patientLabel, ['Order Shipped', 'Order Failed'])
 
-  infoEmail('orderShippedEvent', eventTitle, email, text, order, cancel)
+  var commArr = newCommArr(email, text)
 
-  newEvent(eventTitle, newCommArr(email, text))
+  infoEmail('orderShippedEvent', eventTitle, commArr, order, cancel)
+
+  newEvent(eventTitle, commArr)
 }
 
 function refillReminderEvent(order, email, text, hoursToWait, hourOfDay) {
@@ -16,9 +18,11 @@ function refillReminderEvent(order, email, text, hoursToWait, hourOfDay) {
 
   var cancel = cancelEvents(patientLabel, ['Refill Reminder'])
 
-  infoEmail('refillReminderEvent', eventTitle, email, text, hoursToWait, hourOfDay, order, cancel)
+  var commArr = newCommArr(email, text)
 
-  newEvent(eventTitle, newCommArr(email, text), hoursToWait, hourOfDay)
+  infoEmail('refillReminderEvent', eventTitle, commArr, hoursToWait, hourOfDay, order, cancel)
+
+  newEvent(eventTitle, commArr, hoursToWait, hourOfDay)
 }
 
 function autopayReminderEvent(order, email, text, hoursToWait, hourOfDay) {
@@ -27,9 +31,11 @@ function autopayReminderEvent(order, email, text, hoursToWait, hourOfDay) {
 
   var cancel = cancelEvents(patientLabel, ['Autopay Reminder'])
 
-  infoEmail('autopayReminderEvent', eventTitle, email, text, hoursToWait, hourOfDay, order, cancel)
+  var commArr = newCommArr(email, text)
 
-  newEvent(eventTitle, newCommArr(email, text), hoursToWait, hourOfDay)
+  infoEmail('autopayReminderEvent', eventTitle, commArr, hoursToWait, hourOfDay, order, cancel)
+
+  newEvent(eventTitle, commArr, hoursToWait, hourOfDay)
 }
 
 function orderUpdatedEvent(order, email, text, hoursToWait) {
@@ -38,9 +44,11 @@ function orderUpdatedEvent(order, email, text, hoursToWait) {
 
   var cancel = cancelEvents(patientLabel, ['Order Updated'])
 
-  infoEmail('orderUpdatedEvent', eventTitle, email, text, hoursToWait, order, cancel)
+  var commArr = newCommArr(email, text)
 
-  newEvent(eventTitle, newCommArr(email, text), hoursToWait)
+  infoEmail('orderUpdatedEvent', eventTitle, commArr, hoursToWait, order, cancel)
+
+  newEvent(eventTitle, commArr, hoursToWait)
 }
 
 function needsFormEvent(order, email, text, hoursToWait, hourOfDay) {
@@ -48,9 +56,11 @@ function needsFormEvent(order, email, text, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Needs Form: '+patientLabel+'.  Created:'+new Date()
 
-  infoEmail('needsFormEvent', eventTitle, email, text, hoursToWait, hourOfDay, order)
+  var commArr = newCommArr(email, text)
 
-  newEvent(eventTitle, newCommArr(email, text), hoursToWait, hourOfDay)
+  infoEmail('needsFormEvent', eventTitle, commArr, hoursToWait, hourOfDay, order)
+
+  newEvent(eventTitle, commArr, hoursToWait, hourOfDay)
 }
 
 function orderFailedEvent(order, email, text, hoursToWait, hourOfDay) {
@@ -60,9 +70,11 @@ function orderFailedEvent(order, email, text, hoursToWait, hourOfDay) {
 
   var cancel = cancelEvents(patientLabel, ['Order Failed'])
 
-  infoEmail('orderFailedEvent', eventTitle, email, text, hoursToWait, hourOfDay, order, cancel)
+  var commArr = newCommArr(email, text)
 
-  newEvent(eventTitle, newCommArr(email, text), hoursToWait, hourOfDay)
+  infoEmail('orderFailedEvent', eventTitle, commArr, hoursToWait, hourOfDay, order, cancel)
+
+  newEvent(eventTitle, commArr, hoursToWait, hourOfDay)
 }
 
 function newCommArr(email, text) {
