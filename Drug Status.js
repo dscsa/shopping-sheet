@@ -38,7 +38,7 @@ var drugStatus = {
       ES:''
     },
     NOACTION_MISSING_GCN:{
-      EN:'needs to be checked to determine if it is available',
+      EN:'needs to be checked to see if it is available',
       ES:''
     },
     NOACTION_LOW_STOCK:{

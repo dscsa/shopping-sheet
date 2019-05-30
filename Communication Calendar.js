@@ -132,13 +132,11 @@ function searchEvents(patientLabel, typeArr) {
   var calendar = CalendarApp.getCalendarById(GOOGLE_CAL_ID)
   var events   = calendar.getEvents(start, stop, { search:patientLabel })
 
-  var matches  = []
-
   var matches = events.filter(function(event) {
       var title = event.getTitle()
       return typeArr.reduce(function(match, type) {
           return match || ~ title.indexOf(type)
-      })
+      }, null)
   })
 
   infoEmail('searchEvents', start, stop, patientLabel, typeArr, matches.length+' of '+events.length,'events:', eventString(events))

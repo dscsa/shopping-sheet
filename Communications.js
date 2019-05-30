@@ -34,7 +34,7 @@ function groupDrugs(order) {
     if (drug.$Days && ! drug.$Autofill.rx)
       group.NO_AUTOFILL.push(name+' '+drug.$Msg)
 
-    if (drug.$Days < group.MIN_DAYS)
+    if (drug.$Days && ! drug.$Refills && drug.$Days < group.MIN_DAYS)
       group.MIN_DAYS = drug.$Days
 
     if (drug.$ManuallyAdded)
@@ -49,7 +49,9 @@ function groupDrugs(order) {
 function orderShippedNotice(order, invoice) {
 
   var groups = groupDrugs(order)
+
   refillReminderNotice(order, groups)
+  autopayReminderNotice(order, groups)
 
   var numFills = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
   var subject  = 'Your order '+(numFills ? 'of '+numFills+' items ' : '')+'has shipped and should arrive in 3-5 days.'
@@ -125,15 +127,21 @@ function refillReminderNotice(order, groups) {
 }
 
 //Called from Webform so that we didn't have to repeat conditional logic
-function autopayReminderNotice(order) {
+function autopayReminderNotice(order, groups) {
+
+  var payMethod = payment(order)
+
+  if (payMethod != payment.CARD) return
+
+  var numFills = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
 
   var subject  = "Autopay Reminder."
-  var message  = "Because you are enrolled in autopay, we will be be billing your card "+order.$Card+' $'+order.$Fee+".00 for last month's Order #"+order.$OrderId
+  var message  = "Because you are enrolled in autopay, we will be be billing your card "+order.$Card+' $'+order.$Fee+".00 for last month's Order #"+order.$OrderId+' of '+numFills+' items'
 
   var email = { email:'adam@sirum.org' }
   var text  = { sms:'6507992817', message:subject+' '+message }
 
-  text.message = subject+message
+  text.message = subject+' '+message
 
   email.subject = subject
   email.message = [
@@ -169,8 +177,9 @@ function orderUpdatedNotice(order, drugsChanged) {
   var numFills   = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
   var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
 
-  ///It's depressing to get updates if nothing is being filled
-  if ( ! numFills && ! groups.MANUALLY_ADDED) return infoEmail('orderUpdateNotice NOT sent', 'drugsChanged', drugsChanged, 'numFills', numFills, order, groups)
+  ///It's depressing to get updates if nothing is being filled.  So only send these if manually added and the order was just added (not just drugs changed)
+  if ( ! numFills && ! groups.MANUALLY_ADDED && drugsChanged)
+    return infoEmail('orderUpdateNotice NOT sent', 'drugsChanged', drugsChanged, 'numFills', numFills, order, groups)
 
   var subject = ! drugsChanged
     ? 'We are starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'

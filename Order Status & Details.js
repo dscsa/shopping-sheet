@@ -57,3 +57,18 @@ function setFeeDue(order) {
     order.$Due = 0
   }
 }
+
+function payment(order) {
+
+  if (order.$Coupon && order.$Coupon.slice(0, 6) != "track_")
+    return payment.COUPON
+
+  if (order.$Card)
+    return payment.CARD
+
+  return payment.MANUAL
+}
+
+payment.CARD   = 'CARD'
+payment.COUPON = 'COUPON'
+payment.MANUAL = 'MANUAL'

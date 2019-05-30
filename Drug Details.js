@@ -62,8 +62,9 @@ function sortDrugs(a, b) {
   if(msgA < msgB) { return -1 }
   if(msgB < msgA) { return  1 }
 
-  var nameA = a.$Name.replace(/^[*^] /, '')
-  var nameB = b.$Name.replace(/^[*^] /, '')
+  //http://support.ecisolutions.com/doc-ddms/help/reportsmenu/ascii_sort_order_chart.htm
+  var nameA = a.$Name.replace(/^[*] /, '[') //from * < A < ^ to A < * (now [) < ^
+  var nameB = b.$Name.replace(/^[*] /, '[')
 
   if (nameA < nameB) return -1
   if (nameB < nameA) return 1

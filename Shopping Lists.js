@@ -84,6 +84,8 @@ function createShoppingLists(order, drugs) {
       return debugEmail('Shopping Error: Could not be shopped because not enough qty found - tabs/caps/X00? (2)', drug.$Stock, drug.$Msg, '#'+orderID, v2name, minQty, minDays, drug)
     }
 
+    return //v6 debuggin
+
     if ( ! LIVE_MODE) return debugEmail('createShoppingList canceled because LIVE MODE OFF')
 
     try {

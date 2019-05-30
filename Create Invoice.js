@@ -73,6 +73,8 @@ function createInvoice(order) { //This is undefined when called from Menu
 
    order = flattenOrder(order)
 
+   return //v6 debug
+
    if ( ! LIVE_MODE) return debugEmail('createInvoice canceled because LIVE MODE OFF', order)
 
    Log('flatten order', order.$OrderId, order)

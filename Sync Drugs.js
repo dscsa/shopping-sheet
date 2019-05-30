@@ -68,11 +68,12 @@ function setSyncDate(order, drug) {
     //#14191 if only one drug in order don't sync it with itself. Might be a simpler fix but can't think
     //of it right now. For now, determine this by seeing if 1st drug has days and the 2nd drug has no days
     if (p.syncDates.inOrder == 1 && order.$Drugs.indexOf(drug) == 1)
-      p.syncDate = ['', 0]
+      p.syncDate = ['', 0, 'reset']
   }
 
   //$LastFill == "" means we have N/A for next_fill but still want to count it as a potential sync date. #11272 3 new surescipts were being synced to only 2 old sure scripts
-  if (newDays >= 30 && newDays <= 120 && drug.$Autofill.rx) {
+  //21 is the smallest number that would get rounded to 30 with our current rounding function: Math.ceil((newDays-5)/15)*15
+  if (newDays >= 21 && newDays <= 120 && drug.$Autofill.rx) {
     var nextFill = roundDate(nextFill, 7) //TODO we actually care about how "close" dates are. Right now 2019-05-13 would round to 2019-05-01 and 2019-05-16 would round to 2019-05-15 even though they should be grouped together
     p.syncDates[nextFill] = p.syncDates[nextFill] || 0
     p.syncDates[nextFill]++
@@ -94,7 +95,7 @@ function setSyncDays(order, drug) {
   if (drug.$IsDispensed || ! drug.$Days || p.syncDates.inOrder > p.syncDate[1]) return
 
   var oldDays = drug.$Days
-  var newDays = (new Date(p.syncDate[0]) - new Date(order.$OrderAdded))/1000/60/60/24
+  var newDays = (new Date(p.syncDate[0]) - new Date(drug.$NextRefill))/1000/60/60/24
 
   newDays = Math.ceil((newDays-5)/15)*15   //Cindy wants us to round up to the nearest 15 days.  For rounding to 15, I don't want an equal Math.round() since I would want to error on giving people more than less but not quite just Math.ceil(), instead I do Math.ceil(x-5) because I want 66-80 -> 75, and 81-95 -> 90
 

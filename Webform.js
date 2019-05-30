@@ -60,16 +60,20 @@ function updateWebformDispensed(order, invoice) {
 
     }
 
-    if (order.$Coupon && order.$Coupon.slice(0, 6) != "track_") {
+    var payMethod = payment(order)
+
+    if (payMethod == payment.COUPON) {
       woocommerceOrder.status = 'shipped-coupon'
       woocommerceOrder.coupon_lines = [{code:order.$Coupon}]
-    } else if (order.$Card) {
+    } else if (payMethod == payment.CARD) {
       woocommerceOrder.status = 'shipped-autopay'
       woocommerceOrder.payment_method = 'stripe'
       autopayReminderNotice(order)
-    } else {
+    } else if (payMethod == payment.MANUAL){
       woocommerceOrder.status = 'shipped-unpaid'
       woocommerceOrder.payment_method = 'cheque'
+    } else {
+      debugEmail('updateWebformDispensed UNKOWN payment method',  payMethod, woocommerceOrder, address, order)
     }
 
     infoEmail('updateWebformDispensed', '#'+order.$OrderId, woocommerceOrder, address, order)
