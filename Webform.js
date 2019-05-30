@@ -54,7 +54,7 @@ function updateWebformDispensed(order, invoice) {
         {key:"date_dispensed", value:new Date().toDateString()},
         {key:"guardian_id", value:order.$Patient.guardian_id},
         {key:"invoice_number", value:order.$OrderId},
-        {key:"invoice_doc_id", value:invoice.getId() || ''} //cannot be null otherwise nothing saves
+        {key:"invoice_doc_id", value:invoice && invoice.getId() || ''} //cannot be null otherwise nothing saves
       ],
       shipping_lines:[{method_id:'flat_rate', total:order.$Fee+''}] //Must be a string
 
@@ -68,7 +68,6 @@ function updateWebformDispensed(order, invoice) {
     } else if (payMethod == payment.CARD) {
       woocommerceOrder.status = 'shipped-autopay'
       woocommerceOrder.payment_method = 'stripe'
-      autopayReminderNotice(order)
     } else if (payMethod == payment.MANUAL){
       woocommerceOrder.status = 'shipped-unpaid'
       woocommerceOrder.payment_method = 'cheque'

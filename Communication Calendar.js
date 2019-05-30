@@ -102,8 +102,8 @@ function formatCall(callJson) {
 
   //Improve Pronounciation
   callJson = callJson
-    .replace(/(<br>)+|(%0a)+/g, '........')
     .replace(/;|\.|,/g, '....')
+    .replace(/(<br>)+|(%0a)+/g, '........')
     .replace(/MG/g, 'milligrams')
     .replace(/MG/g, 'micrograms')
     .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, '$1..$2..$3..$4..$5..$6....')
