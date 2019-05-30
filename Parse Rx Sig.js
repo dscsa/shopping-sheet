@@ -17,6 +17,8 @@ function parseSig(drug) {
     Log('cleanedSig', i, cleanedSig, cleanedSigs)
 
     var parsed = {
+      raw:drug.$Sig,
+      cleaned:cleanedSig,
       numDosage:getNumDosage(cleanedSig),
       freqNumerator:getFreqNumerator(cleanedSig),
       freqDemoninator:getFreqDemoninator(cleanedSig),
@@ -29,7 +31,6 @@ function parseSig(drug) {
     }
 
     debugEmail('Could not parse sig', drug.$Sig, '|'+cleanedSig+'|', parsed)
-    drug.$Msg = (drug.$Msg || '') + "Sig Parse Error"
   }
 }
 

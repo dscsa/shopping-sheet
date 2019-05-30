@@ -139,7 +139,8 @@ function searchEvents(patientLabel, typeArr) {
       }, null) //null is neccessary
   })
 
-  infoEmail('searchEvents', start, stop, patientLabel, typeArr, matches.length+' of '+events.length,'events:', eventString(events))
+  if (events.length)
+    infoEmail('searchEvents', start, stop, patientLabel, typeArr, matches.length+' of '+events.length,'events:', eventString(events))
 
   return matches
 }
