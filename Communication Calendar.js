@@ -104,8 +104,7 @@ function newCommArr(email, text) {
 function formatText(textJson) {
 
   textJson = textJson
-    .replace(/(<br>){2,}/g, '%0a%0a')
-    .replace(/(<br>)+/g, ' ')
+    .replace(/<br>/g, '\\n')
 
   try {
     return JSON.parse(textJson)
@@ -118,15 +117,15 @@ function formatCall(callJson) {
 
   //Improve Pronounciation
   callJson = callJson
-    .replace(/;|\./g, '<pause>') //can't do commas without testing for inside quotes because that is part of json syntax
-    .replace(/(<br>)+|(%0a)+/g, '<pause>')
-    .replace(/MG/g, 'milligrams')
-    .replace(/MCG/g, 'micrograms')
-    .replace(/Rxs/ig, 'prescriptions')
-    .replace(/ ER /ig, 'extended release')
-    .replace(/ DR /ig, 'delayed release')
-    .replace(/ TAB| CAP/ig, '')
-    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number $1$2...$3$4...$5$6...')
+    .replace(/(;|\.)/g, '$1<Pause>') //can't do commas without testing for inside quotes because that is part of json syntax
+    .replace(/<br>/g, '<Pause>')
+    .replace(/(\d)+MG/g, '<Pause>$1 milligrams')
+    .replace(/(\d)+MCG/g, '<Pause>$1 micrograms')
+    .replace(/ Rxs/ig, ' prescriptions')
+    .replace(/ ER /ig, ' extended release')
+    .replace(/ DR /ig, ' delayed release')
+    .replace(/ TAB| CAP/ig, '<Pause>')
+    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number<Pause>$1$2...$3$4...$5$6...')
 
   try {
     return JSON.parse(callJson)
