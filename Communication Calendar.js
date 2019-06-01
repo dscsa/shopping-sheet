@@ -93,7 +93,12 @@ function newCommArr(email, text) {
   text = formatText(json)
   call = formatCall(json)
 
-  call.message = 'Hi, this is Good Pill Pharmacy....'+call.message
+  var message = 'Hi, this is Good Pill Pharmacy <Pause />'+call.message+' <Pause length="2" />if you need to speak to someone please call us at 8 8 8<Pause />9 8 7<Pause />5 1 8 7.<Pause length="2" /> Again our phone number is 8 8 8<Pause />9 8 7<Pause />5 1 8 7.<Pause length="2" /> Good Bye!'
+
+  call.message = [
+    message
+  ].join('<Pause length="2" />This message will now repeat<Pause length="6" />')
+
   call.call    = call.sms
   call.sms     = undefined
   //text.fallbacks = [call]
@@ -105,6 +110,7 @@ function formatText(textJson) {
 
   textJson = textJson
     .replace(/<br>/g, '\\n')
+    .replace(/#(\d{4,})/g, '$1') //# sign makes text message think its a phone number and make an erroneous link with it
 
   try {
     return JSON.parse(textJson)
@@ -117,15 +123,17 @@ function formatCall(callJson) {
 
   //Improve Pronounciation
   callJson = callJson
-    .replace(/(;|\.)/g, '$1<Pause>') //can't do commas without testing for inside quotes because that is part of json syntax
-    .replace(/<br>/g, '<Pause>')
-    .replace(/(\d)+MG/g, '<Pause>$1 milligrams')
-    .replace(/(\d)+MCG/g, '<Pause>$1 micrograms')
+    .replace(/(\w):/g, '$1<Pause length=\\"3\\" />') //Don't capture JSON text
+    .replace(/;<br>/g, '<Pause /> and <Pause />') //combine drug list with "and" since it sounds more natural
+    .replace(/;|\./g, '<Pause length=\\"2\\" />') //can't do commas without testing for inside quotes because that is part of json syntax
+    .replace(/<br>/g, '<Pause />')
+    .replace(/(\d+)MG/g, '<Pause />$1 milligrams')
+    .replace(/(\d+)MCG/g, '<Pause />$1 micrograms')
     .replace(/ Rxs/ig, ' prescriptions')
-    .replace(/ ER /ig, ' extended release')
-    .replace(/ DR /ig, ' delayed release')
-    .replace(/ TAB| CAP/ig, '<Pause>')
-    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number<Pause>$1$2...$3$4...$5$6...')
+    .replace(/ ER /ig, ' extended release ')
+    .replace(/ DR /ig, ' delayed release ')
+    .replace(/ TAB| CAP/ig, '<Pause />')
+    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number <Pause length=\\"2\\" />$1$2<Pause />$3$4<Pause />$5$6<Pause />')
 
   try {
     return JSON.parse(callJson)
@@ -231,6 +239,8 @@ function cancelEvents(patientLabel, typeArr) {
   var events = searchEvents(patientLabel, typeArr)
 
   for (var i in events) {
+    var title = events[i].getTitle()
+    if ( ~ title.indexOf('CALLED') ||  ~ title.indexOf('EMAILED') ||  ~ title.indexOf('TEXTED')) continue
     events[i].deleteEvent()
     cancel.push(['deleted an event', eventString(events[i])])
   }

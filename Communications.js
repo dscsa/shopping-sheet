@@ -68,8 +68,8 @@ function orderShippedNotice(order, invoice) {
 
   text.message =
     subject+
-    ' View it at '+shortLink('https://docs.google.com/document/d/'+invoice.getId()+'/pub?embedded=true')+
-    '. Track it at '+shortLink(trackingURL(order.$Tracking))+'. '+
+    (invoice ? ' View it at '+shortLink('https://docs.google.com/document/d/'+invoice.getId()+'/pub?embedded=true')+'. ' : '') +
+    'Track it at '+shortLink(trackingURL(order.$Tracking))+'. '+
     message
 
   email.subject = subject
@@ -87,7 +87,7 @@ function orderShippedNotice(order, invoice) {
     '',
     ''
   ].join('<br>')
-  email.attachments = [invoice.getId()]
+  if (invoice) email.attachments = [invoice.getId()]
 
   orderShippedEvent(order, email, text)
 }
@@ -228,7 +228,7 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
   ///It's depressing to get updates if nothing is being filled
   if (numFills) {
     var subject = "Welcome to Good Pill!  We are excited to fill your 1st order."
-    var message = "Please take 5mins to register so that we can fill your Rxs."
+    var message = "Please take 5mins to register so that we can fill the Rxs we got from your doctor:<br>"+group.FILLED.join(';<br>')+';'
   }
   else {
     var subject = "Welcome to Good Pill! We are so sorry but we can't fill the Rxs that we received from your doctor"
@@ -259,8 +259,8 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
     var hourOfDay   = [10, 18, 10, 18]
 
   } else if (hourAdded < 17){
-    //A if before 5pm, the first one is 15mins from now, the next one is 6pm, then 9am tomorrow, then 6pm tomorrow
-    var hoursToWait = [0, 0, 24, 24]
+    //A if before 5pm, the first one is 10mins from now, the next one is 6pm, then 9am tomorrow, then 6pm tomorrow
+    var hoursToWait = [10/60, 0, 24, 24]
     var hourOfDay   = [null, 18, 10, 18]
 
   } else {
