@@ -280,21 +280,19 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
 
 function orderFailedNotice(order) {
 
-  var subject  = "Apologies but we are having trouble with your Order."
+  var subject  = "Apologies but we are having trouble with your Order #"+order.$OrderId
   var message  = order.$Patient.source == 'Transfer'
     ? "We were unable to transfer the Rxs you requested from "+order.$Pharmacy.short+". This usually happens because we have the wrong pharmacy on file, we are requesting the wrong Rxs, or your Rxs have no refills remaining"
     : "We haven't gotten any Rxs from your doctor yet. You may want to contact your doctor.  If you had meant for us to transfer Rxs from your pharmacy instead, please login to your account and place a new 'transfer' order or give us a call."
 
   var email = { email:'adam@sirum.org' }
-  var text  = { sms:'6507992817', message:subject+' '+message }
-
-  text.message = subject+message
+  var text  = { sms:'6507992817', message:subject+'. '+message }
 
   email.subject = subject
   email.message = [
     'Hello,',
     '',
-    subject+' '+message,
+    subject+'. '+message,
     '',
     'Thanks!',
     'The Good Pill Team',
