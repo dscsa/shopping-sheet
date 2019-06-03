@@ -161,6 +161,8 @@ function newEvent(eventTitle, commArr, hoursToWait, hourOfDay) {
 
   var calendar = CalendarApp.getCalendarById(GOOGLE_CAL_ID)
 
+  debugEmail('newEvent', 'eventTitle', eventTitle, 'hoursToWait', hoursToWait, 'hourOfDay', hourOfDay, 'eventStart', eventStart)
+
   calendar.createEvent(eventTitle, eventStart, eventStop, {description:description})
 }
 
@@ -241,6 +243,7 @@ function cancelEvents(patientLabel, typeArr) {
   for (var i in events) {
     var title = events[i].getTitle()
     if ( ~ title.indexOf('CALLED') ||  ~ title.indexOf('EMAILED') ||  ~ title.indexOf('TEXTED')) continue
+    events[i].setTitle(title+' Deleted:'+new Date())
     events[i].deleteEvent()
     cancel.push(['deleted an event', eventString(events[i])])
   }

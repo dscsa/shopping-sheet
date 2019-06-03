@@ -182,8 +182,8 @@ function orderUpdatedNotice(order, drugsChanged) {
     return infoEmail('orderUpdateNotice NOT sent', 'drugsChanged', drugsChanged, 'numFills', numFills, order, groups)
 
   var subject = ! drugsChanged
-    ? 'We are starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'
-    : 'Update for Order #'+order.$OrderId+' of '+numFills+' items.'
+    ? 'We are starting to prepare '+(numFills ? numFills+' ' : '')+'items for Order #'+order.$OrderId+'.'
+    : 'Update for Order #'+order.$OrderId+(numFills ? ' of '+numFills+' items.' : '')
 
   var message = ''
 
