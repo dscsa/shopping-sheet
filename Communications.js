@@ -94,7 +94,7 @@ function orderShippedNotice(order, invoice) {
 
 function refillReminderNotice(order, groups) {
 
-  if ( ! groups.NO_REFILLS.length && ! groups.NO_AUTOFILL.length) return
+  if (groups.MIN_DAYS == Infinity || ( ! groups.NO_REFILLS.length && ! groups.NO_AUTOFILL.length)) return
 
   var subject  = 'We cannot refill these Rxs without your help.'
   var message      = ''
@@ -254,19 +254,19 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
   var hourAdded = order.$RowAdded.getHours()
 
   if(hourAdded < 10){
-    //A if before 10am, the first one is at 10am, the next one is 6pm, then 10am tomorrow, then 6pm tomorrow
+    //A if before 10am, the first one is at 10am, the next one is 5pm, then 10am tomorrow, then 5pm tomorrow
     var hoursToWait = [0, 0, 24, 24]
-    var hourOfDay   = [10, 18, 10, 18]
+    var hourOfDay   = [10, 17, 10, 17]
 
   } else if (hourAdded < 17){
-    //A if before 5pm, the first one is 10mins from now, the next one is 6pm, then 9am tomorrow, then 6pm tomorrow
+    //A if before 5pm, the first one is 10mins from now, the next one is 5pm, then 10am tomorrow, then 5pm tomorrow
     var hoursToWait = [10/60, 0, 24, 24]
-    var hourOfDay   = [null, 18, 10, 18]
+    var hourOfDay   = [null, 17, 10, 17]
 
   } else {
-    //B if after 5pm, the first one is 9am tomorrow, 6pm tomorrow, 9am the day after tomorrow, 6pm day after tomorrow.
+    //B if after 5pm, the first one is 10am tomorrow, 5pm tomorrow, 10am the day after tomorrow, 5pm day after tomorrow.
     var hoursToWait = [24, 24, 48, 48]
-    var hourOfDay   = [10, 18, 10, 18]
+    var hourOfDay   = [10, 17, 10, 17]
   }
 
   needsFormEvent(order, email, text, hoursToWait[0], hourOfDay[0])
