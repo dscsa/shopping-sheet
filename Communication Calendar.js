@@ -84,7 +84,7 @@ function newCommArr(email, text) {
     text.sms    = '6507992817'
   }
 
-  email.from = 'support@goodpill.org'
+  email.from = 'Good Pill Pharmacy <support@goodpill.org>'
   email.subject = 'v6 '+email.subject //v6 Debugging
 
   //addCallFallback
@@ -93,12 +93,7 @@ function newCommArr(email, text) {
   text = formatText(json)
   call = formatCall(json)
 
-  var message = 'Hi, this is Good Pill Pharmacy <Pause />'+call.message+' <Pause length="2" />if you need to speak to someone please call us at 8 8 8 <Pause />9 8 7 <Pause />5 1 8 7. <Pause length="2" /> Again our phone number is 8 8 8 <Pause />9 8 7 <Pause />5 1 8 7. <Pause length="2" />'
-
-  call.message = [
-    message
-  ].join(' <Pause length="2" />This message will now repeat <Pause length="6" />')
-
+  call.message = 'Hi, this is Good Pill Pharmacy <Pause />'+call.message+' <Pause length="2" />if you need to speak to someone please call us at 8,,,,8,,,,8 <Pause />9,,,,8,,,,7 <Pause />5,,,,1,,,,8,,,,7. <Pause length="2" /> Again our phone number is 8,,,,8,,,,8 <Pause />9,,,,8,,,,7 <Pause />5,,,,1,,,,8,,,,7. <Pause />'
   call.call    = call.sms
   call.sms     = undefined
   //text.fallbacks = [call]
@@ -129,11 +124,12 @@ function formatCall(callJson) {
     .replace(/<br>/g, ' <Pause />')
     .replace(/(\d+)MG/g, '<Pause />$1 milligrams')
     .replace(/(\d+)MCG/g, '<Pause />$1 micrograms')
+    .replace(/(\d+)MCG/g, '<Pause />$1 micrograms')
     .replace(/ Rxs/ig, ' prescriptions')
     .replace(/ ER /ig, ' extended release ')
     .replace(/ DR /ig, ' delayed release ')
     .replace(/ TAB| CAP/ig, ' <Pause />')
-    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number <Pause />$1 $2 $3 $4 $5 $6<Pause /> again that is order number <Pause />$1 $2 $3 $4 $5 $6<Pause />')
+    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number <Pause />$1,,$2,,$3,,$4,,$5,,$6<Pause /> again that is order number <Pause />$1,,$2,,$3,,$4,,$5,,$6')
 
   try {
     return JSON.parse(callJson)
