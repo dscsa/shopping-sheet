@@ -135,6 +135,9 @@ function useEstimate(drug) {
     return drug.$Stock = (drug.$Stock || '') + 'Sig Parse Error'
   }
 
+  parsed.raw = drug.$Sig
+  drug.$Sig = parsed
+
   var days_before_dispensed = Math.round(drug.$RemainingQty/parsed.numDaily, 0)
   var days_limited_totalqty = drug.$IsPended ? Infinity : Math.round(drug.$TotalQty/parsed.numDaily, 0)
 

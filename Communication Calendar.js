@@ -120,8 +120,8 @@ function formatCall(callJson) {
   callJson = callJson
     .replace(/(\w):(?!\/\/)/g, '$1<Pause length=\\"2\\" />') //Don't capture JSON text or URL links
     .replace(/;<br>/g, '<Pause /> and <Pause />') //combine drug list with "and" since it sounds more natural
-    .replace(/;|\./g, ' <Pause length=\\"2\\" />') //can't do commas without testing for inside quotes because that is part of json syntax
-    .replace(/<br>/g, ' <Pause />')
+    .replace(/;|\./g, ' <Pause />') //can't do commas without testing for inside quotes because that is part of json syntax
+    .replace(/(<br>)+/g, ' <Pause length=\\"2\\" />')
     .replace(/(\d+)MG/g, '<Pause />$1 milligrams')
     .replace(/(\d+)MCG/g, '<Pause />$1 micrograms')
     .replace(/(\d+)MCG/g, '<Pause />$1 micrograms')

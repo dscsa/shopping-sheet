@@ -91,13 +91,13 @@ function getNumDosage(sig) {
 }
 
 function getFreqNumerator(sig) {
-  var match = sig.match(/([1-9]\b|10|11|12) time/i)
+  var match = sig.match(/([1-9]\b|10|11|12) +time/i)
   Log('getFreqNumerator', sig, match)
   return match ? match[1] : 1
 }
 
 function getFreqDemoninator(sig) {
-  var match = sig.match(/every ([1-9]\b|10|11|12)(?! time)/i)
+  var match = sig.match(/every ([1-9]\b|10|11|12)(?! +time)/i)
   Log('getFreqDemoninator', sig, match)
   return match ? match[1] : 1
 }
