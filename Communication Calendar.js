@@ -157,7 +157,7 @@ function newEvent(eventTitle, commArr, hoursToWait, hourOfDay) {
 
   var calendar = CalendarApp.getCalendarById(GOOGLE_CAL_ID)
 
-  debugEmail('newEvent', 'eventTitle', eventTitle, 'hoursToWait', hoursToWait, 'hourOfDay', hourOfDay, 'eventStart', eventStart.toString())
+  //debugEmail('newEvent', 'eventTitle', eventTitle, 'hoursToWait', hoursToWait, 'hourOfDay', hourOfDay, 'eventStart', eventStart.toString())
 
   calendar.createEvent(eventTitle, eventStart, eventStop, {description:description})
 }

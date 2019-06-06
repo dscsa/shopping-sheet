@@ -218,9 +218,9 @@ function setStatus(drug) {
       set0Days(drug)
       setDrugStatus(drug, 'NOACTION_MISSING_GCN')
     }
-    else if ( ! drug.$v2) {
-      setDrugStatus(drug, 'NOACTION_MISSING_GCN')
-      debugEmail('Could not find GCN in v2', drug)
+    else if ( ! drug.$IsRefill && ! drug.$v2) {
+      setDrugStatus(drug, 'NOACTION_LIVE_INVENTORY_ERROR')
+      debugEmail('Live Inventory Encountered An Error', drug)
     }
     else if ( ! drug.$IsRefill && ~ ['No V2 stock','Not Offered'].indexOf(drug.$Stock)) {
       set0Days(drug)

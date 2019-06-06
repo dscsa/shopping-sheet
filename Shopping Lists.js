@@ -67,20 +67,15 @@ function createShoppingLists(order, drugs) {
     var minQty    = drug.$Qty
 
 
-    if ( ! minDays || drug.$IsPended || drug.$IsDispensed || order.$Status == 'Dispensing') { //createShoppingLists gets called on a PER ORDER basis.  Some drugs in a Shopping Order may already be pended or dispensed
+    if ( ! v2name || ! minDays || drug.$IsPended || drug.$IsDispensed || order.$Status == 'Dispensing') { //createShoppingLists gets called on a PER ORDER basis.  Some drugs in a Shopping Order may already be pended or dispensed
       //$Msg should already be set when minDays is 0.  drug.$Msg += ' did not shop because minDays is 0'
       return Log('createShoppingList no min days or is already pended/dispensed', drug.$Stock, drug.$Msg, orderID, v2name, minQty, minDays, drug)
-    }
-
-    if ( ! v2name || drug.$Stock == 'Shopping Sheet Error') { //Happens when the Live Inventory sheet was refreshing when being queried
-      drug.$Msg = 'is awaiting manual inventory verification'
-      return debugEmail('Shopping Error: Could not be shopped because of gcn or shopping sheet error (1)', drug.$Stock, drug.$Msg, '#'+orderID, v2name, minQty, minDays, drug)
     }
 
     var shopped = shopV2(drug, orderID)
 
     if ( ! shopped) {
-      drug.$Msg = 'is waiting for manual inventory verification'
+      setDrugStatus(drug, 'NOACTION_SHOPPING_ERROR')
       return debugEmail('Shopping Error: Could not be shopped because not enough qty found - tabs/caps/X00? (2)', drug.$Stock, drug.$Msg, '#'+orderID, v2name, minQty, minDays, drug)
     }
 
@@ -148,8 +143,6 @@ function shopV2(drug, orderID) {
   var list = makeList(ndcs, +(30/minDays*minQty).toFixed(0), 0)
   if (list) return list
   */
-
-  drug.$Msg = drug.$Msg || 'not enough qty found, must be pended manually'
   debugEmail('Shopping Error: Not enough qty found, must be pended manually', '#'+orderID, drug.$Name, v2name, minQty, minDays)
 }
 

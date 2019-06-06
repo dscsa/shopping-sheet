@@ -57,6 +57,14 @@ var drugStatus = {
       EN:'was transferred out to your local pharmacy on $RxChanged',
       ES:''
     },
+    NOACTION_LIVE_INVENTORY_ERROR:{
+      EN:'is awaiting manual inventory verification',
+      ES:''
+    },
+    NOACTION_SHOPPING_ERROR:{
+      EN:'is awaiting manual inventory retrieval',
+      ES:''
+    }
 
 //ACTION BY USER REQUIRED BEFORE (RE)FILL
 
