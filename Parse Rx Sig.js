@@ -183,7 +183,11 @@ function testParseSig() {
     //"TAKE 1/2 TO 2 TABLETS AT BEDTIME FOR SLEEP.",
     //"Take 60 mg daily  1 1\\/2 tablet",
     //"ORAL 1 q8-12h prn muscle spasm",
-    "Take 1 tablet (12.5 mg total) by mouth every 12 (twelve) hours"
+    //"Take 1 tablet (12.5 mg total) by mouth every 12 (twelve) hours",
+    //"Take 1 capsule by mouth at bedtime for chronic back pain/ may increase 1 cap/ week x 3 weeks to 3 caps at bedtime", //NOT FIXED
+    //"Take 1 tablet by mouth 3 times a day"
+    //"Take 1 tablet by mouth 2 (two) times a day with meals."
+    //"Take 1 tablet (5 mg total) by mouth 2 (two) times daily."
   ]
 
 

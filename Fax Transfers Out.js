@@ -9,7 +9,9 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     debugEmail('order.$Drugs.filter is not a function', typeof order.$Drugs, order.$Drugs, order)
   }
 
-  order.$Drugs = order.$Drugs.filter(function(drug) {
+  //order.$Drugs
+
+  var drugs1 = order.$Drugs.filter(function(drug) {
 
     if ( ! drug.$InOrder || drug.$IsRefill) return false
 
@@ -17,6 +19,12 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
 
     return drug.$Msg && ~ drug.$Msg.indexOf('transferred')
   })
+
+  var drugs2 = order.$Drugs.filter(function(drug) {
+    return hasDrugStatus(drug, 'NOACTION_NOT_OFFERED')
+  })
+
+  debugEmail(success + ' Transfer Out Fax', drugs1, drugs2, order)
 
   return //v6 debugging
 
