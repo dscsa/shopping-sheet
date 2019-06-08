@@ -63,8 +63,8 @@ function orderShippedNotice(order, invoice) {
   if (groups.FILL_ACTION.length+groups.NOFILL_ACTION.length)
     message += '<br><br>We cannot fill these Rxs without your help:<br>'+groups.FILL_ACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
-  var email = { email:'adam@sirum.org' }
-  var text  = { sms:'6507992817' }
+  var email = { email:order.$Patient.email }
+  var text  = { sms:getPhones(order) }
 
   text.message =
     subject+
@@ -105,10 +105,8 @@ function refillReminderNotice(order, groups) {
   if (groups.NO_AUTOFILL.length)
     message += '<br><br>These Rxs will NOT be filled automatically and must be requested 2 weeks in advance:<br>'+groups.NO_AUTOFILL.join(';<br>')+';'
 
-  var email = { email:'adam@sirum.org' }
-  var text  = { sms:'6507992817' }
-
-  text.message = subject+message
+  var email = { email:order.$Patient.email }
+  var text  = { sms:getPhones(order), message:subject+message }
 
   email.subject = subject
   email.message = [
@@ -138,8 +136,8 @@ function autopayReminderNotice(order, groups) {
   var subject  = "Autopay Reminder."
   var message  = "Because you are enrolled in autopay, Good Pill Pharmacy will be be billing your card "+order.$Card.split(/ |(?=\d)/).join('<Pause />')+' for $'+order.$Fee+".00. Again we will be billing your card for $"+order.$Fee+".00 for last month's Order #"+order.$OrderId+' of '+numFills+' items'
 
-  var email = { email:'adam@sirum.org' }
-  var text  = { sms:'6507992817', message:subject+' '+message }
+  var email = { email:order.$Patient.email }
+  var text  = { sms:getPhones(order), message:subject+' '+message }
 
   text.message = subject+' '+message
 
@@ -198,8 +196,8 @@ function orderUpdatedNotice(order, drugsChanged) {
     order.$Patient.medsync ? '* The goal of Med Sync is to syncronize your refill dates so that we can consolidate as many of your medications as possible into a single order, rather than sending your medications in separate orders. For this reason, this Rx may be filled for a fewer number of days in this Order before resuming to a normal number of days.' : ''
   ].join('<br><br>')
 
-  var text  = { sms:'6507992817', message:subject+message }
-  var email = { email:'adam@sirum.org' }
+  var email = { email:order.$Patient.email }
+  var text  = { sms:getPhones(order), message:subject+message }
 
   email.subject = subject
   email.message = [
@@ -235,8 +233,8 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
     var message = "Please register online or give us a call if you want to tranfer these Rxs to your local pharmacy.  Because we rely on donated medicine, we can only fill medications that are on our Formulary"
   }
 
-  var email = { email:'adam@sirum.org' }
-  var text  = { sms:'6507992817', message:subject+' '+message }
+  var email = { email:order.$Patient.email }
+  var text  = { sms:getPhones(order), message:subject+' '+message }
 
   email.subject = subject
   email.message = [
@@ -285,8 +283,8 @@ function orderFailedNotice(order) {
     ? "We were unable to transfer the Rxs you requested from "+order.$Pharmacy.short+". This usually happens because we have the wrong pharmacy on file, we are requesting the wrong Rxs, or your Rxs have no refills remaining"
     : "We haven't gotten any Rxs from your doctor yet. You may want to contact your doctor.  If you had meant for us to transfer Rxs from your pharmacy instead, please login to your account and place a new 'transfer' order or give us a call."
 
-  var email = { email:'adam@sirum.org' }
-  var text  = { sms:'6507992817', message:subject+'. '+message }
+  var email = { email:order.$Patient.email }
+  var text  = { sms:getPhones(order),  message:subject+'. '+message }
 
   email.subject = subject
   email.message = [
@@ -323,4 +321,8 @@ function trackingLink(tracking) {
 
 function trackingFormula(tracking) {
   return '=HYPERLINK("'+trackingURL(tracking)+'", "'+tracking+'")'
+}
+
+function getPhones(order) {
+  return order.$Patient.phone1+(order.$Patient.phone2 ? ','+order.$Patient.phone2 : '')
 }
