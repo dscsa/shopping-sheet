@@ -26,8 +26,6 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
 
   debugEmail(success + ' Transfer Out Fax', drugs1, drugs2, order)
 
-  return //v6 debugging
-
   if ( ! order.$Drugs.length || ! LIVE_MODE) return
 
   var fax = mergeDoc("Transfer Out Fax v1", "Transfer #"+order.$OrderId, "Transfer Outs", order)

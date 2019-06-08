@@ -106,8 +106,7 @@ function mainLoop() {
 
      var invoice = getInvoice(order)
 
-     //v6 debugging
-     if (false)// ! invoice)
+     if ( ! invoice)
       return debugEmail('Warning shipped order has no invoice!', invoice, order)
 
      //Don't change Drugs and Invoice since should already be finalized

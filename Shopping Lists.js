@@ -11,8 +11,6 @@ function testShoppingLists() {
 //So Cindy doesn't have to unpend things that didn't ship
 function deleteShoppingLists(orderID) {
 
-  return //V6 Debugging
-
   if ( ! LIVE_MODE) return debugEmail('deleteShoppingLists canceled because LIVE MODE OFF')
 
   var res = v2Fetch('/account/8889875187/pend/'+orderID, 'DELETE')
@@ -78,8 +76,6 @@ function createShoppingLists(order, drugs) {
       setDrugStatus(drug, 'NOACTION_SHOPPING_ERROR')
       return debugEmail('Shopping Error: Could not be shopped because not enough qty found - tabs/caps/X00? (2)', drug.$Stock, drug.$Msg, '#'+orderID, v2name, minQty, minDays, drug)
     }
-
-    return //v6 debuggin
 
     if ( ! LIVE_MODE) return debugEmail('createShoppingList canceled because LIVE MODE OFF')
 
