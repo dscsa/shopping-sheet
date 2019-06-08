@@ -27,7 +27,7 @@ function parseSig(drug) {
 
     if (parsed.numDosage && parsed.freqNumerator && parsed.freqDemoninator && parsed.frequency) {
       parsed.numDaily = parsed.numDosage * parsed.freqNumerator / parsed.freqDemoninator / parsed.frequency
-      return drug.$Sig = parsed
+      return parsed
     }
 
     debugEmail('Could not parse sig', drug.$Sig, '|'+cleanedSig+'|', parsed)

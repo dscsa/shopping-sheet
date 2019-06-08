@@ -135,15 +135,14 @@ function useEstimate(drug) {
     return drug.$Stock = (drug.$Stock || '') + 'Sig Parse Error'
   }
 
-  parsed.raw = drug.$Sig
-  drug.$Sig = parsed
+  drug.$Sig  = parsed
 
   var days_before_dispensed = Math.round(drug.$RemainingQty/parsed.numDaily, 0)
   var days_limited_totalqty = drug.$IsPended ? Infinity : Math.round(drug.$TotalQty/parsed.numDaily, 0)
 
   var stdDays = (drug.$Stock && drug.$TotalQty < 1000) ? 45 : 90 //Only do 45 day if its Low Stock AND less than 1000 Qty.  Cindy noticed we had 8000 Amlodipine but we were filling in 45 day supplies
 
-  infoEmail('useEstimate', 'isLimited', days_limited_totalqty < Math.min(days_before_dispensed, stdDays), 'parsed', parsed, 'days_before_dispensed', days_before_dispensed, 'days_limited_totalqty', days_limited_totalqty, 'stdDays', stdDays, 'drug.$IsRefill', drug.$IsRefill, 'drug.$TotalQty', drug.$TotalQty, 'drug.$MonthlyPrice', drug.$MonthlyPrice, drug)
+  infoEmail('useEstimate', 'isLimited', days_limited_totalqty < Math.min(days_before_dispensed, stdDays), 'days_before_dispensed', days_before_dispensed, 'days_limited_totalqty', days_limited_totalqty, 'stdDays', stdDays, 'drug.$IsRefill', drug.$IsRefill, 'drug.$TotalQty', drug.$TotalQty, 'drug.$MonthlyPrice', drug.$MonthlyPrice, drug)
 
   if (days_limited_totalqty < Math.min(days_before_dispensed, stdDays)) {
 
