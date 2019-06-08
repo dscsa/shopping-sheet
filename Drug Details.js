@@ -225,13 +225,20 @@ function setStatus(drug) {
       setDrugStatus(drug, 'NOACTION_LIVE_INVENTORY_ERROR')
       debugEmail('Live Inventory Encountered An Error', drug)
     }
-    else if ( ! drug.$IsRefill && ~ ['No V2 stock','Not Offered'].indexOf(drug.$Stock)) {
-      set0Days(drug)
-      setDrugStatus(drug, 'NOACTION_NOT_OFFERED')
-    }
-    else if ( ! drug.$IsPended && ! drug.$IsRefill && ~ ['Out of Stock', 'Refills Only'].indexOf(drug.$Stock)) {
-      set0Days(drug)
-      setDrugStatus(drug, drug.$MonthlyPrice >= 20 ? 'ACTION_CHECK_BACK' : 'NOACTION_TRANSFERRED')
+    else if ( ~ ['No V2 stock', 'Not Offered', 'Out of Stock', 'Refills Only'].indexOf(drug.$Stock)) {
+
+      if (drug.$IsRefill || drug.$Pharmacy.phone == '888-987-5187' || drug.$MonthlyPrice >= 20) {
+        if ( ! drug.$IsPended) set0Days(drug)
+        setDrugStatus(drug, 'ACTION_CHECK_BACK')
+      }
+      else if ( ~ ['No V2 stock','Not Offered'].indexOf(drug.$Stock)) {
+        set0Days(drug)
+        setDrugStatus(drug, 'NOACTION_NOT_OFFERED')
+      } else {
+        set0Days(drug)
+        setDrugStatus(drug, 'NOACTION_TRANSFERRED')
+      }
+
     }
     else if ( ! drug.$InOrder && drug.$DaysToRefill < 0 && drug.$RefillsTotal > .1) {
       set0Days(drug)
