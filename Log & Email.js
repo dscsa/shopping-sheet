@@ -67,7 +67,7 @@ function sendEmail(to, subject, body, attachments) {
   else if ( ~ to.indexOf('@')) {
 
     var prevMessage = mainCache.get(to) || ''
-    var msgHistory  = prevMessage+'<br>'+scriptId.toJSON()+': '+subject+'<br>'+body
+    var msgHistory  = scriptId.toJSON()+': '+subject+'<br>'+body+'<br>'+prevMessage
 
     var wasShipped  = ~ prevMessage.indexOf('items has shipped')
     var  isShipped  = ~ msgHistory.indexOf('items has shipped')
@@ -76,7 +76,7 @@ function sendEmail(to, subject, body, attachments) {
     var noCacheIfShipped  = wasShipped ? true : ! isShipped
     var noCacheIfInternal = ! ~ to.indexOf('@sirum.org') && ! ~ to.indexOf('@goodpill.org')
 
-    mainCache.put(to, msgHistory, 4*60*60)
+    mainCache.put(to, msgHistory.slice(0, 10000), 4*60*60)
 
     if (prevMessage && noCacheIfShipped && noCacheIfInternal)
       return debugEmail('Stop email spam', 'to', to, msgHistory)

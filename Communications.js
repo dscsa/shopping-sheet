@@ -96,7 +96,7 @@ function refillReminderNotice(order, groups) {
 
   if (groups.MIN_DAYS == Infinity || ( ! groups.NO_REFILLS.length && ! groups.NO_AUTOFILL.length)) return
 
-  var subject  = 'We cannot refill these Rxs without your help.'
+  var subject  = 'Good Pill cannot refill these Rxs without your help.'
   var message      = ''
 
   if (groups.NO_REFILLS.length)
@@ -136,7 +136,7 @@ function autopayReminderNotice(order, groups) {
   var numFills = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
 
   var subject  = "Autopay Reminder."
-  var message  = "Because you are enrolled in autopay, we will be be billing your card "+order.$Card+' $'+order.$Fee+".00 for last month's Order #"+order.$OrderId+' of '+numFills+' items'
+  var message  = "Because you are enrolled in autopay, Good Pill Pharmacy will be be billing your card "+order.$Card.split(/ |(?=\d)/).join('<Pause />')+' for $'+order.$Fee+".00. Again we will be billing your card for $"+order.$Fee+".00 for last month's Order #"+order.$OrderId+' of '+numFills+' items'
 
   var email = { email:'adam@sirum.org' }
   var text  = { sms:'6507992817', message:subject+' '+message }
@@ -182,7 +182,7 @@ function orderUpdatedNotice(order, drugsChanged) {
     return infoEmail('orderUpdateNotice NOT sent', 'drugsChanged', drugsChanged, 'numFills', numFills, order, groups)
 
   var subject = ! drugsChanged
-    ? 'We are starting to prepare '+(numFills ? numFills+' ' : '')+'items for Order #'+order.$OrderId+'.'
+    ? 'Good Pill is starting to prepare '+(numFills ? numFills+' ' : '')+'items for Order #'+order.$OrderId+'.'
     : 'Update for Order #'+order.$OrderId+(numFills ? ' of '+numFills+' items.' : '')
 
   var message = ''
@@ -280,7 +280,7 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
 
 function orderFailedNotice(order) {
 
-  var subject  = "Apologies but we are having trouble with your Order #"+order.$OrderId
+  var subject  = "Apologies but Good Pill is having trouble with your Order #"+order.$OrderId
   var message  = order.$Patient.source == 'Transfer'
     ? "We were unable to transfer the Rxs you requested from "+order.$Pharmacy.short+". This usually happens because we have the wrong pharmacy on file, we are requesting the wrong Rxs, or your Rxs have no refills remaining"
     : "We haven't gotten any Rxs from your doctor yet. You may want to contact your doctor.  If you had meant for us to transfer Rxs from your pharmacy instead, please login to your account and place a new 'transfer' order or give us a call."
