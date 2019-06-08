@@ -64,7 +64,7 @@ var drugStatus = {
     NOACTION_SHOPPING_ERROR:{
       EN:'is awaiting manual inventory retrieval',
       ES:''
-    }
+    },
 
 //ACTION BY USER REQUIRED BEFORE (RE)FILL
 
