@@ -24,9 +24,11 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     return hasDrugStatus(drug, 'NOACTION_NOT_OFFERED')
   })
 
-  debugEmail('Transfer Out Fax', drugs1, drugs2, order)
+  debugEmail('Transfer Out Fax', drugs1.length, drugs2.length, drugs1, drugs2, order)
 
-  if ( ! order.$Drugs.length || ! LIVE_MODE) return
+  if ( ! drugs2.length || ! LIVE_MODE) return
+
+  order.$Drugs = drugs2
 
   var fax = mergeDoc("Transfer Out Fax v1", "Transfer #"+order.$OrderId, "Transfer Outs", order)
   var pdf = fax.getAs(MimeType.PDF)
