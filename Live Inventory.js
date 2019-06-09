@@ -13,7 +13,7 @@ function setV2info(drug) {
     try {
       _setV2info(drug)
       infoEmail('setV2info error but sleeping for 10 seconds seemed to fix it', drug, e1, e1.stack)
-    } catch (e2) {  
+    } catch (e2) {
       drug.$Stock = 'Shopping Sheet Error'
       debugEmail('Shopping Sheet Error', drug, e2, e2.stack) //spreadsheet ui cannot be triggered from trigger
     }

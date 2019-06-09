@@ -26,6 +26,8 @@ function addDrugDetails(order, caller) {
     setV2info(order.$Drugs[i])
     Log(order.$OrderId, order.$Drugs[i].$Name, "setV2info")
 
+    order.$Drugs[i].$NoTransfer = order.$Pharmacy.phone == '888-987-5187' || order.$Drugs[i].$MonthlyPrice >= 20
+
     //Added because of Order #9554.  Meslamine was pended okay, but then a change of another drug, caused it to run again and this time the TotalQty was too low (because it had been pended) and gave patient a notification that it was too low to fill
     setDrugIsPended(order.$Drugs[i])
     Log(order.$OrderId, order.$Drugs[i].$Name, "setDrugIsPended")
@@ -226,7 +228,7 @@ function setStatus(drug) {
     }
     else if ( ~ ['No V2 stock', 'Not Offered', 'Out of Stock', 'Refills Only'].indexOf(drug.$Stock)) {
 
-      if (drug.$IsRefill || drug.$Pharmacy.phone == '888-987-5187' || drug.$MonthlyPrice >= 20) {
+      if (drug.$IsRefill || drug.$NoTransfer) {
         if ( ! drug.$IsPended) set0Days(drug)
         setDrugStatus(drug, 'ACTION_CHECK_BACK')
       }
