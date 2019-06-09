@@ -211,27 +211,6 @@ function setStatus(drug) {
       set0Days(drug)
       setDrugStatus(drug, 'ACTION_NO_REFILLS')
     }
-    else if (drug.$Autofill.patient == null) {//order.$Status == 'Needs Form' was messing up on #11121 since status showed as "Shopping" but this message still appeared
-      setDrugStatus(drug, 'ACTION_NEEDS_FORM')
-    }
-    else if ( ! drug.$Autofill.patient) { //Drug is in order. Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
-
-      if (drug.$ManuallyAdded) {
-        setDrugStatus(drug, 'NOACTION_RX_OFF_AUTOFILL')
-      } else { //Out of Order or Added by SureScript
-        set0Days(drug)
-        setDrugStatus(drug, 'ACTION_PAT_OFF_AUTOFILL')
-      }
-    }
-    else if ( ! drug.$Autofill.rx) { //Drug NOT in order. Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
-
-      if (drug.$InOrder) { //Added Manually or by SureScript
-        setDrugStatus(drug, 'NOACTION_RX_OFF_AUTOFILL')
-      } else {
-        set0Days(drug)
-        setDrugStatus(drug, 'ACTION_RX_OFF_AUTOFILL')
-      }
-    }
     else if (drug.$Stock == 'No GCN') {
       drug.$IsRefill ? triggerDrugChange(drug) : set0Days(drug)
       setDrugStatus(drug, 'NOACTION_MISSING_GCN')
@@ -259,6 +238,27 @@ function setStatus(drug) {
         setDrugStatus(drug, 'NOACTION_WILL_TRANSFER')
       }
 
+    }
+    else if (drug.$Autofill.patient == null) {//order.$Status == 'Needs Form' was messing up on #11121 since status showed as "Shopping" but this message still appeared
+      setDrugStatus(drug, 'ACTION_NEEDS_FORM')
+    }
+    else if ( ! drug.$Autofill.patient) { //Drug is in order. Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
+
+      if (drug.$ManuallyAdded) {
+        setDrugStatus(drug, 'NOACTION_RX_OFF_AUTOFILL')
+      } else { //Out of Order or Added by SureScript
+        set0Days(drug)
+        setDrugStatus(drug, 'ACTION_PAT_OFF_AUTOFILL')
+      }
+    }
+    else if ( ! drug.$Autofill.rx) { //Drug NOT in order. Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
+
+      if (drug.$InOrder) { //Added Manually or by SureScript
+        setDrugStatus(drug, 'NOACTION_RX_OFF_AUTOFILL')
+      } else {
+        set0Days(drug)
+        setDrugStatus(drug, 'ACTION_RX_OFF_AUTOFILL')
+      }
     }
     else if ( ! drug.$InOrder && (drug.$DaysToRefill == "" || drug.$DaysToRefill < 0)) {
       set0Days(drug)
