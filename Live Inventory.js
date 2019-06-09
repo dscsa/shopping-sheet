@@ -14,8 +14,8 @@ function setV2info(drug) {
       _setV2info(drug)
       infoEmail('setV2info error but sleeping for 10 seconds seemed to fix it', drug, e1, e1.stack)
     } catch (e2) {
-      drug.$Stock = 'Shopping Sheet Error'
-      debugEmail('Shopping Sheet Error', drug, e2, e2.stack) //spreadsheet ui cannot be triggered from trigger
+      debugEmail('setV2info ERROR', drug, e2, e2.stack) //spreadsheet ui cannot be triggered from trigger
+      throw e2
     }
   }
 }
@@ -31,10 +31,7 @@ function _setV2info(drug) {
   drug.$v2        = v2info['generic']
   drug.$TotalQty  = +v2info['inventory.qty'] || 0 //drug.$AvailableQty = +v2info['Available Qty'] || 0
   drug.$RepackQty = +v2info['order.repackQty'] || 135
-  if (v2info.stock == null) //This drug is not on Internal Inventory sheet (assume out of stock in this case)
-    drug.$Stock = 'No V2 Stock'
-  else
-    drug.$Stock = v2info.stock || undefined //empty string means drug is in-stock so put undefined so it doesn't show up in drug json
+  drug.$Stock = v2info.stock || undefined //empty string means drug is in-stock so put undefined so it doesn't show up in drug json
 
   drug.$MonthlyPrice = +v2info['price / month']
 

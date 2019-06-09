@@ -49,11 +49,11 @@ var drugStatus = {
       EN:'is short filled because this Rx had limited refills.',
       ES:''
     },
-    NOACTION_NOT_OFFERED:{
-      EN:'is not currently offered and was transferred to your local pharmacy',
+    NOACTION_WILL_TRANSFER:{
+      EN:'is not currently offered and will be transferred to your local pharmacy',
       ES:''
     },
-    NOACTION_TRANSFERRED:{
+    NOACTION_WAS_TRANSFERRED:{
       EN:'was transferred out to your local pharmacy on $RxChanged',
       ES:''
     },

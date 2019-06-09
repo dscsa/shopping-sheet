@@ -72,8 +72,11 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
       if (newDrug.$Price != null && newDrug.$Price != oldDrug.$Price)
         changes.push(newDrug.$Name+' PRICE CHANGED '+oldDrug.$Price+' -> '+newDrug.$Price)
 
-      if (newDrug.$Stock && newDrug.$Stock != oldDrug.$Stock && ~ ['No GCN', 'No V2 Stock', 'Shopping Sheet Error', 'Sig Parse Error'].indexOf(oldDrug.$Stock)) //undefined != undefined, most statuses not yet set but this attempt to catch No GCNs and Shopping Sheet Error messages that appear or disappear.  Also can include "'Not Offered" status because that gets set latter so we will keep retriggering "'Not Offered" -> undefined.  11271 also had a loop
+      if (newDrug.$Stock && newDrug.$Stock != oldDrug.$Stock && ~ ['No GCN', 'Sig Parse Error'].indexOf(oldDrug.$Stock)) //undefined != undefined, most statuses not yet set but this attempt to catch No GCNs and Shopping Sheet Error messages that appear or disappear.  Also can include "'Not Offered" status because that gets set latter so we will keep retriggering "'Not Offered" -> undefined.  11271 also had a loop
         changes.push(newDrug.$Name+' MSG CHANGED '+oldDrug.$Msg+' -> '+newDrug.$Msg+' STOCK CHANGED '+oldDrug.$Stock+' -> '+newDrug.$Stock)
+
+      if (oldDrug.$TriggerChange && new Date().getMinutes() >= 55)
+        changes.push('TRIGGER CHANGE ON OLD DRUG: '+JSON.stringify(oldDrug))
 
       Log(changes.length ? 'Drug Changed!' : 'No Drug Changes', newDrug, oldDrug, changes)
     }

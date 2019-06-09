@@ -45,7 +45,7 @@ function addDrugDetails(order, caller) {
   order.$Drugs.sort(sortDrugs) //Must be called before setSyncDays
 
   for (var i in order.$Drugs) {
-    
+
     var drug = order.$Drugs[i]
 
     setSyncDays(order, drug)
@@ -156,7 +156,7 @@ function useEstimate(drug) {
 
     if ( ! drug.$NoTransfer) {
       set0Days(drug)
-      setDrugStatus(drug, 'NOACTION_TRANSFERRED')
+      setDrugStatus(drug, 'NOACTION_WILL_TRANSFER')
       debugEmail('Low Quantity Transfer', parsed, 'days_before_dispensed', days_before_dispensed, 'days_limited_totalqty', days_limited_totalqty, 'stdDays', stdDays, 'drug.$IsRefill', drug.$IsRefill, 'drug.$TotalQty', drug.$TotalQty, 'drug.$MonthlyPrice', drug.$MonthlyPrice, drug)
       return
     }
@@ -201,7 +201,7 @@ function setStatus(drug) {
 
     if (drug.$ScriptStatus == 'Transferred Out') {
       set0Days(drug)
-      setDrugStatus(drug, 'NOACTION_TRANSFERRED')
+      setDrugStatus(drug, 'NOACTION_WAS_TRANSFERRED')
     }
     else if (timeToExpiry < 0) {
       set0Days(drug) //Here rather than setDays so we don't have to repeat the conditional logic
@@ -222,26 +222,31 @@ function setStatus(drug) {
       set0Days(drug)
       setDrugStatus(drug, 'ACTION_RX_OFF_AUTOFILL')
     }
-    else if ( ! drug.$IsRefill && ! +drug.$Gcn) {
-      set0Days(drug)
+    else if (drug.$Stock == 'No GCN') {
+      drug.$IsRefill ? triggerDrugChange(drug) : set0Days(drug)
       setDrugStatus(drug, 'NOACTION_MISSING_GCN')
     }
-    else if ( ! drug.$IsRefill && ! drug.$v2) {
+    else if (drug.$IsRefill && drug.$Stock == 'Not Offered') {
+      if (drug.$IsRefill) triggerDrugChange(drug)
+      debugEmail('Error: Refill Rx has "Not Offered" Stock', drug)
+      setDrugStatus(drug, 'NOACTION_LIVE_INVENTORY_ERROR')
+    }
+    else if ( ! drug.$IsRefill && drug.$Stock == 'Not Offered') {
+      set0Days(drug)
+      setDrugStatus(drug, 'NOACTION_WILL_TRANSFER') //this is going to put it in a transfer out fax
+    }
+    else if ( ! drug.$v2) { //TODO Remove this after we confirm its never triggered
       setDrugStatus(drug, 'NOACTION_LIVE_INVENTORY_ERROR')
       debugEmail('Live Inventory Encountered An Error', drug)
     }
-    else if ( ! drug.$IsRefill && ~ ['No V2 stock', 'Not Offered', 'Out of Stock', 'Refills Only'].indexOf(drug.$Stock)) {
+    else if ( ! drug.$IsRefill && ~ ['Out of Stock', 'Refills Only'].indexOf(drug.$Stock)) {
 
       if (drug.$NoTransfer) {
         if ( ! drug.$IsPended) set0Days(drug)
         setDrugStatus(drug, 'ACTION_CHECK_BACK')
-      }
-      else if ( ~ ['No V2 stock','Not Offered'].indexOf(drug.$Stock)) {
-        set0Days(drug)
-        setDrugStatus(drug, 'NOACTION_NOT_OFFERED')
       } else {
         set0Days(drug)
-        setDrugStatus(drug, 'NOACTION_TRANSFERRED')
+        setDrugStatus(drug, 'NOACTION_WILL_TRANSFER')
       }
 
     }
@@ -279,4 +284,9 @@ function set0Days(drug) {
   drug.$Days    = 0
   drug.$Qty     = 0
   drug.$Refills = drug.$RefillsTotal
+}
+
+//Will trigger a drug change on the hour
+function triggerDrugChange(drug) {
+  if (drug.$InOrder) drug.$TriggerChange = true
 }

@@ -21,7 +21,7 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
   })
 
   var drugs2 = order.$Drugs.filter(function(drug) {
-    return hasDrugStatus(drug, 'NOACTION_NOT_OFFERED')
+    return hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER')
   })
 
   debugEmail('Transfer Out Fax', drugs1.length, drugs2.length, drugs1, drugs2, order)
