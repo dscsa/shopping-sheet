@@ -250,7 +250,7 @@ function setStatus(drug) {
       }
 
     }
-    else if ( ! drug.$InOrder && drug.$DaysToRefill < 0 && drug.$RefillsTotal > .1) {
+    else if ( ! drug.$InOrder && (drug.$DaysToRefill == "" || drug.$DaysToRefill < 0)) {
       set0Days(drug)
       setDrugStatus(drug, 'ACTION_PAST_DUE')
     }
