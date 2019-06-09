@@ -23,30 +23,36 @@ function addDrugDetails(order, caller) {
   if (caller != 'addOrder') infoEmail('addDrugDetails by '+caller, order)
 
   for (var i in order.$Drugs) {
-    setV2info(order.$Drugs[i])
-    Log(order.$OrderId, order.$Drugs[i].$Name, "setV2info")
 
-    order.$Drugs[i].$NoTransfer = order.$Pharmacy.phone == '888-987-5187' || order.$Drugs[i].$MonthlyPrice >= 20
+    var drug = order.$Drugs[i]
+
+    setV2info(drug)
+    Log(order.$OrderId, drug.$Name, "setV2info")
+
+    drug.$NoTransfer = drug.$IsRefill || order.$Pharmacy.phone == '888-987-5187' || drug.$MonthlyPrice >= 20
 
     //Added because of Order #9554.  Meslamine was pended okay, but then a change of another drug, caused it to run again and this time the TotalQty was too low (because it had been pended) and gave patient a notification that it was too low to fill
-    setDrugIsPended(order.$Drugs[i])
-    Log(order.$OrderId, order.$Drugs[i].$Name, "setDrugIsPended")
+    setDrugIsPended(drug)
+    Log(order.$OrderId, drug.$Name, "setDrugIsPended")
 
-    setDaysQtyRefills(order.$Drugs[i])
-    Log(order.$OrderId, order.$Drugs[i].$Name, "setDaysQtyRefills")
+    setDaysQtyRefills(drug)
+    Log(order.$OrderId, drug.$Name, "setDaysQtyRefills")
 
-    setSyncDate(order, order.$Drugs[i])
-    Log(order.$OrderId, order.$Drugs[i].$Name, "setSyncDate")
+    setSyncDate(order, drug)
+    Log(order.$OrderId, drug.$Name, "setSyncDate")
   }
 
   order.$Drugs.sort(sortDrugs) //Must be called before setSyncDays
 
   for (var i in order.$Drugs) {
-    setSyncDays(order, order.$Drugs[i])
-    Log(order.$OrderId, order.$Drugs[i].$Name, "getSyncDays")
+    
+    var drug = order.$Drugs[i]
 
-    setPriceTotal(order, order.$Drugs[i]) //Must call this after $Day and $MonthlyPrice are finalized
-    Log(order.$OrderId, order.$Drugs[i].$Name, "setPriceTotal")
+    setSyncDays(order, drug)
+    Log(order.$OrderId, drug.$Name, "getSyncDays")
+
+    setPriceTotal(order, drug) //Must call this after $Day and $MonthlyPrice are finalized
+    Log(order.$OrderId, drug.$Name, "setPriceTotal")
   }
 
   setFeeDue(order)
@@ -148,9 +154,7 @@ function useEstimate(drug) {
 
   if (days_limited_totalqty < Math.min(days_before_dispensed, stdDays)) {
 
-    var transfer = ! drug.$IsRefill && drug.$TotalQty < 90 && drug.$MonthlyPrice < 20
-
-    if (transfer) {
+    if ( ! drug.$NoTransfer) {
       set0Days(drug)
       setDrugStatus(drug, 'NOACTION_TRANSFERRED')
       debugEmail('Low Quantity Transfer', parsed, 'days_before_dispensed', days_before_dispensed, 'days_limited_totalqty', days_limited_totalqty, 'stdDays', stdDays, 'drug.$IsRefill', drug.$IsRefill, 'drug.$TotalQty', drug.$TotalQty, 'drug.$MonthlyPrice', drug.$MonthlyPrice, drug)
@@ -226,9 +230,9 @@ function setStatus(drug) {
       setDrugStatus(drug, 'NOACTION_LIVE_INVENTORY_ERROR')
       debugEmail('Live Inventory Encountered An Error', drug)
     }
-    else if ( ~ ['No V2 stock', 'Not Offered', 'Out of Stock', 'Refills Only'].indexOf(drug.$Stock)) {
+    else if ( ! drug.$IsRefill && ~ ['No V2 stock', 'Not Offered', 'Out of Stock', 'Refills Only'].indexOf(drug.$Stock)) {
 
-      if (drug.$IsRefill || drug.$NoTransfer) {
+      if (drug.$NoTransfer) {
         if ( ! drug.$IsPended) set0Days(drug)
         setDrugStatus(drug, 'ACTION_CHECK_BACK')
       }
