@@ -214,13 +214,23 @@ function setStatus(drug) {
     else if (drug.$Autofill.patient == null) {//order.$Status == 'Needs Form' was messing up on #11121 since status showed as "Shopping" but this message still appeared
       setDrugStatus(drug, 'ACTION_NEEDS_FORM')
     }
-    else if (drug.$InOrder && ! drug.$Autofill.patient && ! drug.$ManuallyAdded) { //Drug is in order. Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
-      set0Days(drug)
-      setDrugStatus(drug, 'ACTION_PAT_OFF_AUTOFILL')
+    else if ( ! drug.$Autofill.patient) { //Drug is in order. Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
+
+      if (drug.$ManuallyAdded) {
+        setDrugStatus(drug, 'NOACTION_RX_OFF_AUTOFILL')
+      } else { //Out of Order or Added by SureScript
+        set0Days(drug)
+        setDrugStatus(drug, 'ACTION_PAT_OFF_AUTOFILL')
+      }
     }
-    else if ( ! drug.$InOrder && ! drug.$Autofill.rx && ! drug.$ManuallyAdded) { //Drug NOT in order. Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
-      set0Days(drug)
-      setDrugStatus(drug, 'ACTION_RX_OFF_AUTOFILL')
+    else if ( ! drug.$Autofill.rx) { //Drug NOT in order. Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
+
+      if (drug.$InOrder) { //Added Manually or by SureScript
+        setDrugStatus(drug, 'NOACTION_RX_OFF_AUTOFILL')
+      } else {
+        set0Days(drug)
+        setDrugStatus(drug, 'ACTION_RX_OFF_AUTOFILL')
+      }
     }
     else if (drug.$Stock == 'No GCN') {
       drug.$IsRefill ? triggerDrugChange(drug) : set0Days(drug)
@@ -268,9 +278,6 @@ function setStatus(drug) {
     }
     else if (timeToExpiry < drug.$Days*24*60*60*1000) {
       setDrugStatus(drug, 'ACTION_EXPIRING')
-    }
-    else if (drug.$InOrder && ! drug.$Autofill.rx) { //Has registered (backup pharmacy) but autofill was turned off (Note: autofill is off until a patient registers)
-      setDrugStatus(drug, 'NOACTION_RX_OFF_AUTOFILL')
     }
     else if (drug.$InOrder && drug.$DaysToRefill > minMedSyncDays(drug)) {
       setDrugStatus(drug, 'NOACTION_WAS_MEDSYNC')
