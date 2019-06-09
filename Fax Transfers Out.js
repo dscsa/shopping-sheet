@@ -24,7 +24,8 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     return hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER')
   })
 
-  debugEmail('Transfer Out Fax', drugs1.length, drugs2.length, drugs1, drugs2, order)
+  if (drugs1.length || drugs2.length)
+    debugEmail('Transfer Out Fax', drugs1.length, drugs2.length, drugs1, drugs2, order)
 
   if ( ! drugs2.length || ! LIVE_MODE) return
 
