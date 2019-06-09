@@ -289,4 +289,5 @@ function set0Days(drug) {
 //Will trigger a drug change on the hour
 function triggerDrugChange(drug) {
   if (drug.$InOrder) drug.$TriggerChange = true
+  debugEmail('Trigger Drug Change Set', drug)
 }
