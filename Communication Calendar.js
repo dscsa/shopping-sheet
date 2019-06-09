@@ -100,7 +100,7 @@ function newCommArr(email, text) {
     text.sms += ','+DEBUG_PHONE
   }
 
-  email.from = 'Good Pill Pharmacy <support@goodpill.org>'
+  email.from = 'Good Pill Pharmacy < support@goodpill.org >' //spaces inside <> are so that google cal doesn't get rid of "HTML" if user edits description
 
   //addCallFallback
   var json = JSON.stringify(text)
