@@ -38,11 +38,24 @@ function autopayReminderEvent(order, email, text, hoursToWait, hourOfDay) {
   newEvent(eventTitle, commArr, hoursToWait, hourOfDay)
 }
 
+function orderCreatedEvent(order, email, text, hoursToWait) {
+  var patientLabel = getPatientLabel(order)
+  var eventTitle   = order.$OrderId+' Order Created: '+patientLabel+'.  Created:'+new Date()
+
+  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated'])
+
+  var commArr = newCommArr(email, text)
+
+  infoEmail('orderCreatedEvent', eventTitle, commArr, hoursToWait, order, cancel)
+
+  newEvent(eventTitle, commArr, hoursToWait)
+}
+
 function orderUpdatedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Updated: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Updated'])
+  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated'])
 
   var commArr = newCommArr(email, text)
 

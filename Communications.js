@@ -214,7 +214,7 @@ function orderUpdatedNotice(order, drugsChanged) {
   ].join('<br>')
 
   //Wait 15 minutes to hopefully batch staggered surescripts and manual rx entry and cindy updates
-  orderUpdatedEvent(order, email, text, 15/60)
+  drugsChanged ? orderUpdatedEvent(order, email, text, 15/60) : orderCreatedEvent(order, email, text, 15/60)
 }
 
 
