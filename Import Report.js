@@ -114,7 +114,7 @@ function normalizeDrug(row) {
     $ScriptStatus:row.script_status,
     $ScriptSource:row.rx_source,
     $RxChanged:row.rx_changed,
-    $RxWritten:addHours( - 365*24, row.expire_date).toJSON().slice(0, 10),
+    $RxWritten:addHours( - 365*24, row.expire_date.slice(0,10)).toJSON().slice(0, 10),
     $RxExpires:row.expire_date.slice(0,10),
     $Autofill:{
       rx: isRegistered ? +row.rx_autofill : null,
