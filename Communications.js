@@ -189,7 +189,7 @@ function orderUpdatedNotice(order, drugsChanged) {
     message += '<br>These Rxs will be included once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
 
   if (numNoFills)
-    message += '<br><br>We have these Rxs but are not filling them right now:<br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).join(';<br>')+';'
+    message += '<br><br>We have these Rxs but are not filling them right now:<br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
   var suffix = [
     "Note: if this is correct, there is no need to do anything. If you want to change or delay this order, please let us know as soon as possible. If delaying, please specify the date on which you want it filled, otherwise if you don't, we will delay it 3 weeks by default.",
