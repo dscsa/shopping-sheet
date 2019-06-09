@@ -97,7 +97,6 @@ function newCommArr(email, text) {
     text.sms    = DEBUG_PHONE
   } else {
     email.bcc = DEBUG_EMAIL
-    text.sms += ','+DEBUG_PHONE
   }
 
   email.from = 'Good Pill Pharmacy < support@goodpill.org >' //spaces inside <> are so that google cal doesn't get rid of "HTML" if user edits description
@@ -109,7 +108,7 @@ function newCommArr(email, text) {
   call = formatCall(json)
 
   call.message = 'Hi, this is Good Pill Pharmacy <Pause />'+call.message+' <Pause length="2" />if you need to speak to someone please call us at 8,,,,8,,,,8 <Pause />9,,,,8,,,,7 <Pause />5,,,,1,,,,8,,,,7. <Pause length="2" /> Again our phone number is 8,,,,8,,,,8 <Pause />9,,,,8,,,,7 <Pause />5,,,,1,,,,8,,,,7. <Pause />'
-  call.call    = call.sms
+  call.call    = call.sms+','+DEBUG_PHONE
   call.sms     = undefined
 
   text.fallbacks = [call]
