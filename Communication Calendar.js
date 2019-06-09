@@ -83,6 +83,7 @@ function newCommArr(email, text) {
     email.email = DEBUG_EMAIL
     text.sms    = DEBUG_PHONE
   } else {
+    email.bcc = DEBUG_EMAIL
     text.sms += ','+DEBUG_PHONE
   }
 
