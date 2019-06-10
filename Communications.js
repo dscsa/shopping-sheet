@@ -162,27 +162,67 @@ function autopayReminderNotice(order, groups) {
 
 //We are coording patient communication via sms, calls, emails, & faxes
 //by building commication arrays based on github.com/dscsa/communication-calendar
+function orderCreatedNotice(order) {
+
+  var groups     = groupDrugs(order)
+  var numFills   = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
+  var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
+
+  var subject = 'Good Pill is starting to prepare '+(numFills ? numFills+' ' : '')+'items for Order #'+order.$OrderId+'.'
+  var message = ''
+
+  if (numFills)
+    message += '<br>These Rxs will be included once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
+
+  if (numNoFills)
+    message += '<br><br>We have these Rxs but are not filling them right now:<br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
+
+  var suffix = [
+    "Note: if this is correct, there is no need to do anything. If you want to change or delay this order, please let us know as soon as possible. If delaying, please specify the date on which you want it filled, otherwise if you don't, we will delay it 3 weeks by default.",
+    order.$Patient.medsync ? '* The goal of Med Sync is to syncronize your refill dates so that we can consolidate as many of your medications as possible into a single order, rather than sending your medications in separate orders. For this reason, this Rx may be filled for a fewer number of days in this Order before resuming to a normal number of days.' : ''
+  ].join('<br><br>')
+
+  var email = { email:order.$Patient.email }
+  var text  = { sms:getPhones(order), message:subject+message }
+
+  email.subject = subject
+  email.message = [
+    'Hello,',
+    '',
+    subject+' We will notify you again once it ships.',
+    message,
+    '',
+    (numFills >= numNoFills) ? 'Thanks for choosing Good Pill!' : 'Apologies for any inconvenience,',
+    'The Good Pill Team',
+    '',
+    '',
+    suffix
+  ].join('<br>')
+
+  orderFailedNotice(order)
+
+  //Wait 15 minutes to hopefully batch staggered surescripts and manual rx entry and cindy updates
+  orderCreatedEvent(order, email, text, 15/60)
+}
+
+//We are coording patient communication via sms, calls, emails, & faxes
+//by building commication arrays based on github.com/dscsa/communication-calendar
 function orderUpdatedNotice(order, drugsChanged) {
 
-  if (drugsChanged) {
-    drugsChanged = JSON.stringify(drugsChanged) //hacky way for us to search for partial matches with indexOf (see below)
-    var majorChanges = drugsChanged.split(/REMOVED FROM ORDER|ADDED TO ORDER|ADDED TO PROFILE AND ORDER/)
+  drugsChanged = JSON.stringify(drugsChanged) //hacky way for us to search for partial matches with indexOf (see below)
+  var majorChanges = drugsChanged.split(/REMOVED FROM ORDER|ADDED TO ORDER|ADDED TO PROFILE AND ORDER/)
 
-    if (majorChanges.length <= 1) return   //Don't renotify on small changes like QTY, DAYS, REFILLS.  Only when adding or subtracting drugs
-  }
+  if (majorChanges.length <= 1) return   //Don't renotify on small changes like QTY, DAYS, REFILLS.  Only when adding or subtracting drugs
 
   var groups     = groupDrugs(order)
   var numFills   = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
   var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
 
   ///It's depressing to get updates if nothing is being filled.  So only send these if manually added and the order was just added (not just drugs changed)
-  if ( ! numFills && ! groups.MANUALLY_ADDED && drugsChanged)
-    return infoEmail('orderUpdateNotice NOT sent', 'drugsChanged', drugsChanged, 'numFills', numFills, order, groups)
+  if ( ! numFills && ! groups.MANUALLY_ADDED)
+    return infoEmail('orderUpdateNotice NOT sent', order.$OrderId, 'drugsChanged', drugsChanged, 'numFills', numFills, order, groups)
 
-  var subject = ! drugsChanged
-    ? 'Good Pill is starting to prepare '+(numFills ? numFills+' ' : '')+'items for Order #'+order.$OrderId+'.'
-    : 'Update for Order #'+order.$OrderId+(numFills ? ' of '+numFills+' items.' : '')
-
+  var subject = 'Update for Order #'+order.$OrderId+(numFills ? ' of '+numFills+' items.' : '')
   var message = ''
 
   if (numFills)
@@ -214,7 +254,7 @@ function orderUpdatedNotice(order, drugsChanged) {
   ].join('<br>')
 
   //Wait 15 minutes to hopefully batch staggered surescripts and manual rx entry and cindy updates
-  drugsChanged ? orderUpdatedEvent(order, email, text, 15/60) : orderCreatedEvent(order, email, text, 15/60)
+  orderUpdatedEvent(order, email, text, 15/60)
 }
 
 

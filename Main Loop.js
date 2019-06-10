@@ -72,12 +72,9 @@ function mainLoop() {
     if ( ! order.$Pharmacy.short) { //Use Pharmacy name rather than $New to keep us from repinging folks if the row has been readded
       needsFormNotice(order)
     }
-    else if (order.$Status == 'Missing Rx') { //Patient filled out webform before RXs were sent
-      orderFailedNotice(order)
-    }
     else {
-      updateWebformReceived(order.$OrderId, order.$Patient.guardian_id, 'processing') //take it out of awaiting-rx or awaiting-transfer
-      orderUpdatedNotice(order)
+      if (order.$Status != 'Missing Rx') updateWebformReceived(order.$OrderId, order.$Patient.guardian_id, 'processing') //take it out of awaiting-rx or awaiting-transfer
+      orderCreatedNotice(order)
       infoEmail('orderUpdatedNotice by addOrder', '#'+order.$OrderId, order.$Status, order)
     }
 
