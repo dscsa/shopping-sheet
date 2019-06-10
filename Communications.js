@@ -218,7 +218,7 @@ function orderUpdatedNotice(order, drugsChanged) {
   var numFills   = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
   var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
 
-  ///It's depressing to get updates if nothing is being filled.  So only send these if manually added and the order was just added (not just drugs changed)
+  //It's depressing to get updates if nothing is being filled.  So only send these if manually added and the order was just added (not just drugs changed)
   if ( ! numFills && ! groups.MANUALLY_ADDED)
     return infoEmail('orderUpdateNotice NOT sent', order.$OrderId, 'drugsChanged', drugsChanged, 'numFills', numFills, order, groups)
 

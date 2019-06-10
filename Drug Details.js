@@ -282,7 +282,7 @@ function setStatus(drug) {
     else if (drug.$InOrder && drug.$DaysToRefill > minMedSyncDays(drug)) {
       setDrugStatus(drug, 'NOACTION_WAS_MEDSYNC')
     }
-    else if ( ! drug.$InOrder && drug.$DaysToRefill < maxMedSyncDays(drug)) {
+    else if ( ! drug.$InOrder && drug.$DaysToRefill <= maxMedSyncDays(drug)) {
       setDrugStatus(drug, 'NOACTION_MAY_MEDSYNC')
     }
 }
