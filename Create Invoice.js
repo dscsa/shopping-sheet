@@ -45,6 +45,8 @@ function updateInvoice() {
 
   Log('Update Invoice Called', order)
 
+  order.$Total = 0
+
   for (var i in order.$Drugs)
     setPriceTotal(order, order.$Drugs[i])
 
