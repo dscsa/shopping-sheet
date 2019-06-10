@@ -42,7 +42,7 @@ function orderCreatedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Created: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated'])
+  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated', 'Order Hold'])
 
   var commArr = newCommArr(email, text)
 
@@ -51,11 +51,24 @@ function orderCreatedEvent(order, email, text, hoursToWait) {
   newEvent(eventTitle, commArr, hoursToWait)
 }
 
+function orderHoldEvent(order, email, text, hoursToWait) {
+  var patientLabel = getPatientLabel(order)
+  var eventTitle   = order.$OrderId+' Order Hold: '+patientLabel+'.  Created:'+new Date()
+
+  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated', 'Order Hold'])
+
+  var commArr = newCommArr(email, text)
+
+  infoEmail('orderHoldEvent', eventTitle, commArr, hoursToWait, cancel, order)
+
+  newEvent(eventTitle, commArr, hoursToWait)
+}
+
 function orderUpdatedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Updated: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated'])
+  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated', 'Order Hold'])
 
   var commArr = newCommArr(email, text)
 

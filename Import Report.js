@@ -190,8 +190,8 @@ function newGroup(row) {
       short:pharmacyName ? pharmacyName.replace(/ #|-\d|\d-|\d|pharmacy/ig, '').replace(/\s{2,}/g, ' ')+' on '+pharmacyInfo[3]+' ('+pharmacyInfo[2]+')' : '',
       name:pharmacyName,
       npi:pharmacyInfo[0],
-      fax:pharmacyInfo[1],
-      phone:pharmacyInfo[2],
+      fax:pharmacyInfo[1] || '', //Replace Fax Out Transfer Template with a blank string
+      phone:pharmacyInfo[2] || '', //Replace Fax Out Transfer Template with a blank string
       street:pharmacyInfo[3]
     },
     $PatientAdded:toDate(row.patient_added),

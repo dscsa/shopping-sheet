@@ -96,11 +96,11 @@ function replaceVars(section, order) {
 function replaceVar(section, key, val) {
 
   key = key.replace('$', '\\$').replace('.', '\\.') //escape the $ otherwise matches line-endings
-
+  val = val == null ? 'NULL' : val
   try {
     section.replaceText(key, val)
   } catch (e) {
-    debugEmail('Merge Google Doc replaceVar', typeof key, key, typeof val, JSON.stringify(val || 'falsey'), e)
+    debugEmail('Merge Google Doc replaceVar', typeof key, key, typeof val, val, e)
   }
 }
 

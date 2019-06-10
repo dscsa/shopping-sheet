@@ -164,15 +164,15 @@ function autopayReminderNotice(order, groups) {
 //by building commication arrays based on github.com/dscsa/communication-calendar
 function orderCreatedNotice(order) {
 
+
   var groups     = groupDrugs(order)
   var numFills   = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
   var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
 
-  var subject = 'Good Pill is starting to prepare '+(numFills ? numFills+' ' : '')+'items for Order #'+order.$OrderId+'.'
-  var message = ''
+  if ( ! numFills) return orderHoldNotice(order, groups)
 
-  if (numFills)
-    message += '<br>These Rxs will be included once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
+  var subject = 'Good Pill is starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'
+  var message = '<br>These Rxs will be included once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
 
   if (numNoFills)
     message += '<br><br>We have these Rxs but are not filling them right now:<br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
@@ -203,6 +203,35 @@ function orderCreatedNotice(order) {
 
   //Wait 15 minutes to hopefully batch staggered surescripts and manual rx entry and cindy updates
   orderCreatedEvent(order, email, text, 15/60)
+}
+
+//We are coording patient communication via sms, calls, emails, & faxes
+//by building commication arrays based on github.com/dscsa/communication-calendar
+function orderHoldNotice(order, groups) {
+
+  var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
+
+  var subject = 'Good Pill can not fill your '+numNoFills+' items for Order #'+order.$OrderId+'.'
+  var message = ' We have these Rxs but can not filling them right now:<br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
+
+  var email = { email:order.$Patient.email }
+  var text  = { sms:getPhones(order), message:subject+message }
+
+  email.subject = subject
+  email.message = [
+    'Hello,',
+    '',
+    subject+message,
+    '',
+    'Apologies for any inconvenience,',
+    'The Good Pill Team',
+    '',
+    '',
+    "Note: if this is correct, there is no need to do anything. If you think there is a mistake, please let us know as soon as possible."
+  ].join('<br>')
+
+  //Wait 15 minutes to hopefully batch staggered surescripts and manual rx entry and cindy updates
+  orderHoldEvent(order, email, text, 15/60)
 }
 
 //We are coording patient communication via sms, calls, emails, & faxes
