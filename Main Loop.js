@@ -142,7 +142,8 @@ function mainLoop() {
     //Since drugs were changed we need to add drug details back in
     addDrugDetails(order, 'statusChanged')// This call is expensive, avoid calling when possible
 
-    orderUpdatedNotice(order, drugsChanged)
+    if (drugsChanged)
+      orderUpdatedNotice(order, drugsChanged)
 
     if (order.$Status == 'Shopping') //Must be called *AFTER* drug details are set
       order.$Status = createShoppingLists(order, order.$Drugs)

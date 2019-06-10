@@ -100,7 +100,7 @@ function replaceVar(section, key, val) {
   try {
     section.replaceText(key, val)
   } catch (e) {
-    debugEmail('Merge Google Doc replaceVar', typeof key, key, typeof val, val, e)
+    debugEmail('Merge Google Doc replaceVar', typeof key, key, typeof val, JSON.stringify(val || 'falsey'), e)
   }
 }
 
