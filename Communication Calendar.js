@@ -7,7 +7,7 @@ function orderShippedEvent(order, email, text) {
 
   var commArr = newCommArr(email, text)
 
-  infoEmail('orderShippedEvent', eventTitle, commArr, order, cancel)
+  infoEmail('orderShippedEvent', eventTitle, commArr, cancel, order)
 
   newEvent(eventTitle, commArr)
 }
@@ -20,7 +20,7 @@ function refillReminderEvent(order, email, text, hoursToWait, hourOfDay) {
 
   var commArr = newCommArr(email, text)
 
-  infoEmail('refillReminderEvent', eventTitle, commArr, hoursToWait, hourOfDay, order, cancel)
+  infoEmail('refillReminderEvent', eventTitle, commArr, hoursToWait, hourOfDay, cancel, order)
 
   newEvent(eventTitle, commArr, hoursToWait, hourOfDay)
 }
@@ -33,7 +33,7 @@ function autopayReminderEvent(order, email, text, hoursToWait, hourOfDay) {
 
   var commArr = newCommArr(email, text)
 
-  infoEmail('autopayReminderEvent', eventTitle, commArr, hoursToWait, hourOfDay, order, cancel)
+  infoEmail('autopayReminderEvent', eventTitle, commArr, hoursToWait, hourOfDay, cancel, order)
 
   newEvent(eventTitle, commArr, hoursToWait, hourOfDay)
 }
@@ -46,7 +46,7 @@ function orderCreatedEvent(order, email, text, hoursToWait) {
 
   var commArr = newCommArr(email, text)
 
-  infoEmail('orderCreatedEvent', eventTitle, commArr, hoursToWait, order, cancel)
+  infoEmail('orderCreatedEvent', eventTitle, commArr, hoursToWait, cancel, order)
 
   newEvent(eventTitle, commArr, hoursToWait)
 }
@@ -59,7 +59,7 @@ function orderUpdatedEvent(order, email, text, hoursToWait) {
 
   var commArr = newCommArr(email, text)
 
-  infoEmail('orderUpdatedEvent', eventTitle, commArr, hoursToWait, order, cancel)
+  infoEmail('orderUpdatedEvent', eventTitle, commArr, hoursToWait, cancel, order)
 
   newEvent(eventTitle, commArr, hoursToWait)
 }
@@ -85,7 +85,7 @@ function orderFailedEvent(order, email, text, hoursToWait, hourOfDay) {
 
   var commArr = newCommArr(email, text)
 
-  infoEmail('orderFailedEvent', eventTitle, commArr, hoursToWait, hourOfDay, order, cancel)
+  infoEmail('orderFailedEvent', eventTitle, commArr, hoursToWait, hourOfDay, cancel, order)
 
   newEvent(eventTitle, commArr, hoursToWait, hourOfDay)
 }
