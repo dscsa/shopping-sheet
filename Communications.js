@@ -52,6 +52,7 @@ function orderShippedNotice(order, invoice) {
 
   refillReminderNotice(order, groups)
   autopayReminderNotice(order, groups)
+  newPatientFollowup(order, groups)
 
   var numFills = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
   var subject  = 'Your order '+(numFills ? 'of '+numFills+' items ' : '')+'has shipped and should arrive in 3-5 days.'
@@ -129,7 +130,7 @@ function autopayReminderNotice(order, groups) {
 
   var payMethod = payment(order)
 
-  if (payMethod != payment.CARD) return
+  if (payMethod != payment.AUTOPAY) return
 
   var numFills = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
 
@@ -163,7 +164,6 @@ function autopayReminderNotice(order, groups) {
 //We are coording patient communication via sms, calls, emails, & faxes
 //by building commication arrays based on github.com/dscsa/communication-calendar
 function orderCreatedNotice(order) {
-
 
   var groups     = groupDrugs(order)
   var numFills   = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
@@ -400,6 +400,43 @@ function orderFailedNotice(order) {
   ].join('<br>')
 
   orderFailedEvent(order, email, text, 5*24, 16)
+}
+
+function newPatientFollowup(order, groups) {
+
+  if ( ! order.$New) return
+
+  var numFills   = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
+  var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
+
+  ///It's depressing to get updates if nothing is being filled
+  var subject = "Follow up on new patient's first order"
+  var daysAgo = 5
+
+  var email = { email:'support@goodpill.org' }
+
+  email.subject = subject
+  email.message = [
+    'Hello,',
+    '',
+    order.$Patient.first+' '+order.$Patient.last+' '+order.$Patient.birth_date+' is a new patient.  They were shipped Order #'+order.$OrderId+' with '+numFills+' items '+daysAgo+' days ago.',
+    '',
+    'Please call them at '+[order.$Patient.phone1, order.$Patient.phone2]+' and check on the following:',
+    '- Order with tracking number '+trackingLink(order.$Tracking)+' was delivered and that they received it',
+    '',
+    '- Make sure they got all '+numFills+' of their medications, that we filled the correct number of pills, and answer any questions the patient has',
+    numNoFills ? '<br>- Explain why we did NOT fill<br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+'<br>' : '',
+    '- Let them know they are currently set to pay via '+payment(order)+' and the cost of the '+numFills+' items was $'+order.$Fee+' this time, but next time it will be $'+order.$Total,
+    '',
+    '- Review their current medication list and remind them which prescriptions we will be filling automatically and which ones they need to request 2 weeks in advance'
+    '',
+    'Thanks!',
+    'The Good Pill Team',
+    '',
+    ''
+  ].join('<br>')
+
+  newPatientFollowupEvent(order, email, daysAgo*24, 9)
 }
 
 function trackingURL(trackingNumber) {

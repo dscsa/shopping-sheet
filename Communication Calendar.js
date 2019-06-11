@@ -3,7 +3,7 @@ function orderShippedEvent(order, email, text) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Shipped: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Shipped', 'Order Failed'])
+  var cancel = cancelEvents(patientLabel, ['Order Shipped', 'Order Failed', 'Needs Form'])
 
   var commArr = newCommArr(email, text)
 
@@ -42,7 +42,7 @@ function orderCreatedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Created: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated', 'Order Hold', 'No Rx'])
+  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form'])
 
   var commArr = newCommArr(email, text)
 
@@ -117,6 +117,20 @@ function orderFailedEvent(order, email, text, hoursToWait, hourOfDay) {
   newEvent(eventTitle, commArr, hoursToWait, hourOfDay)
 }
 
+function newPatientFollowupEvent(order, email, hoursToWait, hourOfDay) {
+
+  var patientLabel = getPatientLabel(order)
+  var eventTitle   = order.$OrderId+' New Patient Followup: '+patientLabel+'.  Created:'+new Date()
+
+  var cancel = cancelEvents(patientLabel, ['New Patient Followup'])
+
+  var commArr = newCommArr(email)
+
+  infoEmail('newPatientFollowupEvent', eventTitle, commArr, hoursToWait, hourOfDay, cancel, order)
+
+  newEvent(eventTitle, commArr, hoursToWait, hourOfDay)
+}
+
 function newCommArr(email, text) {
 
   if ( ! LIVE_MODE) {
@@ -128,6 +142,8 @@ function newCommArr(email, text) {
 
   email.from = 'Good Pill Pharmacy < support@goodpill.org >' //spaces inside <> are so that google cal doesn't get rid of "HTML" if user edits description
 
+  if ( ! text) return [email]
+  
   //addCallFallback
   var json = JSON.stringify(text)
 
