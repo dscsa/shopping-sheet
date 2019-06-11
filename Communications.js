@@ -60,8 +60,8 @@ function orderShippedNotice(order, invoice) {
   if (groups.FILLED.length)
     message += '<br>These Rxs are on the way:<br>'+groups.FILLED.join(';<br>')+';'
 
-  if (groups.FILL_ACTION.length+groups.NOFILL_ACTION.length)
-    message += '<br><br>We cannot fill these Rxs without your help:<br>'+groups.FILL_ACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
+  if (groups.NOFILL_ACTION.length+groups.NOFILL_NOACTION.length)
+    message += '<br><br>We cannot fill these Rxs without your help:<br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).join(';<br>')+';'
 
   var email = { email:order.$Patient.email }
   var text  = { sms:getPhones(order) }
