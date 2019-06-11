@@ -211,6 +211,8 @@ function orderHoldNotice(order, groups) {
 
   var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
 
+  if ( ! numNoFills) return noRxNotice(order)
+
   var subject = 'Good Pill can not fill your '+numNoFills+' items for Order #'+order.$OrderId+'.'
   var message = ' We have these Rxs but can not filling them right now:<br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
@@ -343,6 +345,36 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
   needsFormEvent(order, email, text, hoursToWait[1], hourOfDay[1])
   needsFormEvent(order, email, text, hoursToWait[2], hourOfDay[2])
   needsFormEvent(order, email, text, hoursToWait[3], hourOfDay[3])
+}
+
+//We are coording patient communication via sms, calls, emails, & faxes
+//by building commication arrays based on github.com/dscsa/communication-calendar
+function noRxNotice(order) {
+
+  var subject = 'Good Pill received Order #'+order.$OrderId+' but is waiting for your prescriptions'
+  var message  = order.$Patient.source == 'Transfer'
+    ? "We will attempt to transfer the Rxs you requested from "+order.$Pharmacy.short+"."
+    : "We haven't gotten any Rxs from your doctor yet but will notify you as soon as we do."
+
+  var email = { email:order.$Patient.email }
+  var text  = { sms:getPhones(order), message:subject+'. '+message }
+
+  email.subject = subject
+  email.message = [
+    'Hello,',
+    '',
+    subject+message,
+    '',
+    '',
+    'Thanks,',
+    'The Good Pill Team',
+    '',
+    '',
+    "Note: if this is correct, there is no need to do anything. If you think there is a mistake, please let us know as soon as possible."
+  ].join('<br>')
+
+  //Wait 15 minutes to hopefully batch staggered surescripts and manual rx entry and cindy updates
+  noRxEvent(order, email, text, 15/60)
 }
 
 function orderFailedNotice(order) {
