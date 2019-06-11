@@ -13,7 +13,7 @@ function updateWebformShipped(order, invoice) {
       shipping_lines:[{method_id:'flat_rate', total:order.$Fee+''}] //Must be a string
     }
 
-    webformPaymethod(order, woocommerceOrder, 'updateWebformShipped')
+    webformPayMethod(order, woocommerceOrder, 'updateWebformShipped')
 
     //Order was already created (1) by user when registering, or (2) by status update when rx recieved
     updateWebformOrder(order.$OrderId, woocommerceOrder)
@@ -52,7 +52,7 @@ function updateWebformDispensed(order, invoice) {
 
     }
 
-    webformPaymethod(order, woocommerceOrder, 'updateWebformDispensed')
+    webformPayMethod(order, woocommerceOrder, 'updateWebformDispensed')
 
     infoEmail('updateWebformDispensed', '#'+order.$OrderId, woocommerceOrder, address, order)
     //Order was already created (1) by user when registering, or (2) by status update when rx recieved
@@ -155,14 +155,14 @@ function _fetch(url, method, body) {
   }
 }
 
-function webformPaymethod(order, woocommerceOrder, debugMsg) {
+function webformPayMethod(order, woocommerceOrder, debugMsg) {
 
   var payMethod = payment(order)
 
   if (payMethod == payment.COUPON) {
     woocommerceOrder.status = 'shipped-coupon'
     woocommerceOrder.coupon_lines = [{code:order.$Coupon}]
-  } else if (payMethod == payment.CARD) {
+  } else if (payMethod == payment.AUTOPAY) {
     woocommerceOrder.status = 'shipped-autopay'
     woocommerceOrder.payment_method = 'stripe'
   } else if (payMethod == payment.MANUAL){

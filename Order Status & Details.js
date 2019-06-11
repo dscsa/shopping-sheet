@@ -64,11 +64,11 @@ function payment(order) {
     return payment.COUPON
 
   if (order.$Card)
-    return payment.CARD
+    return payment.AUTOPAY
 
   return payment.MANUAL
 }
 
-payment.CARD   = 'CARD'
-payment.COUPON = 'COUPON'
-payment.MANUAL = 'MANUAL'
+payment.AUTOPAY = 'AUTOPAY'
+payment.COUPON  = 'COUPON'
+payment.MANUAL  = 'MANUAL'
