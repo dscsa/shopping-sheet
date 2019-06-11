@@ -13,15 +13,7 @@ function updateWebformShipped(order, invoice) {
       shipping_lines:[{method_id:'flat_rate', total:order.$Fee+''}] //Must be a string
     }
 
-    if (order.$Coupon) {
-      woocommerceOrder.status = 'shipped-coupon'
-    } else if (order.$Card) {
-      woocommerceOrder.status = 'shipped-autopay'
-      woocommerceOrder.payment_method = 'stripe'
-    } else {
-      woocommerceOrder.status = 'shipped-unpaid'
-      woocommerceOrder.payment_method = 'cheque'
-    }
+    webformPaymethod(order, woocommerceOrder, 'updateWebformShipped')
 
     //Order was already created (1) by user when registering, or (2) by status update when rx recieved
     updateWebformOrder(order.$OrderId, woocommerceOrder)
@@ -60,20 +52,7 @@ function updateWebformDispensed(order, invoice) {
 
     }
 
-    var payMethod = payment(order)
-
-    if (payMethod == payment.COUPON) {
-      woocommerceOrder.status = 'shipped-coupon'
-      woocommerceOrder.coupon_lines = [{code:order.$Coupon}]
-    } else if (payMethod == payment.CARD) {
-      woocommerceOrder.status = 'shipped-autopay'
-      woocommerceOrder.payment_method = 'stripe'
-    } else if (payMethod == payment.MANUAL){
-      woocommerceOrder.status = 'shipped-unpaid'
-      woocommerceOrder.payment_method = 'cheque'
-    } else {
-      debugEmail('updateWebformDispensed UNKOWN payment method',  payMethod, woocommerceOrder, address, order)
-    }
+    webformPaymethod(order, woocommerceOrder, 'updateWebformDispensed')
 
     infoEmail('updateWebformDispensed', '#'+order.$OrderId, woocommerceOrder, address, order)
     //Order was already created (1) by user when registering, or (2) by status update when rx recieved
@@ -174,4 +153,23 @@ function _fetch(url, method, body) {
   } catch (e) {
     debugEmail('Could not fetch woocommerce.  Is site down?', e, 'https://goodpill.org/wp-json/wc/v2/'+url, opts)
   }
+}
+
+function webformPaymethod(order, woocommerceOrder, debugMsg) {
+
+  var payMethod = payment(order)
+
+  if (payMethod == payment.COUPON) {
+    woocommerceOrder.status = 'shipped-coupon'
+    woocommerceOrder.coupon_lines = [{code:order.$Coupon}]
+  } else if (payMethod == payment.CARD) {
+    woocommerceOrder.status = 'shipped-autopay'
+    woocommerceOrder.payment_method = 'stripe'
+  } else if (payMethod == payment.MANUAL){
+    woocommerceOrder.status = 'shipped-unpaid'
+    woocommerceOrder.payment_method = 'cheque'
+  } else {
+    debugEmail(debugMsg+' UNKNOWN Payment Method', payMethod, woocommerceOrder, order)
+  }
+
 }
