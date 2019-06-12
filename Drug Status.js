@@ -9,8 +9,12 @@ var drugStatus = {
 
 //NO ACTION BY USER NECESSARY
 
+    NOACTION_PAST_DUE:{
+      EN:'is past due and may be Med Synced to this Order *',
+      ES:''
+    },
     NOACTION_MAY_MEDSYNC: {
-      EN:'may be Med Synced to this Order *',
+      EN:'is due soon and may be Med Synced to this Order *',
       ES:''
     },
     NOACTION_WAS_MEDSYNC: {
@@ -42,11 +46,11 @@ var drugStatus = {
       ES:''
     },
     NOACTION_LOW_STOCK:{
-      EN:'is short filled because this drug is low in stock.',
+      EN:'is short filled because this drug is low in stock',
       ES:''
     },
     NOACTION_LOW_REFILL:{
-      EN:'is short filled because this Rx had limited refills.',
+      EN:'is short filled because this Rx had limited refills',
       ES:''
     },
     NOACTION_WILL_TRANSFER:{
@@ -89,11 +93,7 @@ var drugStatus = {
       ES:''
     },
     ACTION_CHECK_BACK:{
-      EN:'is unavailable for new RXs at this time, check back later.',
-      ES:''
-    },
-    ACTION_PAST_DUE:{
-      EN:'is past due, please request 2 weeks in advance',
+      EN:'is unavailable for new RXs at this time, check back later',
       ES:''
     },
     ACTION_RX_OFF_AUTOFILL:{
@@ -101,7 +101,7 @@ var drugStatus = {
       ES:''
     },
     ACTION_PAT_OFF_AUTOFILL:{
-      EN:'was requested but you have turned all medications off autorefill',
+      EN:'was not filled because you have turned all medications off autorefill',
       ES:''
     },
     ACTION_NEEDS_FORM:{

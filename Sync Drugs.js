@@ -39,13 +39,22 @@ function setSyncDate(order, drug) {
   p.syncDate  = p.syncDate  || ['', 0]   //Explicit 0 fixed JS quirk when using ">" with undefined
 
   //Count how many drugs have each NextFill date
-  //Only keep "MAY MEDSYNC" in order if there is at least one other script to be filled
+  //Only keep "MAY MEDSYNC" and "PAST DUE" in order if there is at least one other script to be filled
   //Assuming drug order sorted by InOrder == true first
   if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && ! p.syncDates.inOrder){
     drug.$Days = 0
     setDrugStatus(drug, 'NOACTION_NOT_DUE')
   }
+  else if (hasDrugStatus(drug, 'NOACTION_PAST_DUE') && ! p.syncDates.inOrder){
+    drug.$Days = 0
+    //Keep status the same for now
+  }
   else if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && p.syncDates.inOrder) {
+    p.medsync = true
+    p.syncDates.inOrder++
+    drug.$Name = drug.$Name.replace('*', '^')
+  }
+  else if (hasDrugStatus(drug, 'NOACTION_PAST_DUE') && p.syncDates.inOrder) {
     p.medsync = true
     p.syncDates.inOrder++
     drug.$Name = drug.$Name.replace('*', '^')

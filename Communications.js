@@ -214,16 +214,18 @@ function orderHoldNotice(order, groups) {
   if ( ! numNoFills) return noRxNotice(order)
 
   var subject = 'Good Pill is NOT filling your '+numNoFills+' items for Order #'+order.$OrderId+'.'
-  var message = ' <u>We have these Rxs but are NOT filling them right now:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
+  var message = '<u>We have these Rxs but are NOT filling them right now:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
   var email = { email:order.$Patient.email }
-  var text  = { sms:getPhones(order), message:subject+message }
+  var text  = { sms:getPhones(order), message:subject+' '+message }
 
   email.subject = subject
   email.message = [
     'Hello,',
     '',
-    subject+message,
+    subject,
+    '',
+    message,
     '',
     'Apologies for any inconvenience,',
     'The Good Pill Team',
