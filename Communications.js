@@ -59,10 +59,10 @@ function orderShippedNotice(order, invoice) {
   var message  = ''
 
   if (groups.FILLED.length)
-    message += '<br>These Rxs are on the way:<br>'+groups.FILLED.join(';<br>')+';'
+    message += '<br><u>These Rxs are on the way:</u><br>'+groups.FILL_ACTION.concat(groups.FILL_NOACTION).join(';<br>')+';'
 
   if (groups.NOFILL_ACTION.length+groups.NOFILL_NOACTION.length)
-    message += '<br><br>We cannot fill these Rxs without your help:<br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).join(';<br>')+';'
+    message += '<br><br><u>We cannot fill these Rxs without your help:</u><br>'+groups.NOFILL_ACTION.concat(groups.NOFILL_NOACTION).join(';<br>')+';'
 
   var email = { email:order.$Patient.email }
   var text  = { sms:getPhones(order) }
@@ -101,10 +101,10 @@ function refillReminderNotice(order, groups) {
   var message      = ''
 
   if (groups.NO_REFILLS.length)
-    message += '<br>We need a new Rx for the following:<br>'+groups.NO_REFILLS.join(';<br>')+';'
+    message += '<br><u>We need a new Rx for the following:</u><br>'+groups.NO_REFILLS.join(';<br>')+';'
 
   if (groups.NO_AUTOFILL.length)
-    message += '<br><br>These Rxs will NOT be filled automatically and must be requested 2 weeks in advance:<br>'+groups.NO_AUTOFILL.join(';<br>')+';'
+    message += '<br><br><u>These Rxs will NOT be filled automatically and must be requested 2 weeks in advance:</u><br>'+groups.NO_AUTOFILL.join(';<br>')+';'
 
   var email = { email:order.$Patient.email }
   var text  = { sms:getPhones(order), message:subject+message }
@@ -172,10 +172,10 @@ function orderCreatedNotice(order) {
   if ( ! numFills) return orderHoldNotice(order, groups)
 
   var subject = 'Good Pill is starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'
-  var message = '<br>These Rxs will be included once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
+  var message = '<br><u>These Rxs will be included once we confirm their availability:</u><br>'+groups.FILLED.join(';<br>')+';'
 
   if (numNoFills)
-    message += '<br><br>We have these Rxs but are NOT filling them right now:<br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
+    message += '<br><br><u>We have these Rxs but are NOT filling them right now:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
   var suffix = [
     "Note: if this is correct, there is no need to do anything. If you want to change or delay this order, please let us know as soon as possible. If delaying, please specify the date on which you want it filled, otherwise if you don't, we will delay it 3 weeks by default.",
@@ -214,7 +214,7 @@ function orderHoldNotice(order, groups) {
   if ( ! numNoFills) return noRxNotice(order)
 
   var subject = 'Good Pill is NOT filling your '+numNoFills+' items for Order #'+order.$OrderId+'.'
-  var message = ' We have these Rxs but are NOT filling them right now:<br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
+  var message = ' <u>We have these Rxs but are NOT filling them right now:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
   var email = { email:order.$Patient.email }
   var text  = { sms:getPhones(order), message:subject+message }
@@ -257,10 +257,10 @@ function orderUpdatedNotice(order, drugsChanged) {
   var message = ''
 
   if (numFills)
-    message += '<br>These Rxs will be included once we confirm their availability:<br>'+groups.FILLED.join(';<br>')+';'
+    message += '<br><u>These Rxs will be included once we confirm their availability:</u><br>'+groups.FILLED.join(';<br>')+';'
 
   if (numNoFills)
-    message += '<br><br>We have these Rxs but are NOT filling them right now:<br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
+    message += '<br><br><u>We have these Rxs but are NOT filling them right now:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
   var suffix = [
     "Note: if this is correct, there is no need to do anything. If you want to change or delay this order, please let us know as soon as possible. If delaying, please specify the date on which you want it filled, otherwise if you don't, we will delay it 3 weeks by default.",
@@ -425,7 +425,7 @@ function newPatientFollowup(order, groups) {
     '- Order with tracking number '+trackingLink(order.$Tracking)+' was delivered and that they received it',
     '',
     '- Make sure they got all '+numFills+' of their medications, that we filled the correct number of pills, and answer any questions the patient has',
-    numNoFills ? '<br>- Explain why we did NOT fill<br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+'<br>' : '',
+    numNoFills ? '<br>- Explain why we did NOT fill:<br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+'<br>' : '',
     '- Let them know they are currently set to pay via '+payment(order)+' and the cost of the '+numFills+' items was $'+order.$Fee+' this time, but next time it will be $'+order.$Total,
     '',
     '- Review their current medication list and remind them which prescriptions we will be filling automatically and which ones they need to request 2 weeks in advance'
