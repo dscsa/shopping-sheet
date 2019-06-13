@@ -299,7 +299,7 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
   ///It's depressing to get updates if nothing is being filled
   if (numFills) {
     var subject = 'Welcome to Good Pill!  We are excited to fill your 1st Order.'
-    var message = 'Your order will be #'+order.$OrderId+". Please take 5mins to register so that we can fill the Rxs we got from your doctor.  You can register online at w,,,,w,,,,w . good,,,,pill . org or by calling us at 8,,,,8,,,,8 <Pause />9,,,,8,,,,7 <Pause />5,,,,1,,,,8,,,,7. The drugs in your 1st order will be:<br>"+groups.FILLED.join(';<br>')+';'
+    var message = 'Your order will be #'+order.$OrderId+". Please take 5mins to register so that we can fill the Rxs we got from your doctor.  You can register online at www.goodpill.org or by calling us at (888) 987-5187. The drugs in your 1st order will be:<br>"+groups.FILLED.join(';<br>')+';'
   }
   else {
     var subject = "Welcome to Good Pill! We are so sorry but we can't fill the Rxs that we received from your doctor"
