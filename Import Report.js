@@ -204,7 +204,7 @@ function newGroup(row) {
        last:row.lname,
        birth_date:row.birth_date.slice(0, 10),
        email:row.email,
-       phone1:formatPhone(row.home_phone),
+       phone1:row.home_phone ? formatPhone(row.home_phone) :  '',
        phone2:row.home_phone != row.cell_phone && row.cell_phone ? formatPhone(row.cell_phone) :  '',
        guardian_id:row.pat_id,
        address_1:row.address_1.slice(1, -1),
