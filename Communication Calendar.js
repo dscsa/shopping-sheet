@@ -133,7 +133,7 @@ function newPatientFollowupEvent(order, email, hoursToWait, hourOfDay) {
 
 function newCommArr(email, text) {
 
-  if ( ! LIVE_MODE) {
+  if ( ! LIVE_MODE || ! email.email) {
     email.email = DEBUG_EMAIL
     text.sms    = DEBUG_PHONE
   } else {
@@ -142,8 +142,8 @@ function newCommArr(email, text) {
 
   email.from = 'Good Pill Pharmacy < support@goodpill.org >' //spaces inside <> are so that google cal doesn't get rid of "HTML" if user edits description
 
-  if ( ! text) return [email]
-  
+  if ( ! text || ! text.sms) return [email]
+
   //addCallFallback
   var json = JSON.stringify(text)
 
