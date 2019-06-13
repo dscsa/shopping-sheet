@@ -430,7 +430,7 @@ function newPatientFollowup(order, groups) {
     numNoFills ? '<br>- Explain why we did NOT fill:<br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+'<br>' : '',
     '- Let them know they are currently set to pay via '+payment(order)+' and the cost of the '+numFills+' items was $'+order.$Fee+' this time, but next time it will be $'+order.$Total,
     '',
-    '- Review their current medication list and remind them which prescriptions we will be filling automatically and which ones they need to request 2 weeks in advance'
+    '- Review their current medication list and remind them which prescriptions we will be filling automatically and which ones they need to request 2 weeks in advance',
     '',
     'Thanks!',
     'The Good Pill Team',
