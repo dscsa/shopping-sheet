@@ -61,7 +61,7 @@ function orderShippedNotice(order, invoice) {
   if (groups.FILLED.length)
     message += '<br><u>These Rxs are on the way:</u><br>'+groups.FILL_ACTION.concat(groups.FILL_NOACTION).join(';<br>')+';'
 
-  if (groups.NOFILL_ACTION.length+groups.NOFILL_NOACTION.length)
+  if (groups.NOFILL_ACTION.length)
     message += '<br><br><u>We cannot fill these Rxs without your help:</u><br>'+groups.NOFILL_ACTION.join(';<br>')+';'
 
   var email = { email:order.$Patient.email }

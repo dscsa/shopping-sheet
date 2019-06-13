@@ -260,8 +260,8 @@ function setStatus(drug) {
         setDrugStatus(drug, 'ACTION_RX_OFF_AUTOFILL')
       }
     }
-    else if ( ! drug.$InOrder && (drug.$DaysToRefill == "" || drug.$DaysToRefill < 0)) {
-      setDrugStatus(drug, 'NOACTION_PAST_DUE')
+    else if (drug.$DaysToRefill == "" || drug.$DaysToRefill < 0) {
+      setDrugStatus(drug, drug.$InOrder ? 'NOACTION_WAS_MEDSYNC' : 'NOACTION_PAST_DUE')
     }
     else if (drug.$DaysSinceRefill && drug.$DaysSinceRefill < maxMedSyncDays(drug)) {
       set0Days(drug)

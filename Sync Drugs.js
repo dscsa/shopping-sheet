@@ -35,17 +35,19 @@ function roundDate(date, roundBy) {
 function setSyncDate(order, drug) {
 
   var p = order.$Patient
-  p.syncDates = p.syncDates || { inOrder:0 }
+  p.syncDates = p.syncDates || { inOrder:0 } //Count how many drugs have each NextFill date
   p.syncDate  = p.syncDate  || ['', 0]   //Explicit 0 fixed JS quirk when using ">" with undefined
 
-  //Count how many drugs have each NextFill date
-  //Only keep "MAY MEDSYNC" and "PAST DUE" in order if there is at least one other script to be filled
-  //Assuming drug order sorted by InOrder == true first
-  if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && ! p.syncDates.inOrder){
+
+  //Only keep "MAY MEDSYNC" and "PAST DUE" in order if there is at least one other script to be filled AND the order hasn't been dispensed yet
+  var excludeMedSynced = ! p.syncDates.inOrder || ~ ['Dispensed', 'Shipped'].indexOf(order.$Status)
+
+  //We can do keep accurate check of p.syncDates.inOrder within the loop as long as loop's drug order sorted by InOrder == true first
+  if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && excludeMedSynced){
     drug.$Days = 0
     setDrugStatus(drug, 'NOACTION_NOT_DUE')
   }
-  else if (hasDrugStatus(drug, 'NOACTION_PAST_DUE') && ! p.syncDates.inOrder){
+  else if (hasDrugStatus(drug, 'NOACTION_PAST_DUE') && excludeMedSynced){
     drug.$Days = 0
     //Keep status the same for now
   }
