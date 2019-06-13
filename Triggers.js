@@ -47,7 +47,7 @@ function lock() {
 
   var lock = LockService.getScriptLock();
 
-  if ( ! lock.tryLock(1000)) return Log('Scipt is Locked '+scriptId.toJSON())
+  if ( ! lock.tryLock(1000)) return Log('Script is Locked '+scriptId.toJSON())
 
   var updateShoppingLock = mainCache.get('updateShoppingLock')
 

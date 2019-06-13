@@ -163,6 +163,7 @@ function formatText(textJson) {
 
   textJson = textJson
     .replace(/<br>/g, '\\n')
+    .replace(/<.*?>/g, '') //Remove html tags such as email underlines
     .replace(/#(\d{4,})/g, '$1') //# sign makes text message think its a phone number and make an erroneous link with it
 
   try {
