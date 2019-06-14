@@ -68,7 +68,7 @@ function orderUpdatedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Updated: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated', 'Order Hold', 'No Rx'])
+  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form'])
 
   var commArr = newCommArr(email, text)
 
@@ -191,7 +191,7 @@ function formatCall(callJson) {
     .replace(/ TAB| CAP/ig, ' <Pause />')
     .replace(/\(?888[)-.]? ?987[.-]?5187/g, '8,,,,8,,,,8 <Pause />9,,,,8,,,,7 <Pause />5,,,,1,,,,8,,,,7')
     .replace(/(www\.)?goodpill\.org/g, 'w,,,,w,,,,w,,,,dot,,,,good,,,,g,,,,o,,,,o,,,d,,,,pill,,,,p,,,,i,,,,l,,,,l,,,,dot,,,,org,,,,o,,,,r,,,,g')
-    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number <Pause />$1,,$2,,$3,,$4,,$5,,$6<Pause /> again that is order number <Pause />$1,,$2,,$3,,$4,,$5,,$6')
+    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number,,,,$1,,$2,,$3,,$4,,$5,,$6<Pause /> again that is order number <Pause />$1,,$2,,$3,,$4,,$5,,$6')
 
   try {
     return JSON.parse(callJson)

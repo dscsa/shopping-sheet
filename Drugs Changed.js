@@ -45,7 +45,8 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
       }
       //Now this is #2 and #3 ONLY
 
-      if (oldDrug.$InOrder && ! newDrug.$InOrder) //Can't do this "|| (oldDrug.$Days > 0 && newDrug.$Days === 0)" because setDaysQtyRefills has not run yet so newDrug.$Days might be null because it hasn't been set yet
+      //Switch from oldDrug.$InOrder to oldDrug.$Days because of 14793 getting an update of a drug that was "in order" but no days should not send update notices if it is removed from order
+      if (oldDrug.$Days && ! newDrug.$InOrder) //Can't do this "|| (oldDrug.$Days > 0 && newDrug.$Days === 0)" because setDaysQtyRefills has not run yet so newDrug.$Days might be null because it hasn't been set yet
         changes.push(oldDrug.$Name+' -> '+newDrug.$Name+' REMOVED FROM ORDER '+oldDrug.$InOrder+' -> '+newDrug.$InOrder)
 
       else if (newDrug.$InOrder && ! oldDrug.$InOrder) //Can't do this "|| (newDrug.$Days > 0 && oldDrug.$Days === 0)" because setDaysQtyRefills has not run yet so newDrug.$Days might not be 0 yet
