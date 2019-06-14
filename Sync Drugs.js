@@ -44,11 +44,11 @@ function setSyncDate(order, drug) {
 
   //We can do keep accurate check of p.syncDates.inOrder within the loop as long as loop's drug order sorted by InOrder == true first
   if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && excludeMedSynced){
-    drug.$Days = 0
+    set0Days(drug)
     setDrugStatus(drug, 'NOACTION_NOT_DUE')
   }
   else if (hasDrugStatus(drug, 'NOACTION_PAST_DUE') && excludeMedSynced){
-    drug.$Days = 0
+    set0Days(drug)
     //Keep status the same for now
   }
   else if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && p.syncDates.inOrder) {

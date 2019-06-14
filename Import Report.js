@@ -170,9 +170,13 @@ function groupByOrder(report) {
 }
 
 function newGroup(row) {
+
+  //SELECT * FROM csct_code WHERE ct_id = 5007.  Not specified usually means Entered (Phone/Fax) or Surescripts
+  var order_categories = ['Not Specified', 'Webform Complete', 'eRx', 'Transfer', 'Refill', '0 Refills', 'Webform Refill']
+
   var pharmacyInfo = row.user_def_2.slice(1, -1).split(',')
   var paymentInfo  = row.user_def_4.slice(1, -1).split(',')
-  var rxSource     = row.order_category == 3 ? 'Transfer' : 'eRX'
+  var rxSource     = order_categories[row.order_category]
   var pharmacyName = row.user_def_1.slice(1, -1)  //Remove digits, pound sign, and hyphens (Store Number) from pharmacy name
 
   var now = new Date()

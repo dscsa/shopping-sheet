@@ -216,14 +216,26 @@ function orderHoldNotice(order, groups) {
   var subject = 'Good Pill is NOT filling your '+numNoFills+' items for Order #'+order.$OrderId+'.'
   var message = '<u>We have these Rxs but are NOT filling them right now:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
+  //['Not Specified', 'Webform Complete', 'eRx', 'Transfer', 'Refill', '0 Refills', 'Webform Refill']
+  var trigger = ''
+
+  if (order.$Patient.source == 'Not Specified')
+    trigger = 'We got Rxs from your doctor but'
+  else if (order.$Patient.source == 'Transfer')
+    trigger = 'We received your transfer request but'
+  else if (order.$Patient.source == '0 Refills')
+    trigger = 'We requested refills from your doctor but have not heard back so'
+  else if (order.$Patient.source == 'Webform Refill')
+    trigger = 'We received your refill request but'
+
   var email = { email:order.$Patient.email }
-  var text  = { sms:getPhones(order), message:subject+' '+message }
+  var text  = { sms:getPhones(order), message:trigger+' '+subject+' '+message }
 
   email.subject = subject
   email.message = [
     'Hello,',
     '',
-    subject,
+    trigger+' '+subject,
     '',
     message,
     '',
