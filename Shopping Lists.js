@@ -139,14 +139,16 @@ function shopV2(drug, orderID) {
   var list = makeList(ndcs, +(30/minDays*minQty).toFixed(0), 0)
   if (list) return list
   */
-  debugEmail('Shopping Error: Not enough qty found, must be pended manually', '#'+orderID, drug.$Name, v2name, minQty, minDays)
+
+  if (new Date().getMinutes() >= 55) //Otherwise we get an email on every run
+    debugEmail('Shopping Error: Not enough qty found, must be pended manually', '#'+orderID, drug.$Name, v2name, minQty, minDays)
 }
 
 function groupByNdc(rows, drug) {
   //Organize by NDC since we don't want to mix them
   var ndcs = {}
-  var caps = drug.$Name.match(/ caps?| cps?\b| softgel/i) //"caps" to exclude caplet which is closer to a tablet
-  var tabs = drug.$Name.match(/ tabs?| tbs?\b/i)
+  var caps = drug.$Name.match(/ cap(?!l)s?| cps?\b| softgel/i) //include cap, caps, capsule but not caplet which is more like a tablet
+  var tabs = drug.$Name.match(/ tabs?| tbs?| capl\b/i) //include caplet which is like a tablet
 
   //debugEmail('Shopping Now', $Name, v2name, minQty, minDays, drugStock, rows)
 
