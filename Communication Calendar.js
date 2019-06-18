@@ -303,14 +303,28 @@ function cancelEvents(patientLabel, typeArr) {
   var events = searchEvents(patientLabel, typeArr)
 
   for (var i in events) {
+
     var title = events[i].getTitle()
+    
     if ( ~ title.indexOf('CALLED') ||  ~ title.indexOf('EMAILED') ||  ~ title.indexOf('TEXTED')) continue
-    events[i].setTitle(title+' Deleted:'+new Date())
-    events[i].deleteEvent()
+
+    cancelEvent(events[i], title)
+
     cancel.push(['deleted an event', eventString(events[i])])
   }
 
   return cancel
+}
+
+function cancelEvent(event, title) {
+  try { //We're sorry, a server error occurred. Please wait a bit and try again."
+    event.setTitle(title+' Deleted:'+new Date())
+    event.deleteEvent()
+  } catch (e) {
+    Utilities.sleep(5000)
+    event.setTitle(title+' Deleted:'+new Date())
+    event.deleteEvent()
+  }
 }
 
 function eventString(events) {
