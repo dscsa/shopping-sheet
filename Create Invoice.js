@@ -45,12 +45,7 @@ function updateInvoice() {
 
   Log('Update Invoice Called', order)
 
-  order.$Total = 0
-
-  for (var i in order.$Drugs)
-    setPriceTotal(order, order.$Drugs[i])
-
-  setFeeDue(order) //User may have changed $Days and $Prices so recalculate totals
+  setPriceFeesDue(order)  //User may have changed $Days and $Prices so recalculate totals
 
   sheet.setCellByKeys(order.$OrderId, '$Total', order.$Total)
   sheet.setCellByKeys(order.$OrderId, '$Fee', order.$Fee)

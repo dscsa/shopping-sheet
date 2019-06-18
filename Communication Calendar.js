@@ -181,7 +181,7 @@ function formatCall(callJson) {
 
   //Improve Pronounciation
   callJson = callJson
-    .replace(/(\w):(?!\/\/)/g, '$1<Pause length=\\"2\\" />') //Don't capture JSON text or URL links
+    .replace(/(\w):(?!\/\/)/g, '$1<Pause />') //Don't capture JSON text or URL links
     .replace(/;<br>/g, '<Pause /> and <Pause />') //combine drug list with "and" since it sounds more natural
     .replace(/;|\./g, ' <Pause />') //can't do commas without testing for inside quotes because that is part of json syntax
     .replace(/(<br>)+/g, ' <Pause length=\\"2\\" />')

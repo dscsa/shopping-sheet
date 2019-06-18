@@ -216,7 +216,7 @@ function newGroup(row) {
        city:row.city,
        state:row.state,
        zip:row.zip,
-       source:rxSource
+       source:rxSource || row.order_category || 'Unknown'
      }
    }
 }

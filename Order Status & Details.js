@@ -33,6 +33,16 @@ function didStatusChange(oldStatus, newStatus) {
   return oldStatus && ! ~ oldStatus.indexOf(newStatus || null)
 }
 
+function setPriceFeesDue(order) {
+
+  order.$Total = 0
+
+  for (var i in order.$Drugs)
+    setPriceTotal(order, order.$Drugs[i])
+
+  setFeeDue(order) //User may have changed $Days and $Prices so recalculate totals
+}
+
 function setPriceTotal(order, drug) {
   drug.$Price  = +Math.max(drug.$Days * drug.$MonthlyPrice / 30, drug.$Days ? 1 : 0).toFixed(0) || 0 //Minimum price of $1 (CK suggestion).  2019-01-28 Changed $Excluded to $Days because of Order 8235 and 8291
 
