@@ -399,7 +399,7 @@ function orderFailedNotice(order) {
   var subject  = "Apologies but Good Pill is having trouble with your Order #"+order.$OrderId
   var message  = order.$Patient.source == 'Transfer'
     ? "We were unable to transfer the Rxs you requested from "+order.$Pharmacy.short+". This usually happens because we have the wrong pharmacy on file, we are requesting the wrong Rxs, or your Rxs have no refills remaining"
-    : "We haven't gotten any Rxs from your doctor yet. You may want to contact your doctor.  If you had meant for us to transfer Rxs from your pharmacy instead, please login to your account and place a new 'transfer' order or give us a call."
+    : "We haven't gotten any Rxs from your doctor yet. You may want to contact your doctor.  If you had meant for us to transfer Rxs from your pharmacy instead, please login to your account and place a new 'transfer' order or give us a call at (888) 987-5187."
 
   var email = { email:order.$Patient.email }
   var text  = { sms:getPhones(order),  message:subject+'. '+message }
