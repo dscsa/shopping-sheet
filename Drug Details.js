@@ -216,8 +216,7 @@ function setStatus(drug) {
       setDrugStatus(drug, 'NOACTION_MISSING_GCN')
     }
     else if (drug.$IsRefill && drug.$Stock == 'Not Offered') {
-      if (drug.$IsRefill) triggerDrugChange(drug)
-      debugEmail('Error: Refill Rx has "Not Offered" Stock', drug)
+      triggerDrugChange(drug)
       setDrugStatus(drug, 'NOACTION_LIVE_INVENTORY_ERROR')
     }
     else if ( ! drug.$IsRefill && drug.$Stock == 'Not Offered') {
