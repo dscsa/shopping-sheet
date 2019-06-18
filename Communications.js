@@ -303,6 +303,8 @@ function orderUpdatedNotice(order, drugsChanged) {
 
   //Wait 15 minutes to hopefully batch staggered surescripts and manual rx entry and cindy updates
   orderUpdatedEvent(order, email, text, 15/60)
+
+  orderFailedNotice(order) //After updated event since orderUpdatedEvent() will delete an previous orderFailed messages
 }
 
 

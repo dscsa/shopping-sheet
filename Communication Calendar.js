@@ -72,7 +72,7 @@ function orderUpdatedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Updated: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form'])
+  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form', 'Order Failed'])
 
   var commArr = newCommArr(email, text)
 
@@ -305,7 +305,7 @@ function cancelEvents(patientLabel, typeArr) {
   for (var i in events) {
 
     var title = events[i].getTitle()
-    
+
     if ( ~ title.indexOf('CALLED') ||  ~ title.indexOf('EMAILED') ||  ~ title.indexOf('TEXTED')) continue
 
     cancelEvent(events[i], title)
