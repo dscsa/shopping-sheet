@@ -181,6 +181,8 @@ function formatCall(callJson) {
 
   //Improve Pronounciation
   callJson = callJson
+    .replace(/View it at [^ ]+ /, "")
+    .replace(/Track it at [^ ]+ /, "View and track your order online at www.goodpill.org")
     .replace(/(\w):(?!\/\/)/g, '$1<Pause />') //Don't capture JSON text or URL links
     .replace(/;<br>/g, '<Pause /> and <Pause />') //combine drug list with "and" since it sounds more natural
     .replace(/;|\./g, ' <Pause />') //can't do commas without testing for inside quotes because that is part of json syntax
@@ -193,7 +195,7 @@ function formatCall(callJson) {
     .replace(/ ER /ig, ' extended release ')
     .replace(/ DR /ig, ' delayed release ')
     .replace(/ TAB| CAP/ig, ' <Pause />')
-    .replace(/\(?(\d)(\d)(\d)[)-.]? ?(\d)(\d)(\d)[.-]?(\d)(\d)(\d)(\d)/g, '$1,,,,$2,,,,$3 <Pause />$4,,,,$5,,,,$6 <Pause />$7,,,,$8,,,,$9,,,,$10')
+    .replace(/\(?888[)-.]? ?987[.-]?5187/g, '8,,,,8,,,,8 <Pause />9,,,,8,,,,7 <Pause />5,,,,1,,,,8,,,,7')
     .replace(/(www\.)?goodpill\.org/g, 'w,,,,w,,,,w,,,,dot,,,,good,,,,g,,,,o,,,,o,,,d,,,,pill,,,,p,,,,i,,,,l,,,,l,,,,dot,,,,org,,,,o,,,,r,,,,g')
     .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number,,,,$1,,$2,,$3,,$4,,$5,,$6<Pause /> again that is order number <Pause />$1,,$2,,$3,,$4,,$5,,$6')
 
