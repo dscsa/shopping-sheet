@@ -193,7 +193,7 @@ function formatCall(callJson) {
     .replace(/ ER /ig, ' extended release ')
     .replace(/ DR /ig, ' delayed release ')
     .replace(/ TAB| CAP/ig, ' <Pause />')
-    .replace(/\(?888[)-.]? ?987[.-]?5187/g, '8,,,,8,,,,8 <Pause />9,,,,8,,,,7 <Pause />5,,,,1,,,,8,,,,7')
+    .replace(/\(?(\d)(\d)(\d)[)-.]? ?(\d)(\d)(\d)[.-]?(\d)(\d)(\d)(\d)/g, '$1,,,,$2,,,,$3 <Pause />$4,,,,$5,,,,$6 <Pause />$7,,,,$8,,,,$9,,,,$10')
     .replace(/(www\.)?goodpill\.org/g, 'w,,,,w,,,,w,,,,dot,,,,good,,,,g,,,,o,,,,o,,,d,,,,pill,,,,p,,,,i,,,,l,,,,l,,,,dot,,,,org,,,,o,,,,r,,,,g')
     .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number,,,,$1,,$2,,$3,,$4,,$5,,$6<Pause /> again that is order number <Pause />$1,,$2,,$3,,$4,,$5,,$6')
 
