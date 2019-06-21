@@ -425,6 +425,8 @@ function newPatientFollowup(order, groups) {
 
   if ( ! order.$New) return
 
+  if ( ! order.$Total) debugEmail('newPatientFollowup has not $Total', order)
+
   var numFills   = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
   var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
 
