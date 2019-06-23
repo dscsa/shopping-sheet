@@ -98,7 +98,7 @@ function normalizeDrug(row) {
     $DaysSupply:+row.days_supply,
     $DispenseQty:+row.dispense_qty,
     $WrittenQty:+row.written_qty,
-    $RemainingQty:row.written_qty * ( +$RefillsLeft || ( +row.refills_total ? 1 : 0)), //Assume we will switch to a script with refills if one is available),
+    $RemainingQty:row.written_qty * ( +$RefillsLeft || +row.refills_total), //Assume we will switch to a script with refills if one is available),
     $OriginalQty:row.written_qty * row.refills_orig,
     $ProviderName:row.provider_fname+' '+row.provider_lname,
     $ProviderPhone:row.provider_phone,
