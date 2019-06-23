@@ -42,7 +42,7 @@ function subsituteNumerals(sig) {
   sig = sig.replace(/(\d+) (1\/2|one-half) /ig, '$1.5 ') //Take 1 1/2 tablets
   sig = sig.replace(/ (1\/2|one-half) /ig, ' .5 ')
   sig = sig.replace(/\bone /ig, '1 ') // \b is for space or start of line
-  sig = sig.replace(/\btwo | other /ig, '2 ') // \b is for space or start of line
+  sig = sig.replace(/\btwo |\bother /ig, '2 ') // \b is for space or start of line
   sig = sig.replace(/\bthree /ig, '3 ') // \b is for space or start of line
   sig = sig.replace(/\bfour /ig, '4 ') // \b is for space or start of line
   sig = sig.replace(/\bfive /ig, '5 ') // \b is for space or start of line
@@ -187,7 +187,8 @@ function testParseSig() {
     //"Take 1 capsule by mouth at bedtime for chronic back pain/ may increase 1 cap/ week x 3 weeks to 3 caps at bedtime", //NOT FIXED
     //"Take 1 tablet by mouth 3 times a day"
     //"Take 1 tablet by mouth 2 (two) times a day with meals."
-    //"Take 1 tablet (5 mg total) by mouth 2 (two) times daily."
+    //"Take 1 tablet (5 mg total) by mouth 2 (two) times daily.",
+    //"Take 1 tablet by mouth every other day"
   ]
 
 
