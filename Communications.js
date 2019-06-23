@@ -172,7 +172,7 @@ function orderCreatedNotice(order) {
   if ( ! numFills) return orderHoldNotice(order, groups)
 
   var subject = 'Good Pill is starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'
-  var message = '<br><u>These Rxs will be included once we confirm their availability:</u><br>'+groups.FILLED.join(';<br>')+';'
+  var message = 'If your address has recently changed please let us know right away.<br><br><u>These Rxs will be included once we confirm their availability:</u><br>'+groups.FILLED.join(';<br>')+';'
 
   if (numNoFills)
     message += '<br><br><u>We have these Rxs but are NOT filling them right now:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
@@ -183,14 +183,13 @@ function orderCreatedNotice(order) {
   ].join('<br><br>')
 
   var email = { email:order.$Patient.email }
-  var text  = { sms:getPhones(order), message:subject+message }
+  var text  = { sms:getPhones(order), message:subject+' '+message }
 
   email.subject = subject
   email.message = [
     'Hello,',
     '',
-    subject+' We will notify you again once it ships.',
-    message,
+    subject+' We will notify you again once it ships. '+message,
     '',
     (numFills >= numNoFills) ? 'Thanks for choosing Good Pill!' : 'Apologies for any inconvenience,',
     'The Good Pill Team',
