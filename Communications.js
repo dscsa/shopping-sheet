@@ -209,7 +209,7 @@ function orderCreatedNotice(order) {
 function transferRequestedNotice(order, groups) {
 
   var subject = 'Good Pill recieved your transfer request for Order #'+order.$OrderId+'.'
-  var message = 'We will notify you once we have contacted your pharmacy, '+order.$Pharmacy.short+', whether or not the transfer was successful;'
+  var message = 'We will notify you once we have contacted your pharmacy, '+order.$Pharmacy.short.replace(/\(\d{10}\)/g, '')+', whether or not the transfer was successful;'
 
 
   var email = { email:order.$Patient.email }
