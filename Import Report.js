@@ -172,7 +172,7 @@ function groupByOrder(report) {
 function newGroup(row) {
 
   //SELECT * FROM csct_code WHERE ct_id = 5007.  Not specified usually means Entered (Phone/Fax) or Surescripts
-  var order_categories = ['Not Specified', 'Webform Complete', 'eRx', 'Transfer', 'Refill', '0 Refills', 'Webform Refill']
+  var order_categories = ['Not Specified', 'Webform Complete', 'eRx', 'Transfer', 'Refill', '0 Refills', 'Webform Refill', 'eRx /w Note', 'Transfer /w Note', 'Refill w/ Note']
 
   var pharmacyInfo = row.user_def_2.slice(1, -1).split(',')
   var paymentInfo  = row.user_def_4.slice(1, -1).split(',')
