@@ -172,11 +172,11 @@ function groupByOrder(report) {
 function newGroup(row) {
 
   //SELECT * FROM csct_code WHERE ct_id = 5007.  Not specified usually means Entered (Phone/Fax) or Surescripts
-  var order_categories = ['Not Specified', 'Webform Complete', 'eRx', 'Transfer', 'Refill', '0 Refills', 'Webform Refill', 'eRx /w Note', 'Transfer /w Note', 'Refill w/ Note']
+  var order_categories = ['Not Specified', 'Webform Complete', 'Webform eRx', 'Webform Transfer', 'Auto Refill', '0 Refills', 'Webform Refill', 'eRx /w Note', 'Transfer /w Note', 'Refill w/ Note']
 
   var pharmacyInfo = row.user_def_2.slice(1, -1).split(',')
   var paymentInfo  = row.user_def_4.slice(1, -1).split(',')
-  var rxSource     = order_categories[row.order_category]
+  var orderSource  = row.order_category ? (order_categories[row.order_category] || row.order_category) : 'Guess: '+row.rx_source 
   var pharmacyName = row.user_def_1.slice(1, -1)  //Remove digits, pound sign, and hyphens (Store Number) from pharmacy name
 
   var now = new Date()
@@ -186,7 +186,7 @@ function newGroup(row) {
   return {
     $OrderId:row.invoice_nbr,
     $Drugs:[],
-    $New:+row.is_current_patient ? undefined : rxSource, //2 is eRx, 3 is pharmacy, NULL is SureScript or Cindy Manually Entered //Delete later if not new
+    $New:+row.is_current_patient ? undefined : orderSource, //2 is eRx, 3 is pharmacy, NULL is SureScript or Cindy Manually Entered //Delete later if not new
     $Coupon:paymentInfo[3],
     $Card:paymentInfo[2] && paymentInfo[0] ? paymentInfo[2]+' '+paymentInfo[0] : '',
     $Lang:row.primary_language_cd,
@@ -216,7 +216,7 @@ function newGroup(row) {
        city:row.city,
        state:row.state,
        zip:row.zip,
-       source:rxSource || row.order_category || 'Unknown'
+       source:orderSource
      }
    }
 }
