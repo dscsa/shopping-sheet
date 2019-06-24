@@ -169,6 +169,8 @@ function orderCreatedNotice(order) {
   var numFills   = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
   var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
 
+  //['Not Specified', 'Webform Complete', 'Webform eRx', 'Webform Transfer', 'Auto Refill', '0 Refills', 'Webform Refill', 'eRx /w Note', 'Transfer /w Note', 'Refill w/ Note']
+  if (order.$Patient.sourceCode == 3 || order.$Patient.sourceCode == 8) return transferRequestedNotice(order, groups)
   if ( ! numFills) return orderHoldNotice(order, groups)
 
   var subject = 'Good Pill is starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'
@@ -204,11 +206,34 @@ function orderCreatedNotice(order) {
   orderCreatedEvent(order, email, text, 15/60)
 }
 
+function transferRequestedNotice(order, groups) {
+
+  var subject = 'Good Pill recieved your transfer request for Order #'+order.$OrderId+'.'
+  var message = 'We will notify you once we have contacted your pharmacy, '+order.$Pharmacy.short+', whether or not the transfer was successful;'
+
+
+  var email = { email:order.$Patient.email }
+  var text  = { sms:getPhones(order), message:subject+' '+message }
+
+  email.subject = subject
+  email.message = [
+    'Hello,',
+    '',
+    subject,
+    '',
+    message,
+    '',
+    'Thanks!',
+    'The Good Pill Team'
+  ].join('<br>')
+
+  //Wait 15 minutes to hopefully batch staggered surescripts and manual rx entry and cindy updates
+  transferRequestedEvent(order, email, text, 15/60)
+}
+
 //We are coording patient communication via sms, calls, emails, & faxes
 //by building commication arrays based on github.com/dscsa/communication-calendar
 function orderHoldNotice(order, groups) {
-
-  if (order.$Patient.source == 'Unknown') return debugEmail('Not sending orderHoldNotice/noRxNotice because Surescript Denied?', order)
 
   var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
 
@@ -217,16 +242,16 @@ function orderHoldNotice(order, groups) {
   var subject = 'Good Pill is NOT filling your '+numNoFills+' items for Order #'+order.$OrderId+'.'
   var message = '<u>We have these Rxs but are NOT filling them right now:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
-  //['Not Specified', 'Webform Complete', 'eRx', 'Transfer', 'Refill', '0 Refills', 'Webform Refill']
+  //['Not Specified', 'Webform Complete', 'Webform eRx', 'Webform Transfer', 'Auto Refill', '0 Refills', 'Webform Refill', 'eRx /w Note', 'Transfer /w Note', 'Refill w/ Note']
   var trigger = ''
 
-  if (order.$Patient.source == 'Not Specified')
-    trigger = 'We got Rxs from your doctor but'
-  else if (order.$Patient.source == 'Transfer')
-    trigger = 'We received your transfer request but'
-  else if (order.$Patient.source == '0 Refills')
+  if (order.$Patient.sourceCode === 0 || order.$Patient.source == "SureScripts" || order.$Patient.source == "Fax" || order.$Patient.source == "Phone")
+    trigger = 'We got Rxs from your doctor via '+order.$Patient.source+' but'
+  else if (order.$Patient.sourceCode == 2 || order.$Patient.sourceCode == 7)
+    trigger = 'You successfully registered but'
+  else if (order.$Patient.sourceCode == 5)
     trigger = 'We requested refills from your doctor but have not heard back so'
-  else if (order.$Patient.source == 'Webform Refill')
+  else if (order.$Patient.sourceCode == 6 || order.$Patient.sourceCode == 9)
     trigger = 'We received your refill request but'
 
   var email = { email:order.$Patient.email }

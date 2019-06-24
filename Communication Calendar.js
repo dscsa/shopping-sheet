@@ -46,7 +46,7 @@ function orderCreatedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Created: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form'])
+  var cancel = cancelEvents(patientLabel, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form'])
 
   var commArr = newCommArr(email, text)
 
@@ -55,11 +55,24 @@ function orderCreatedEvent(order, email, text, hoursToWait) {
   newEvent(eventTitle, commArr, hoursToWait)
 }
 
+function transferRequestedEvent(order, email, text, hoursToWait) {
+  var patientLabel = getPatientLabel(order)
+  var eventTitle   = order.$OrderId+' Transfer Requested: '+patientLabel+'.  Created:'+new Date()
+
+  var cancel = cancelEvents(patientLabel, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Hold', 'No Rx'])
+
+  var commArr = newCommArr(email, text)
+
+  infoEmail('transferRequestedEvent', eventTitle, commArr, hoursToWait, cancel, order)
+
+  newEvent(eventTitle, commArr, hoursToWait)
+}
+
 function orderHoldEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Hold: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated', 'Order Hold', 'No Rx'])
+  var cancel = cancelEvents(patientLabel, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Hold', 'No Rx'])
 
   var commArr = newCommArr(email, text)
 
@@ -72,7 +85,7 @@ function orderUpdatedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Updated: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form', 'Order Failed'])
+  var cancel = cancelEvents(patientLabel, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form', 'Order Failed'])
 
   var commArr = newCommArr(email, text)
 

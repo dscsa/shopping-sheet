@@ -176,7 +176,7 @@ function newGroup(row) {
 
   var pharmacyInfo = row.user_def_2.slice(1, -1).split(',')
   var paymentInfo  = row.user_def_4.slice(1, -1).split(',')
-  var orderSource  = row.order_category ? (order_categories[row.order_category] || row.order_category) : 'Guess: '+row.rx_source 
+  var orderSource  = order_categories[row.order_category] || row.rx_source
   var pharmacyName = row.user_def_1.slice(1, -1)  //Remove digits, pound sign, and hyphens (Store Number) from pharmacy name
 
   var now = new Date()
@@ -216,7 +216,8 @@ function newGroup(row) {
        city:row.city,
        state:row.state,
        zip:row.zip,
-       source:orderSource
+       source:orderSource,
+       sourceCode:row.order_category
      }
    }
 }
