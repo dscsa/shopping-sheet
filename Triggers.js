@@ -31,10 +31,13 @@ function triggerShopping() {
 function updateShopping() {
   try {
     var unlock = lock()
-    if (unlock) {
-      mainLoop()
-      unlock()
-    }
+
+    if ( ! unlock)
+      throw new Error('Sheet is already running, try again later')
+
+    mainLoop()
+    unlock()
+
   } catch (e) {
     if (unlock) unlock()
     debugEmail('updateShopping error', 'scriptId', scriptId, e, e.stack, mainCache)
