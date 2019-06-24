@@ -150,13 +150,10 @@ function newPatientFollowupEvent(order, email, hoursToWait, hourOfDay) {
 
 function newCommArr(email, text) {
 
-  if ( ! LIVE_MODE || ! email.email) {
-    email.email = DEBUG_EMAIL
-    text.sms    = DEBUG_PHONE
-  } else {
-    email.bcc = DEBUG_EMAIL
-  }
+  if ( ! LIVE_MODE || ! email.email) email.email = DEBUG_EMAIL
+  if ( ! LIVE_MODE || ! text.sms) text.sms = DEBUG_EMAIL
 
+  email.bcc  = DEBUG_EMAIL
   email.from = 'Good Pill Pharmacy < support@goodpill.org >' //spaces inside <> are so that google cal doesn't get rid of "HTML" if user edits description
 
   if ( ! text || ! text.sms) return [email]
