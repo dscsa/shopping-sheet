@@ -50,7 +50,7 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
       if (oldDrug.$Days && oldDrug.$InOrder && ! newDrug.$InOrder) //Can't do this "|| (oldDrug.$Days > 0 && newDrug.$Days === 0)" because setDaysQtyRefills has not run yet so newDrug.$Days might be null because it hasn't been set yet
         changes.push(oldDrug.$Name+' -> '+newDrug.$Name+' REMOVED FROM ORDER '+oldDrug.$InOrder+' -> '+newDrug.$InOrder)
 
-      else if (newDrug.$InOrder && ! oldDrug.$InOrder) //Can't do this "|| (newDrug.$Days > 0 && oldDrug.$Days === 0)" because setDaysQtyRefills has not run yet so newDrug.$Days might not be 0 yet
+      else if ( ! oldDrug.$Days && ! oldDrug.$InOrder && newDrug.$InOrder) //Can't do this "|| (newDrug.$Days > 0 && oldDrug.$Days === 0)" because setDaysQtyRefills has not run yet so newDrug.$Days might not be 0 yet
         changes.push(oldDrug.$Name+' -> '+newDrug.$Name+' ADDED TO ORDER'+oldDrug.$InOrder+' -> '+newDrug.$InOrder)
 
       else if (newDrug.$RefillsLeft != oldDrug.$RefillsLeft) //"else if" because refills_left often change when adding a drug to an order - no need to double count

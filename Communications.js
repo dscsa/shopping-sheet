@@ -208,6 +208,8 @@ function orderCreatedNotice(order) {
 //by building commication arrays based on github.com/dscsa/communication-calendar
 function orderHoldNotice(order, groups) {
 
+  if (order.$Patient.source == 'Unknown') return debugEmail('Not sending orderHoldNotice/noRxNotice because Surescript Denied?', order)
+
   var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
 
   if ( ! numNoFills) return noRxNotice(order)
