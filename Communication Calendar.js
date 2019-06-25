@@ -208,7 +208,7 @@ function formatCall(callJson) {
     .replace(/ ER /ig, ' extended release ')
     .replace(/ DR /ig, ' delayed release ')
     .replace(/ TAB| CAP/ig, ' <Pause />')
-    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number,,,,$1,,$2,,$3,,$4,,$5,,$6<Pause /> again that is order number <Pause />$1,,$2,,$3,,$4,,$5,,$6')
+    .replace(/\#(\d)(\d)(\d)(\d)(\d)(\d)?/, 'number,,,,$1,,$2,,$3,,$4,,$5,,$6') //<Pause /> again that is order number <Pause />$1,,$2,,$3,,$4,,$5,,$6
 
   try {
     return JSON.parse(callJson)
