@@ -14,7 +14,6 @@ function mainLoop() {
 
   var drugs     = sheet.colByKey('$Drugs')
   var tracking  = sheet.colByKey('$Tracking')
-  var fee       = sheet.colByKey('$Fee')
   var status    = sheet.colByKey('$Status')
 
   Log('Drug IDs', Object.keys(drugs))
@@ -108,7 +107,8 @@ function mainLoop() {
 
      //Don't change Drugs and Invoice since should already be finalized
      order.$Drugs = drugs[order.$OrderId]
-     order.$Fee = fee[order.$OrderId]
+
+     setPriceFeesDue(order)
 
      updateWebformShipped(order, invoice)
 
