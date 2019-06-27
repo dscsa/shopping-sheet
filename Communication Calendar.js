@@ -195,7 +195,7 @@ function formatCall(callJson) {
     .replace(/View it at [^ ]+ /, "")
     .replace(/Track it at [^ ]+ /, "View and track your order online at www.goodpill.org")
     .replace(/\(?888[)-.]? ?987[.-]?5187/g, '8,,,,8,,,,8 <Pause />9,,,,8,,,,7 <Pause />5,,,,1,,,,8,,,,7')
-    .replace(/(www\.)?goodpill\.org/g, 'w,,,,w,,,,w,,,,dot,,,,good,,,,g,,,,o,,,,o,,,d,,,,pill,,,,p,,,,i,,,,l,,,,l,,,,dot,,,,org,,,,o,,,,r,,,,g')
+    .replace(/(www\.)?goodpill\.org/g, 'w,,w,,w,,dot,,,,good,,,,pill,,,,dot,,,,org,,,,again that is g,,,,o,,,,o,,,d,,,,p,,,,i,,,,l,,,,l,,,,dot,,,,o,,,,r,,,,g')
     .replace(/(\w):(?!\/\/)/g, '$1<Pause />') //Don't capture JSON text or URL links
     .replace(/;<br>/g, '<Pause /> and <Pause />') //combine drug list with "and" since it sounds more natural
     .replace(/;|\./g, ' <Pause />') //can't do commas without testing for inside quotes because that is part of json syntax
