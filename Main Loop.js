@@ -145,6 +145,9 @@ function mainLoop() {
     if (drugsChanged)
       orderUpdatedNotice(order, drugsChanged)
 
+    else if (status[order.$OrderId] == 'Needs Form') //Order 15402.  Needs form was never deleted when patient registered
+      orderCreatedNotice(order)
+
     if (order.$Status == 'Shopping') //Must be called *AFTER* drug details are set
       order.$Status = createShoppingLists(order, order.$Drugs)
 

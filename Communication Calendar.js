@@ -3,7 +3,7 @@ function orderShippedEvent(order, email, text) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Shipped: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Shipped', 'Order Failed', 'Needs Form'])
+  var cancel = cancelEvents(order.$Patient, ['Order Shipped', 'Order Failed', 'Needs Form'])
 
   var commArr = newCommArr(email, text)
 
@@ -20,7 +20,7 @@ function refillReminderEvent(order, email, text, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Refill Reminder: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Refill Reminder'])
+  var cancel = cancelEvents(order.$Patient, ['Refill Reminder'])
 
   var commArr = newCommArr(email, text)
 
@@ -33,7 +33,7 @@ function autopayReminderEvent(order, email, text, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Autopay Reminder: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Autopay Reminder'])
+  var cancel = cancelEvents(order.$Patient, ['Autopay Reminder'])
 
   var commArr = newCommArr(email, text)
 
@@ -46,7 +46,7 @@ function orderCreatedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Created: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form'])
+  var cancel = cancelEvents(order.$Patient, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form'])
 
   var commArr = newCommArr(email, text)
 
@@ -59,7 +59,7 @@ function transferRequestedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Transfer Requested: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Hold', 'No Rx'])
+  var cancel = cancelEvents(order.$Patient, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Hold', 'No Rx'])
 
   var commArr = newCommArr(email, text)
 
@@ -72,7 +72,7 @@ function orderHoldEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Hold: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Hold', 'No Rx'])
+  var cancel = cancelEvents(order.$Patient, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Hold', 'No Rx'])
 
   var commArr = newCommArr(email, text)
 
@@ -85,7 +85,7 @@ function orderUpdatedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Updated: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form', 'Order Failed'])
+  var cancel = cancelEvents(order.$Patient, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form', 'Order Failed'])
 
   var commArr = newCommArr(email, text)
 
@@ -111,7 +111,7 @@ function noRxEvent(order, email, text, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' No Rx: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['No Rx'])
+  var cancel = cancelEvents(order.$Patient, ['No Rx'])
 
   var commArr = newCommArr(email, text)
 
@@ -125,7 +125,7 @@ function orderFailedEvent(order, email, text, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Failed: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['Order Failed'])
+  var cancel = cancelEvents(order.$Patient, ['Order Failed'])
 
   var commArr = newCommArr(email, text)
 
@@ -139,7 +139,7 @@ function newPatientFollowupEvent(order, email, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' New Patient Followup: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(patientLabel, ['New Patient Followup'])
+  var cancel = cancelEvents(order.$Patient, ['New Patient Followup'])
 
   var commArr = newCommArr(email)
 
@@ -258,24 +258,29 @@ function setHours(hourOfDay, date) {
   return copy
 }
 
-function searchEvents(patientLabel, typeArr) {
+function searchEvents(patient, typeArr) {
 
   var start    = new Date()
   var stop     = addHours(24*90, start) //stop date seems to be required by Google.  Everything should happen within 90 days
   var calendar = CalendarApp.getCalendarById(GOOGLE_CAL_ID)
-  var events   = calendar.getEvents(start, stop, { search:patientLabel })
+  var events   = calendar.getEvents(start, stop, { search:patient.birth_date }) //Can't put in name because can't google cal doesn't seem to support a partial word search e.g, "greg" will not show results for gregory
 
   var matches = events.filter(function(event) {
       var title = event.getTitle()
       return typeArr.reduce(function(match, type) {
-          return match || ~ title.indexOf(type)
+          return match || matchPatient(title, patient, type)
       }, null) //null is neccessary
   })
 
   if (events.length)
-    infoEmail('searchEvents', start, stop, patientLabel, typeArr, matches.length+' of '+events.length,'events:', eventString(events))
+    infoEmail('searchEvents', start, stop, patient, typeArr, matches.length+' of '+events.length,'events:', eventString(events))
 
   return matches
+}
+
+//TODO exactly replicate Guardian's patient matching function
+function matchPatient(title, patient, type) {
+  return ~ title.indexOf(patient.first.slice(0, 3)) && ~ title.indexOf(patient.last) && ~ title.indexOf(type)
 }
 
 //NOTE: RELIES on the assumption that ALL drugs (and their associated messages) end with a semicolon (;) and
