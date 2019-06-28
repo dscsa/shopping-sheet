@@ -291,8 +291,7 @@ function orderUpdatedNotice(order, drugsChanged) {
 
   //It's depressing to get updates if nothing is being filled.  So only send these if manually added and the order was just added (not just drugs changed)
   if ( ! numFills && ! groups.MANUALLY_ADDED) {
-    var patientLabel = getPatientLabel(order)
-    var cancel = cancelEvents(patientLabel, ['Order Created', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form'])
+    var cancel = cancelEvents(order.$Patient, ['Order Created', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form'])
     return infoEmail('orderUpdateNotice NOT sent', order.$OrderId, 'drugsChanged', drugsChanged, 'numFills', numFills, order, groups)
   }
 

@@ -155,7 +155,7 @@ function mainLoop() {
 
     if (order.$Status == 'Dispensed') {
 
-      var cancel = cancelEvents(getPatientLabel(order), ['Order Failed', 'Needs Form']) //most likely happens when shipped but add here for good measure
+      var cancel = cancelEvents(order.$Patient, ['Order Failed', 'Needs Form']) //most likely happens when shipped but add here for good measure
 
       //SEE HOW ACCURATE OUR PREDICTIONS WERE COMPARED TO WHAT WAS ACTUALLY DISPENSED
       infoEmail('Invoice Comparison', '#'+order.$OrderId, drugsChanged, 'Cancelled Communications', cancel, 'New Drugs', order.$Drugs, 'Old Drugs', drugs[order.$OrderId], order)
