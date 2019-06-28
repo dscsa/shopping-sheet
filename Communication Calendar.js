@@ -201,6 +201,7 @@ function formatCall(callJson) {
     .replace(/;|\./g, ' <Pause />') //can't do commas without testing for inside quotes because that is part of json syntax
     .replace(/(<br>)+/g, ' <Pause length=\\"1\\" />')
     .replace(/\.(\d)(\d)?(\d)?/g, ' point $1,,$2,,$3') //skips pronouncing decimal points
+    .replace(/ but /g, ',,,,but,,,,')
     .replace(/(\d+)MG/g, '<Pause />$1 milligrams')
     .replace(/(\d+)MCG/g, '<Pause />$1 micrograms')
     .replace(/(\d+)MCG/g, '<Pause />$1 micrograms')
