@@ -181,7 +181,7 @@ function useEstimate(drug) {
 
   //This part is pulled from the CP_FillRx and CP_RefillRx SPs
   //See order #5307 - new script qty 90 w/ 1 refill dispensed as qty 45.  This basically switches the refills from 1 to 2, so after the 1st dispense there should still be one refill left
-  var denominator = drug.$IsRefill ? drug.$DispenseQty : drug.$WrittenQty //DispenseQty will be pulled from previous Rxs.  We want to see if it has been set specifically for this Rx.
+  var denominator = drug.$FirstRefill ? drug.$DispenseQty : drug.$WrittenQty  //DispenseQty will be pulled from previous Rxs.  We want to see if it has been set specifically for this Rx.
   setRefills(drug, drug.$RefillsTotal - drug.$Qty/denominator)
 }
 
@@ -259,8 +259,8 @@ function setStatus(drug) {
         setDrugStatus(drug, 'ACTION_RX_OFF_AUTOFILL')
       }
     }
-    else if (drug.$DaysToRefill == "" || drug.$DaysToRefill < 0) {
-      setDrugStatus(drug, drug.$InOrder ? 'NOACTION_WAS_MEDSYNC' : 'NOACTION_PAST_DUE')
+    else if ( ! drug.$InOrder && (drug.$DaysToRefill == "" || drug.$DaysToRefill < 0)) {
+      setDrugStatus(drug, 'NOACTION_PAST_DUE')
     }
     else if (drug.$DaysSinceRefill && drug.$DaysSinceRefill < maxMedSyncDays(drug)) {
       set0Days(drug)

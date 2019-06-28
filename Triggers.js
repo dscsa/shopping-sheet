@@ -4,7 +4,7 @@
 function onOpen() {
   SpreadsheetApp.getUi() // Or DocumentApp or FormApp.
       .createMenu('Shopping')
-      .addItem('Refresh Shopping Sheet', 'updateShopping')
+      .addItem('Refresh Shopping Sheet', 'refreshShopping')
       .addItem('Update Order Invoice', 'updateInvoice')
       .addItem('Fax Transfer Out', 'createTransferFax')
       .addItem('Unlock', 'unlockScript')
@@ -28,7 +28,7 @@ function triggerShopping() {
   }
 }
 
-function updateShopping() {
+function refreshShopping() {
   try {
     var unlock = lock()
 

@@ -155,9 +155,9 @@ function newCommArr(email, text) {
   email.bcc  = DEBUG_EMAIL
   email.from = 'Good Pill Pharmacy < support@goodpill.org >' //spaces inside <> are so that google cal doesn't get rid of "HTML" if user edits description
 
-  if ( ! text) return [email]
+  if ( ! text || ~ DO_NOT_SMS.indexOf(text.sms)) return [email]
 
-  if ( ! LIVE_MODE || ! text.sms) text.sms = DEBUG_EMAIL
+  if ( ! LIVE_MODE || ! text.sms) text.sms = DEBUG_PHONE
 
   //addCallFallback
   var json = JSON.stringify(text)

@@ -27,17 +27,20 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
       var gcnChanged    = newDrug.$Gcn && oldDrug.$Gcn && newDrug.$Gcn != oldDrug.$Gcn //Eliminate Gcn == 0 errors
       //var nameChanged   = (! newDrug.$Gcn || ! oldDrug.$Gcn) && newDrug.$Name.replace(/\^ *|\* */g, '').toUpperCase() != oldDrug.$Name.replace(/\^ *|\* */g, '').toUpperCase //Only if no GCN available
 
+      /*if (newDrugs[0].$OrderId == 15396) {
+         debugEmail('Order Debug', 'scriptChanged', scriptChanged, 'gcnChanged', gcnChanged, '$Status', $Status, 'newDrug', newDrug, 'oldDrug', oldDrug, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs)
+      }*/
+
       if (scriptChanged && gcnChanged) continue //This is the wrong drug, keep moving
 
       drugAdded = false //Match found so this is NOT a new drug
-
 
       //3 Possibilities
       //#1 scriptChanged && ! gcnChanged
       //#2 ! scriptChanged && gcnChanged
       //#3 ! scriptChanged && ! gcnChanged
 
-      if (scriptChanged) continue //#1 We have multiple scripts for same drug and we just switching between them.  Drug is not added so Order Updates won't be triggered
+      if (scriptChanged && (oldDrug.$InOrder == newDrug.$InOrder)) continue //#1 We have multiple scripts for same drug and we just switching between them.  Drug is not added so Order Updates won't be triggered.  See 15396 for why I put in, oldDrug.$InOrder == newDrug.$InOrder, order not updating from an old Rx with not refills once a new script with refills came in
 
       if (gcnChanged) {
         if (new Date().getMinutes() < 10) debugEmail('GCN Changed but ScriptNo did not', changes, '$Status', $Status, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs) //#2 GCN changed without a scriptChange is weird, but keep going
