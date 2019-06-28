@@ -260,6 +260,9 @@ function setHours(hourOfDay, date) {
 
 function searchEvents(patient, typeArr) {
 
+  if ( ! patient.first)
+    debugEmail('searchEvents no patient first name', patient, typeArr)
+
   var start    = new Date()
   var stop     = addHours(24*90, start) //stop date seems to be required by Google.  Everything should happen within 90 days
   var calendar = CalendarApp.getCalendarById(GOOGLE_CAL_ID)
@@ -286,12 +289,12 @@ function matchPatient(title, patient, type) {
 //NOTE: RELIES on the assumption that ALL drugs (and their associated messages) end with a semicolon (;) and
 //that NO other semicolons are used for any other reason. It removes everything between the drug name and the
 //semicolon, and if no semicolons are left in the communication, then the entire communication is deleted
-function removeDrugsFromEvents(patientLabel, drugs, typeArr) {
+function removeDrugsFromEvents(patient, drugs, typeArr) {
 
   if ( ! LIVE_MODE) return
 
   var log    = []
-  var events = searchEvents(patientLabel, typeArr)
+  var events = searchEvents(patient, typeArr)
 
   for (var i in events) {
     var oldEvent = events[i].getDescription() //This is still JSON.stringified
@@ -310,15 +313,15 @@ function removeDrugsFromEvents(patientLabel, drugs, typeArr) {
     }
   }
 
-  debugEmail('removeDrugsFromEvents', patientLabel, drugs, typeArr, log)
+  debugEmail('removeDrugsFromEvents', patient, drugs, typeArr, log)
 }
 
-function cancelEvents(patientLabel, typeArr) {
+function cancelEvents(patient, typeArr) {
 
   if ( ! LIVE_MODE) return
 
   var cancel = []
-  var events = searchEvents(patientLabel, typeArr)
+  var events = searchEvents(patient, typeArr)
 
   for (var i in events) {
 
