@@ -67,9 +67,13 @@ function normalizeDrug(row) {
 
   var dispenseDate = +row.is_refill ? row.dispense_date : row.orig_disp_date //See Order 10062.  Seems that orig_disp_date may get set before dispense date causing a mismatch.  Correct for that here.
   var isRegistered = row.user_def_1.slice(1, -1) //Use presence of backup pharmacy as proxy for registration
+
+  var daysSinceRefill = Math.floor((toDate(row.order_added) - new Date(dispenseDate))/1000/60/60/24) || ''
+  var daysToRefill    = $NextRefill ? Math.floor((toDate($NextRefill) - toDate(row.order_added))/1000/60/60/24) : ''
   //Changed threshold from 4 days to 2 days because of order 11265, which showed as dispensing with the same meds that we had shipped out
   //See Order #8590.  Risperidone 2mg was dispensed but it didn't register here and so because it was out of refills was excluded from the order //Order 10862 was shipped within 4 days of 10698, so showed Levothroxine and Metoprolol as dispensed even though they were in order 10698 and not 10862.  However for 11640 a 2 day difference caused it to not be on invoice sheet, so getting it to 3 days since 2 is too little and 4 is too much
-  var $IsDispensed = row.ship_date ? !!row.in_order : (row.in_order && (new Date() - new Date(dispenseDate) < 3*24*60*60*1000))
+  //See Order #15472 which came 2.7 days after #15227.  Should not have been marked as isDispensed but threshold was at 3 days since it was actually shipped already
+  var $IsDispensed = row.ship_date ? !!row.in_order : (row.in_order && daysSinceRefill < 4 && daysToRefill >= 15)
   var $InOrder     = $IsDispensed || (row.in_order && +row.refills_total)   //Even if its "in the order" it could be a pending or denied surescript refill request (order 7236) so need to make sure refills are available
   var $RefillsLeft = ($InOrder && ! $IsDispensed) ? +row.refills_left : +row.refills_total //if not in order or already shipped use total refills not just the last dispensed to avoid erroneous out of refills warning
   var $NextRefill  = row.autofill_date ? row.autofill_date : row.refill_date
@@ -84,8 +88,8 @@ function normalizeDrug(row) {
     $FirstRefill:row.orig_disp_date,
     $LastRefill:dispenseDate,
     $NextRefill:$NextRefill.slice(0, 10),
-    $DaysSinceRefill:Math.floor((toDate(row.order_added) - new Date(dispenseDate))/1000/60/60/24) || '',
-    $DaysToRefill:$NextRefill ? Math.floor((toDate($NextRefill) - toDate(row.order_added))/1000/60/60/24) : '',
+    $DaysSinceRefill:daysSinceRefill,
+    $DaysToRefill:daysToRefill,
     $Stock:undefined,  //placeholder for JSON ordering.
     $SyncBy:undefined, //placeholder for JSON ordering.
     $RefillsOrig:+(+row.refills_orig).toFixed(2),
