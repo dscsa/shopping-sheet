@@ -260,8 +260,10 @@ function setHours(hourOfDay, date) {
 
 function searchEvents(patient, typeArr) {
 
-  if ( ! patient.first)
+  if ( ! patient.first) {
     debugEmail('searchEvents no patient first name', patient, typeArr)
+    patient.first = ''
+  }
 
   var start    = new Date()
   var stop     = addHours(24*90, start) //stop date seems to be required by Google.  Everything should happen within 90 days
