@@ -286,7 +286,8 @@ function searchEvents(patient, typeArr) {
 
 //TODO exactly replicate Guardian's patient matching function
 function matchPatient(title, patient, type) {
-  return ~ title.indexOf(patient.first.slice(0, 3)) && ~ title.indexOf(patient.last) && ~ title.indexOf(type)
+  title = title.toLowerCase()
+  return ~ title.indexOf(patient.first.toLowerCase().slice(0, 3)) && ~ title.indexOf(patient.last.toLowerCase()) && ~ title.indexOf(type.toLowerCase())
 }
 
 //NOTE: RELIES on the assumption that ALL drugs (and their associated messages) end with a semicolon (;) and
