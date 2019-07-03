@@ -266,7 +266,7 @@ function setStatus(drug) {
       set0Days(drug)
       setDrugStatus(drug, 'NOACTION_RECENT_FILL')
     }
-    else if (drug.$DaysToRefill > maxMedSyncDays(drug)) {
+    else if ( ! drug.$ManuallyAdded && drug.$DaysToRefill > maxMedSyncDays(drug)) {
       set0Days(drug)
       setDrugStatus(drug, 'NOACTION_NOT_DUE')
     }
