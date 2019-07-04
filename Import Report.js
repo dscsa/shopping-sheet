@@ -248,7 +248,7 @@ function setImportTimestamp(sheet, csv) {
     sendEmail('hello@goodpill.org', 'Please restart Google Drive Sync', ['Please restart Google Drive Sync. Shopping Report last updated '+hoursAgo+' hours ago on '+lastRunAt])
   } else {
     sheet.getRange('B1').setValue(csv[0].get_date)
-    if (now.getHours() == 16 && emailOnTheHour > .92)
-      sendEmail('adam.kircher@gmail.com', 'csv', [JSON.stringify(csv, null, '  ')])
+    if (now.getHours() == 18)
+      debugEmail('import report csv', [emailOnTheHour, JSON.stringify(csv, null, '  ')])
   }
 }

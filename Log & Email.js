@@ -111,7 +111,12 @@ function sendEmail(to, subject, body, attachments) {
     //MailApp.sendEmail(opts)
   } catch (e) {
     //TODO confirm this by checking if error matches "Email quota likely reached Exception: Service invoked too many times for one day: email."  "
-    Log('Email Not Sent', e.message, e.stack, e, opts)
-    throw ['Email Not Sent', e, opts]
+    Log('Email Not Sent Error', e.message, e.stack, opts.htmlBody.length, opts)
+    Log('Email Not Sent Body', opts.htmlBody)
+
+    if ( ! ~ e.message.indexOf('Limit Exceeded: Email Body Size'))
+      throw ['Email Not Sent',  e.message, e.stack, opts]
+    else
+      debugEmail('Limit Exceeded: Email Body Size', to, subject, opts.htmlBody.slice(0, 2000))
   }
 }
