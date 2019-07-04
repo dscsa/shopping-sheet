@@ -74,7 +74,7 @@ function createShoppingLists(order, drugs) {
 
     if ( ! shopped) {
       setDrugStatus(drug, 'NOACTION_SHOPPING_ERROR')
-      return debugEmail('Shopping Error: Could not be shopped because not enough qty found - tabs/caps/X00? (2)', drug.$Stock, drug.$Msg, '#'+orderID, v2name, minQty, minDays, drug)
+      return debugEmail('Shopping Error: Could not be shopped because not enough qty found - tabs/caps/X00/Y00/Z00? (2)', drug.$Stock, drug.$Msg, '#'+orderID, v2name, minQty, minDays, drug)
     }
 
     if ( ! LIVE_MODE) return debugEmail('createShoppingList canceled because LIVE MODE OFF')
@@ -155,7 +155,7 @@ function groupByNdc(rows, drug) {
   for (var i in rows) {
 
     //Ignore Cindy's makeshift dispensed queue
-    if (rows[i].doc.bin == 'X00') continue
+    if (rows[i].doc.bin == 'X00' || rows[i].doc.bin == 'Y00' || rows[i].doc.bin == 'Z00') continue
     //Only select the correct form even though v2 gives us both
     if ( ~ rows[i].doc.drug.form.indexOf('Tablet') && caps) {
       var msg = 'may only be available in capsule form'
