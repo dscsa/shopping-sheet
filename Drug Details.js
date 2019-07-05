@@ -156,7 +156,7 @@ function useEstimate(drug) {
 
     if ( ! drug.$NoTransfer) {
       set0Days(drug)
-      setDrugStatus(drug, 'NOACTION_WILL_TRANSFER')
+      setDrugStatus(drug, 'NOACTION_WILL_TRANSFER_CHECK_BACK')
       debugEmail('Low Quantity Transfer', parsed, 'days_before_dispensed', days_before_dispensed, 'days_limited_totalqty', days_limited_totalqty, 'stdDays', stdDays, 'drug.$IsRefill', drug.$IsRefill, 'drug.$TotalQty', drug.$TotalQty, 'drug.$MonthlyPrice', drug.$MonthlyPrice, drug)
       return
     }
@@ -234,7 +234,7 @@ function setStatus(drug) {
         setDrugStatus(drug, 'ACTION_CHECK_BACK')
       } else {
         set0Days(drug)
-        setDrugStatus(drug, 'NOACTION_WILL_TRANSFER')
+        setDrugStatus(drug, 'NOACTION_WILL_TRANSFER_CHECK_BACK')
       }
 
     }

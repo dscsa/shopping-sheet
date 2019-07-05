@@ -10,26 +10,13 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
   }
 
   //order.$Drugs
-
-  var drugs1 = order.$Drugs.filter(function(drug) {
-
-    if ( ! drug.$InOrder || drug.$IsRefill) return false
-
-    if ( ! drug.$v2 && +drug.$Gcn) return true //Should we be transferring out if the GCN can't be found?
-
-    return drug.$Msg && ~ drug.$Msg.indexOf('transferred')
+  var drugs = order.$Drugs.filter(function(drug) {
+    return hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER') || hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER_CHECK_BACK')
   })
 
-  var drugs2 = order.$Drugs.filter(function(drug) {
-    return hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER')
-  })
+  if ( ! drugs.length || ! LIVE_MODE) return
 
-  if (drugs1.length || drugs2.length)
-    debugEmail('Transfer Out Fax', drugs1.length, drugs2.length, drugs1, drugs2, order)
-
-  if ( ! drugs2.length || ! LIVE_MODE) return
-
-  order.$Drugs = drugs2
+  order.$Drugs = drugs
 
   var fax = mergeDoc("Transfer Out Fax v1", "Transfer #"+order.$OrderId, "Transfer Outs", order)
   var pdf = fax.getAs(MimeType.PDF)
