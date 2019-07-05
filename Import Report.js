@@ -5,7 +5,13 @@ function importCSV(filename){
   var files = DriveApp.getFilesByName(filename)
 
   if (files.hasNext()) {
-    var file = files.next().getBlob().getDataAsString()
+    var file = files.next()
+
+    var now = new Date()
+    if (now.getHours() == 18 && now.getMinutes() < 10)
+      sendEmail('adam@sirum.org', 'import report csv', 'import report csv is attached', file.getAs(MimeType.CSV))
+
+    file = file.getBlob().getDataAsString()
 
     //https://stackoverflow.com/questions/632475/regex-to-pick-commas-outside-of-quotes
     return file.split(/\r\n/g).map(function(row) {
@@ -248,7 +254,5 @@ function setImportTimestamp(sheet, csv) {
     sendEmail('hello@goodpill.org', 'Please restart Google Drive Sync', ['Please restart Google Drive Sync. Shopping Report last updated '+hoursAgo+' hours ago on '+lastRunAt])
   } else {
     sheet.getRange('B1').setValue(csv[0].get_date)
-    if (now.getHours() == 18)
-      debugEmail('import report csv', [emailOnTheHour, JSON.stringify(csv, null, '  ')])
   }
 }
