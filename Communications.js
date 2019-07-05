@@ -201,7 +201,7 @@ function orderCreatedNotice(order) {
   ].join('<br>')
 
   if (order.$Status != 'Dispensed' && order.$Status != 'Shipped')
-    orderFailedNotice(order)
+    orderFailedNotice(order, numFills)
   else
     debugEmail('orderCreatedNotice but order is already Dispensed or Shipped', order.$Status, order)
 
@@ -332,7 +332,7 @@ function orderUpdatedNotice(order, drugsChanged) {
   //Wait 15 minutes to hopefully batch staggered surescripts and manual rx entry and cindy updates
   orderUpdatedEvent(order, email, text, 15/60)
 
-  orderFailedNotice(order) //After updated event since orderUpdatedEvent() will delete an previous orderFailed messages
+  orderFailedNotice(order, numFills) //After updated event since orderUpdatedEvent() will delete an previous orderFailed messages
 }
 
 
@@ -344,7 +344,7 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
   ///It's depressing to get updates if nothing is being filled
   if (numFills) {
     var subject = 'Welcome to Good Pill!  We are excited to fill your 1st Order.'
-    var message = 'Your order will be #'+order.$OrderId+". Please take 5mins to register so that we can fill the Rxs we got from your doctor.  You can register online at www.goodpill.org or by calling us at (888) 987-5187.<br><br><u>The drugs in your 1st order will be:</u><br>"+groups.FILLED.join(';<br>')+';'
+    var message = 'Your order will be #'+order.$OrderId+". Please take 5mins to register so that we can fill the Rxs we got from your doctor as soon as possible. Once you register it will take 5-7 business days before you receive your order. You can register online at www.goodpill.org or by calling us at (888) 987-5187.<br><br><u>The drugs in your 1st order will be:</u><br>"+groups.FILLED.join(';<br>')+';'
   }
   else {
     var subject = "Welcome to Good Pill! We are so sorry but we can't fill the Rx(s) in Order #"+order.$OrderId+" that we received from your doctor."
@@ -371,18 +371,18 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
 
   if(hourAdded < 10){
     //A if before 10am, the first one is at 10am, the next one is 5pm, then 10am tomorrow, then 5pm tomorrow
-    var hoursToWait = [0, 0, 24, 24]
-    var hourOfDay   = [10, 17, 10, 17]
+    var hoursToWait = [0, 0, 24, 24, 24*7, 24*14]
+    var hourOfDay   = [10, 17, 10, 17, 17, 17]
 
   } else if (hourAdded < 17){
     //A if before 5pm, the first one is 10mins from now, the next one is 5pm, then 10am tomorrow, then 5pm tomorrow
-    var hoursToWait = [10/60, 0, 24, 24]
-    var hourOfDay   = [null, 17, 10, 17]
+    var hoursToWait = [10/60, 0, 24, 24, 24*7, 24*14]
+    var hourOfDay   = [null, 17, 10, 17, 17, 17]
 
   } else {
     //B if after 5pm, the first one is 10am tomorrow, 5pm tomorrow, 10am the day after tomorrow, 5pm day after tomorrow.
-    var hoursToWait = [24, 24, 48, 48]
-    var hourOfDay   = [10, 17, 10, 17]
+    var hoursToWait = [24, 24, 48, 48, 24*7, 24*14]
+    var hourOfDay   = [10, 17, 10, 17, 17, 17]
   }
 
   needsFormEvent(order, email, text, hoursToWait[0], hourOfDay[0])
@@ -424,12 +424,16 @@ function noRxNotice(order) {
   noRxEvent(order, email, text, 15/60)
 }
 
-function orderFailedNotice(order) {
+function orderFailedNotice(order, numFills) {
 
   var subject  = "Apologies but Good Pill is having trouble with your Order #"+order.$OrderId
-  var message  = order.$Patient.source == 'Transfer'
-    ? "We were unable to transfer the Rxs you requested from "+order.$Pharmacy.short.replace(/ \(\d{10}\)/g, '')+". This usually happens because we have the wrong pharmacy on file, we are requesting the wrong Rxs, or your Rxs have no refills remaining"
-    : "We haven't gotten any Rxs from your doctor yet. You may want to contact your doctor.  If you had meant for us to transfer Rxs from your pharmacy instead, please login to your account and place a new 'transfer' order or give us a call at (888) 987-5187."
+
+  if (numFills)
+    var message = "We are so sorry for the incoveince. Please call us at (888) 987-5187 and we will explain the issue."
+  else if (order.$Patient.source == 'Transfer')
+    var message = "We were unable to transfer the Rxs you requested from "+order.$Pharmacy.short.replace(/ \(\d{10}\)/g, '')+". This usually happens because we have the wrong pharmacy on file, we are requesting the wrong Rxs, or your Rxs have no refills remaining"
+  else
+    var message = "We haven't gotten any Rxs from your doctor yet. You may want to contact your doctor.  If you had meant for us to transfer Rxs from your pharmacy instead, please login to your account and place a new 'transfer' order or give us a call at (888) 987-5187."
 
   var email = { email:order.$Patient.email }
   var text  = { sms:getPhones(order),  message:subject+'. '+message }
