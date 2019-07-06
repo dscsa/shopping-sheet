@@ -230,6 +230,7 @@ function newGroup(row) {
        city:row.city,
        state:row.state,
        zip:row.zip,
+       statusCode:row.order_status,
        source:orderSource,
        sourceCode:row.order_category
      }
