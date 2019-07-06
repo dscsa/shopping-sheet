@@ -9,7 +9,7 @@ function importCSV(filename){
 
     var now = new Date()
     if (now.getHours() == 18 && now.getMinutes() < 10)
-      sendEmail('adam@sirum.org', 'import report csv', 'import report csv is attached', file.getAs(MimeType.CSV))
+      sendEmail('adam@sirum.org', 'import report csv', 'import report csv is attached', file.getAs(MimeType.CSVne))
 
     file = file.getBlob().getDataAsString()
 
@@ -155,6 +155,8 @@ function groupByOrder(report) {
     if ( ! report[i].invoice_nbr) continue //Now that we include Transfer Outs.  Some patients may not have any Order Id (only one drug and it was never filled), skip these for now, because this currently causes shopping sheet to go crazy and keep adding blank rows
 
     if (report[i].script_status == 'Inactive') continue //skip inactive Rxs for right now
+
+    if (report[i].order_status == 209) continue //skip SureScript Authorization Denied: [CsOmStatus] for now
 
     var orderID = report[i].invoice_nbr
 
