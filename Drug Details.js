@@ -259,7 +259,7 @@ function setStatus(drug) {
         setDrugStatus(drug, 'ACTION_RX_OFF_AUTOFILL')
       }
     }
-    else if ( ! drug.$InOrder && (drug.$DaysToRefill == "" || drug.$DaysToRefill < 0)) {
+    else if ( ! drug.$InOrder && drug.$DaysToRefill < 0) {
       setDrugStatus(drug, 'NOACTION_PAST_DUE')
     }
     else if (drug.$DaysSinceRefill && drug.$DaysSinceRefill < maxMedSyncDays(drug)) {
@@ -277,11 +277,12 @@ function setStatus(drug) {
     else if (timeToExpiry < drug.$Days*24*60*60*1000) {
       setDrugStatus(drug, 'ACTION_EXPIRING')
     }
+    //This will also catch drug.$DaysToRefill == ""
+    else if (drug.$DaysToRefill <= minMedSyncDays(drug)) {
+      setDrugStatus(drug, 'NOACTION_WAS_MEDSYNC') // Order #15736, Call Sheet #4949. was set to MAY MEDSYNC but then later removed from order by SYNC drugs.  Classifying as NOACTION_WAS_MEDSYNC will avoid this issue
+    }
     else if (drug.$InOrder && drug.$DaysToRefill > minMedSyncDays(drug)) {
       setDrugStatus(drug, 'NOACTION_WAS_MEDSYNC')
-    }
-    else if (drug.$DaysToRefill > 0 && drug.$DaysToRefill <= minMedSyncDays(drug)) {
-      setDrugStatus(drug, 'NOACTION_WAS_MEDSYNC') // Order #15736, Call Sheet #4949. was set to MAY MEDSYNC but then later removed from order by SYNC drugs.  Classifying as NOACTION_WAS_MEDSYNC will avoid this issue
     }
     else if ( ! drug.$InOrder && drug.$DaysToRefill <= maxMedSyncDays(drug)) {
       setDrugStatus(drug, 'NOACTION_MAY_MEDSYNC')
