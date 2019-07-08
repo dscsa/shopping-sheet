@@ -280,6 +280,9 @@ function setStatus(drug) {
     else if (drug.$InOrder && drug.$DaysToRefill > minMedSyncDays(drug)) {
       setDrugStatus(drug, 'NOACTION_WAS_MEDSYNC')
     }
+    else if (drug.$DaysToRefill > 0 && drug.$DaysToRefill <= minMedSyncDays(drug)) {
+      setDrugStatus(drug, 'NOACTION_WAS_MEDSYNC') // Order #15736, Call Sheet #4949. was set to MAY MEDSYNC but then later removed from order by SYNC drugs.  Classifying as NOACTION_WAS_MEDSYNC will avoid this issue
+    }
     else if ( ! drug.$InOrder && drug.$DaysToRefill <= maxMedSyncDays(drug)) {
       setDrugStatus(drug, 'NOACTION_MAY_MEDSYNC')
     }
