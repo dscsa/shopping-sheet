@@ -450,7 +450,7 @@ function orderFailedNotice(order, numFills) {
     ''
   ].join('<br>')
 
-  orderFailedEvent(order, email, text, 6*24, 16)
+  orderFailedEvent(order, email, text, 7*24, 17)
 }
 
 function newPatientFollowup(order, groups) {
