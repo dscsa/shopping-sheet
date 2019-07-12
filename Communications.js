@@ -177,7 +177,7 @@ function orderCreatedNotice(order) {
   var message = 'If your address has recently changed please let us know right away.<br><br><u>These Rxs will be included once we confirm their availability:</u><br>'+groups.FILLED.join(';<br>')+';'
 
   if (numNoFills)
-    message += '<br><br><u>We have these Rxs but are NOT filling them right now:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
+    message += '<br><br><u>We are NOT filling these Rxs:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
   var suffix = [
     "Note: if this is correct, there is no need to do anything. If you want to change or delay this order, please let us know as soon as possible. If delaying, please specify the date on which you want it filled, otherwise if you don't, we will delay it 3 weeks by default.",
@@ -243,7 +243,7 @@ function orderHoldNotice(order, groups) {
   if ( ! numNoFills) return noRxNotice(order)
 
   var subject = 'Good Pill is NOT filling your '+numNoFills+' items for Order #'+order.$OrderId+'.'
-  var message = '<u>We have these Rxs but are NOT filling them right now:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
+  var message = '<u>We are NOT filling these Rxs:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
   //['Not Specified', 'Webform Complete', 'Webform eRx', 'Webform Transfer', 'Auto Refill', '0 Refills', 'Webform Refill', 'eRx /w Note', 'Transfer /w Note', 'Refill w/ Note']
   var trigger = ''
@@ -305,7 +305,7 @@ function orderUpdatedNotice(order, drugsChanged) {
     message += '<br><u>These Rxs will be included once we confirm their availability:</u><br>'+groups.FILLED.join(';<br>')+';'
 
   if (numNoFills)
-    message += '<br><br><u>We have these Rxs but are NOT filling them right now:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
+    message += '<br><br><u>We are NOT filling these Rxs:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
   var suffix = [
     "Note: if this is correct, there is no need to do anything. If you want to change or delay this order, please let us know as soon as possible. If delaying, please specify the date on which you want it filled, otherwise if you don't, we will delay it 3 weeks by default.",
