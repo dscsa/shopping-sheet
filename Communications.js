@@ -451,6 +451,7 @@ function orderFailedNotice(order, numFills) {
   ].join('<br>')
 
   orderFailedEvent(order, email, text, 7*24, 13)
+  orderFailedEvent(order, {email:CINDY_EMAIL+','+DEBUG_EMAIL, subject:'To Be Sent Tomorrow: '+subject, message:email.message}, null, 6*24, 13)
 }
 
 function confirmShipmentNotice(order, groups) {
