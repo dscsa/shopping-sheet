@@ -458,7 +458,7 @@ function confirmShipmentNotice(order, groups) {
   confirmShippingExternal(order, groups)
 }
 
-confirmShippingInternal(order, groups) {
+function confirmShippingInternal(order, groups) {
 
   if ( ! order.$New) return
 
@@ -496,7 +496,7 @@ confirmShippingInternal(order, groups) {
   confirmShipmentEvent(order, email, daysAgo*24, 9)
 }
 
-confirmShippingExternal(order, groups) {
+function confirmShippingExternal(order, groups) {
 
   var email = { email:order.$Patient.email }
   var text  = { sms:getPhones(order) }
