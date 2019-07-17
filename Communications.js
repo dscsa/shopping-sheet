@@ -429,7 +429,7 @@ function orderFailedNotice(order, numFills) {
   var subject  = "Apologies but Good Pill is having trouble with your Order #"+order.$OrderId
 
   if (numFills)
-    var message = "We are so sorry for the incoveince. Please call us at (888) 987-5187 and we will explain the issue."
+    var message = "We are so sorry for the inconvenience. Please call us at (888) 987-5187 and we will explain the issue."
   else if (order.$Patient.source == 'Transfer')
     var message = "We were unable to transfer the Rxs you requested from "+order.$Pharmacy.short.replace(/ \(\d{10}\)/g, '')+". This usually happens because we have the wrong pharmacy on file, we are requesting the wrong Rxs, or your Rxs have no refills remaining"
   else
@@ -450,7 +450,7 @@ function orderFailedNotice(order, numFills) {
     ''
   ].join('<br>')
 
-  orderFailedEvent(order, email, text, 7*24, 17)
+  orderFailedEvent(order, email, text, 7*24, 13)
 }
 
 function confirmShipmentNotice(order, groups) {
