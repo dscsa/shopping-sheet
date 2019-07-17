@@ -52,7 +52,7 @@ function orderShippedNotice(order, invoice) {
 
   refillReminderNotice(order, groups)
   autopayReminderNotice(order, groups)
-  newPatientFollowup(order, groups)
+  confirmShipmentNotice(order, groups)
 
   var numFills = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
   var subject  = 'Your order '+(numFills ? 'of '+numFills+' items ' : '')+'has shipped and should arrive in 3-5 days.'
@@ -453,11 +453,14 @@ function orderFailedNotice(order, numFills) {
   orderFailedEvent(order, email, text, 7*24, 17)
 }
 
-function newPatientFollowup(order, groups) {
+function confirmShipmentNotice(order, groups) {
+  confirmShippingInternal(order, groups)
+  confirmShippingExternal(order, groups)
+}
+
+confirmShippingInternal(order, groups) {
 
   if ( ! order.$New) return
-
-  if ( ! order.$Total) debugEmail('newPatientFollowup has no $Total', order)
 
   var numFills   = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
   var numNoFills = groups.NOFILL_ACTION.length + groups.NOFILL_NOACTION.length
@@ -489,7 +492,33 @@ function newPatientFollowup(order, groups) {
     ''
   ].join('<br>')
 
-  newPatientFollowupEvent(order, email, daysAgo*24, 9)
+
+  confirmShipmentEvent(order, email, daysAgo*24, 9)
+}
+
+confirmShippingExternal(order, groups) {
+
+  var email = { email:order.$Patient.email }
+  var text  = { sms:getPhones(order) }
+
+  var subject = "Order #"+order.$OrderId+" was delivered."
+  var message = " should have been delivered within the past few days.  Please contact us at 888.987.5187 if you have not yet received your order."
+
+  text.message = subject+' Your order with tracking number '+order.$Tracking+message
+
+  email.subject = subject
+  email.message = [
+    'Hello,',
+    '',
+    subject+' Your order with tracking number '+trackingLink(order.$Tracking)+message,
+    '',
+    'Thanks!',
+    'The Good Pill Team',
+    '',
+    ''
+  ].join('<br>')
+
+  confirmShipmentEvent(order, email, 7*24, 11)
 }
 
 function trackingURL(trackingNumber) {

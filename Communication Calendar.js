@@ -134,16 +134,16 @@ function orderFailedEvent(order, email, text, hoursToWait, hourOfDay) {
   newEvent(eventTitle, commArr, hoursToWait, hourOfDay)
 }
 
-function newPatientFollowupEvent(order, email, hoursToWait, hourOfDay) {
+function confirmShipmentEvent(order, email, hoursToWait, hourOfDay) {
 
   var patientLabel = getPatientLabel(order)
-  var eventTitle   = order.$OrderId+' New Patient Followup: '+patientLabel+'.  Created:'+new Date()
+  var eventTitle   = order.$OrderId+' Confirm Shipment: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(order.$Patient, ['New Patient Followup'])
+  var cancel = cancelEvents(order.$Patient, ['Confirm Shipment'])
 
   var commArr = newCommArr(email)
 
-  infoEmail('newPatientFollowupEvent', eventTitle, commArr, hoursToWait, hourOfDay, cancel, order)
+  infoEmail('confirmShipmentEvent', eventTitle, commArr, hoursToWait, hourOfDay, cancel, order)
 
   newEvent(eventTitle, commArr, hoursToWait, hourOfDay)
 }
