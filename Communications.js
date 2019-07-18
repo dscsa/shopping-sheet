@@ -45,7 +45,7 @@ function groupDrugs(order) {
 }
 
 //Internal communication warning an order was shipped but not dispensed.  Gets erased when/if order is shipped
-function orderShippedNotice(order) {
+function orderDispensedNotice(order) {
 
 
   var daysAgo = 2
@@ -57,7 +57,7 @@ function orderShippedNotice(order) {
     email.subject+' '+daysAgo+' day ago. Please either add tracking number to guardian or erase the "Order Failed" event.'
 
   ].join('<br>')
-  
+
   orderDispensedEvent(order, email, daysAgo*24)
 }
 
