@@ -217,10 +217,7 @@ function orderCreatedNotice(order) {
     suffix
   ].join('<br>')
 
-  if (order.$Status != 'Dispensed' && order.$Status != 'Shipped')
-    orderFailedNotice(order, numFills)
-  else
-    debugEmail('orderCreatedNotice but order is already Dispensed or Shipped', order.$Status, order)
+  orderFailedNotice(order, numFills)
 
   //Wait 15 minutes to hopefully batch staggered surescripts and manual rx entry and cindy updates
   orderCreatedEvent(order, email, text, 15/60)

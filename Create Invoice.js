@@ -39,6 +39,8 @@ function getInvoiceByName(name) {
 //Called by user manually from menu.  This is done when a manual correction is made
 function updateInvoice() {
 
+  unlockScript() //remove protections in case an update is running
+
   var sheet = getSheet(null, 'A', 2)
 
   order = sheet.rowByKey() //When null, we should get active row. Get Order Ourselves because this is manually called by user and can't pass a parameter

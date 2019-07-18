@@ -293,7 +293,7 @@ function searchEvents(patient, typeArr) {
   })
 
   if (events.length)
-    infoEmail('searchEvents', start, stop, patient, typeArr, matches.length+' of '+events.length,'events:', eventString(events))
+    infoEmail('searchEvents', start, stop, patient, matches.length+' of '+events.length+' of the events below match the following:', typeArr,'events:', eventString(events))
 
   return matches
 }

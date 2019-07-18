@@ -83,4 +83,12 @@ function lock() {
 //TODO, add unprotect sheets as well
 function unlockScript() {
   if (mainCache.remove) mainCache.remove('updateShoppingLock')
+  unprotectSheet('Shopping')
+  unprotectSheet('Shipped')
+}
+
+function unprotectSheet(sheetName) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName)
+  var protect = sheet.getProtections(SpreadsheetApp.ProtectionType.SHEET)
+  for (var i in protect) protect[i].remove()
 }
