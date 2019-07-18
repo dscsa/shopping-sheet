@@ -9,7 +9,7 @@ function importCSV(filename){
 
     var now = new Date()
     if (now.getHours() == 18 && now.getMinutes() < 10)
-      sendEmail('adam@sirum.org', 'import report csv', 'import report csv is attached', file.getAs(MimeType.CSVne))
+      sendEmail('adam@sirum.org', 'import report csv', 'import report csv is attached', file.getAs(MimeType.CSV))
 
     file = file.getBlob().getDataAsString()
 
