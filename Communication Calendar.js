@@ -1,9 +1,23 @@
+function orderDispensedEvent(order, email, hoursToWait) {
+
+  var patientLabel = getPatientLabel(order)
+  var eventTitle   = order.$OrderId+' Order Dispensed: '+patientLabel+'.  Created:'+new Date()
+
+  var cancel = cancelEvents(order.$Patient, ['Order Dispensed', 'Order Failed', 'Needs Form'])
+
+  var commArr = newCommArr(email)
+
+  infoEmail('orderDispensedEvent', eventTitle, commArr, cancel, order)
+
+  newEvent(eventTitle, commArr, hoursToWait)
+}
+
 function orderShippedEvent(order, email, text) {
 
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Shipped: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(order.$Patient, ['Order Shipped', 'Order Failed', 'Needs Form'])
+  var cancel = cancelEvents(order.$Patient, ['Order Shipped', 'Order Dispensed', 'Order Failed', 'Needs Form'])
 
   var commArr = newCommArr(email, text)
 

@@ -44,6 +44,23 @@ function groupDrugs(order) {
   return group
 }
 
+//Internal communication warning an order was shipped but not dispensed.  Gets erased when/if order is shipped
+function orderShippedNotice(order) {
+
+
+  var daysAgo = 2
+  var email   = { email:CINDY_EMAIL+','+DEBUG_EMAIL }
+
+  email.subject = 'Warning Order #'+order.$OrderId+' dispensed but not shipped'
+  email.message = [
+
+    email.subject+' '+daysAgo+' day ago. Please either add tracking number to guardian or erase the "Order Failed" event.'
+
+  ].join('<br>')
+  
+  orderDispensedEvent(order, email, daysAgo*24)
+}
+
 //We are coording patient communication via sms, calls, emails, & faxes
 //by building commication arrays based on github.com/dscsa/communication-calendar
 function orderShippedNotice(order, invoice) {
@@ -451,7 +468,11 @@ function orderFailedNotice(order, numFills) {
   ].join('<br>')
 
   orderFailedEvent(order, email, text, 7*24, 13)
-  orderFailedEvent(order, {email:CINDY_EMAIL+','+DEBUG_EMAIL, subject:'To Be Sent Tomorrow: '+subject, message:email.message}, null, 6*24, 13)
+  orderFailedEvent(order, {
+    email:CINDY_EMAIL+','+DEBUG_EMAIL,
+    subject:'To Be Sent Tomorrow: '+subject,
+    message:email.message
+  }, null, 6*24, 13)
 }
 
 function confirmShipmentNotice(order, groups) {
