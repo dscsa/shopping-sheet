@@ -55,7 +55,7 @@ function lock() {
   var updateShoppingLock = mainCache.get('updateShoppingLock')
 
   if (updateShoppingLock)
-    return debugEmail('updateShoppingLock was set even though getScriptLock succeeded', 'Locked at:', updateShoppingLock, 'Failed at:', scriptId.toJSON())
+    return //debugEmail('updateShoppingLock was set even though getScriptLock succeeded', 'Locked at:', updateShoppingLock, 'Failed at:', scriptId.toJSON())
 
   mainCache.put('updateShoppingLock', scriptId.toJSON(), 30*60)
 
