@@ -158,7 +158,7 @@ function mainLoop() {
       orderDispensedNotice(order)
 
       //SEE HOW ACCURATE OUR PREDICTIONS WERE COMPARED TO WHAT WAS ACTUALLY DISPENSED
-      infoEmail('Invoice Comparison', '#'+order.$OrderId, drugsChanged, 'Cancelled Communications', cancel, 'New Drugs', order.$Drugs, 'Old Drugs', drugs[order.$OrderId], order)
+      infoEmail('Invoice Comparison', '#'+order.$OrderId, drugsChanged, 'New Drugs', order.$Drugs, 'Old Drugs', drugs[order.$OrderId], order)
 
       var invoice = createInvoice(order) //Pre-create invoice so Cindy doesn't always need to run it manually
 
