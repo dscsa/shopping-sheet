@@ -361,8 +361,8 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
     var message = 'Your order will be #'+order.$OrderId+". Please take 5mins to register so that we can fill the Rxs we got from your doctor as soon as possible. Once you register it will take 5-7 business days before you receive your order. You can register online at www.goodpill.org or by calling us at (888) 987-5187.<br><br><u>The drugs in your 1st order will be:</u><br>"+groups.FILLED.join(';<br>')+';'
   }
   else {
-    var subject = "Welcome to Good Pill! We are so sorry but we can't fill the Rx(s) in Order #"+order.$OrderId+" that we received from your doctor."
-    var message = "We are very sorry for the inconvenience. Please ask your local pharmacy to contact us to get the prescription OR register online or over the phone and let us know to which pharmacy we should transfer the Rx(s).<br><br>Because we rely on donated medicine, we can only fill medications that are on our Formulary"
+    var subject = "Welcome to Good Pill. Unfortunately we can't complete your 1st Order"
+    var message = "We are very sorry for the inconvenience but we can't fill the Rx(s) in Order #"+order.$OrderId+" that we received from your doctor. Please ask your local pharmacy to contact us to get the prescription OR register online or over the phone and let us know to which pharmacy we should transfer the Rx(s).<br><br>Because we rely on donated medicine, we can only fill medications that are listed here www.goodpill.org/gp-stock"
   }
 
   var email = { email:order.$Patient.email }
