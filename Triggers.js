@@ -62,15 +62,12 @@ function lock() {
   var shopping = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Shopping')
   var shipped = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Shipped')
 
-  var protectShopping = shopping.protect().setDescription('Autoprotect Shopping Sheet: '+scriptId)
-  var protectShipped  =  shipped.protect().setDescription('Autoprotect Shipped Sheet: '+scriptId)
+  var protectShopping = shopping.protect().setDescription('Autoprotect Shopping Sheet: '+scriptId).setWarningOnly(true)
+  var protectShipped  =  shipped.protect().setDescription('Autoprotect Shipped Sheet: '+scriptId).setWarningOnly(true)
 
   //Note this won't work if user is support@goodpill.org (e.g. "Refresh Shopping Sheet" is called by User from Menu)
-  protectShopping.removeEditor('support@goodpill.org').setWarningOnly(true)
-  protectShipped.removeEditor('support@goodpill.org').setWarningOnly(true)
-
-  //if (protectShopping.canDomainEdit()) protectShopping.setDomainEdit(false) //Not available when setWarningOnly(true)
-  //if (protectShipped.canDomainEdit()) protectShipped.setDomainEdit(false)   //Not available when setWarningOnly(true)
+  //if (protectShopping.canDomainEdit()) protectShopping.setDomainEdit(false).removeEditor('support@goodpill.org') //Not available when setWarningOnly(true)
+  //if (protectShipped.canDomainEdit()) protectShipped.setDomainEdit(false).removeEditor('support@goodpill.org')   //Not available when setWarningOnly(true)
 
   return function unlock() {
     if (protectShopping.remove) protectShopping.remove()
