@@ -313,15 +313,17 @@ function removeDrugsFromEvents(patient, drugs, typeArr) {
 
   var log    = []
   var events = searchEvents(patient, typeArr)
+  var regex  = new RegExp('('+drugs.join('|')+')[^;]*;', 'g')
 
   for (var i in events) {
     var oldEvent = events[i].getDescription() //This is still JSON.stringified
-    var regex    = new RegExp('('+drugs.join('|')+')[^;]*;', 'g')
+
     var newEvent = oldEvent.replace(regex, '')
 
-    if (oldEvent == newEvent) continue
-
-    if ( ~ newEvent.indexOf(';')) {
+    if (oldEvent == newEvent) {
+      log.push(['unmodified event', eventString(events[i]), newEvent])
+    }
+    else if ( ~ newEvent.indexOf(';')) {
       log.push(['modified an event', eventString(events[i]), newEvent])
       events[i].setDescription(newEvent)
     }
@@ -331,7 +333,7 @@ function removeDrugsFromEvents(patient, drugs, typeArr) {
     }
   }
 
-  debugEmail('removeDrugsFromEvents', patient, drugs, typeArr, log)
+  debugEmail('removeDrugsFromEvents', patient, drugs, typeArr, log, events)
 }
 
 function cancelEvents(patient, typeArr) {
