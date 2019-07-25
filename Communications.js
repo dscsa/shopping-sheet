@@ -219,6 +219,9 @@ function orderCreatedNotice(order) {
 
   orderFailedNotice(order, numFills)
 
+  //Remove Refill Reminders for new Rxs we just received Order #14512
+  removeDrugsFromEvents(order.$Patient, groups.FILLED, ['Refill Reminder'])
+
   //Wait 15 minutes to hopefully batch staggered surescripts and manual rx entry and cindy updates
   orderCreatedEvent(order, email, text, 15/60)
 }
@@ -468,7 +471,7 @@ function orderFailedNotice(order, numFills) {
   orderFailedEvent(order, {
     email:CINDY_EMAIL+','+DEBUG_EMAIL,
     subject:'To Be Sent Tomorrow: '+subject,
-    message:email.message
+    message:'To Be Sent Tomorrow: '+email.message
   }, null, 6*24, 13)
 }
 

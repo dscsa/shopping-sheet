@@ -3,7 +3,7 @@ function orderDispensedEvent(order, email, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Dispensed: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(order.$Patient, ['Order Dispensed', 'Order Failed', 'Needs Form'])
+  var cancel = cancelEvents(order.$Patient, ['Order Dispensed', 'Order Failed', 'Needs Form', 'Refill Reminder'])
 
   var commArr = newCommArr(email)
 
@@ -17,7 +17,7 @@ function orderShippedEvent(order, email, text) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Shipped: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(order.$Patient, ['Order Shipped', 'Order Dispensed', 'Order Failed', 'Needs Form'])
+  var cancel = cancelEvents(order.$Patient, ['Order Shipped', 'Order Dispensed', 'Order Failed', 'Needs Form', 'Refill Reminder'])
 
   var commArr = newCommArr(email, text)
 
@@ -60,7 +60,7 @@ function orderCreatedEvent(order, email, text, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Created: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(order.$Patient, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Hold', 'No Rx', 'Needs Form'])
+  var cancel = cancelEvents(order.$Patient, ['Order Created', 'Transfer Requested', 'Order Updated', 'Order Failed', 'Order Hold', 'No Rx', 'Needs Form'])
 
   var commArr = newCommArr(email, text)
 
