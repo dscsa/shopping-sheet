@@ -168,28 +168,30 @@ function confirmShipmentEvent(order, email, hoursToWait, hourOfDay) {
 
 function newCommArr(email, text) {
 
-  if ( ! LIVE_MODE || ! email.email) email.email = DEBUG_EMAIL
+  var commArr = []
 
-  email.bcc  = DEBUG_EMAIL
-  email.from = 'Good Pill Pharmacy < support@goodpill.org >' //spaces inside <> are so that google cal doesn't get rid of "HTML" if user edits description
+  if (LIVE_MODE && email.email && ! email.email.match(/\d\d\d\d-\d\d-\d\d@goodpill\.org/)) {
+    email.bcc  = DEBUG_EMAIL
+    email.from = 'Good Pill Pharmacy < support@goodpill.org >' //spaces inside <> are so that google cal doesn't get rid of "HTML" if user edits description
+    commArr.push(email)
+  }
 
-  if ( ! text || ~ DO_NOT_SMS.indexOf(text.sms)) return [email]
+  if (LIVE_MODE && text && text.sms && ! ~ DO_NOT_SMS.indexOf(text.sms)) {
+    //addCallFallback
+    var json = JSON.stringify(text)
 
-  if ( ! LIVE_MODE || ! text.sms) text.sms = DEBUG_PHONE
+    text = formatText(json)
+    call = formatCall(json)
 
-  //addCallFallback
-  var json = JSON.stringify(text)
+    call.message = 'Hi, this is Good Pill Pharmacy <Pause />'+call.message+' <Pause length="2" />if you need to speak to someone please call us at 8,,,,8,,,,8 <Pause />9,,,,8,,,,7 <Pause />5,,,,1,,,,8,,,,7. <Pause length="2" /> Again our phone number is 8,,,,8,,,,8 <Pause />9,,,,8,,,,7 <Pause />5,,,,1,,,,8,,,,7. <Pause />'
+    call.call    = call.sms
+    call.sms     = undefined
 
-  text = formatText(json)
-  call = formatCall(json)
+    text.fallbacks = [call]
+    commArr.push(text)
+  }
 
-  call.message = 'Hi, this is Good Pill Pharmacy <Pause />'+call.message+' <Pause length="2" />if you need to speak to someone please call us at 8,,,,8,,,,8 <Pause />9,,,,8,,,,7 <Pause />5,,,,1,,,,8,,,,7. <Pause length="2" /> Again our phone number is 8,,,,8,,,,8 <Pause />9,,,,8,,,,7 <Pause />5,,,,1,,,,8,,,,7. <Pause />'
-  call.call    = call.sms
-  call.sms     = undefined
-
-  text.fallbacks = [call]
-
-  return [text, email]
+  return commArr
 }
 
 function formatText(textJson) {
