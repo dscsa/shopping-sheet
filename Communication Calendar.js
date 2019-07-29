@@ -21,14 +21,6 @@ function orderShippedEvent(order, email, text) {
 
   var commArr = newCommArr(email, text)
 
-  if (commArr && commArr[0] && commArr[0].fallbacks && commArr[0].fallbacks[0].message) {
-    commArr[0].fallbacks[0].message = commArr[0].fallbacks[0].message
-      .replace('View it at https[^ ]+', '')
-      .replace('Track it at https[^ ]+', 'View it and track it online at w,,,,w,,,,w,,,,dot,,,,good,,,,g,,,,o,,,,o,,,d,,,,pill,,,,p,,,,i,,,,l,,,,l,,,,dot,,,,org,,,,o,,,,r,,,,g')
-  } else {
-    debugEmail('orderShippedEvent Error', eventTitle, commArr, cancel, order)
-  }
-
   infoEmail('orderShippedEvent', eventTitle, commArr, cancel, order)
 
   newEvent(eventTitle, commArr)
