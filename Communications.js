@@ -152,7 +152,7 @@ function autopayReminderNotice(order, groups) {
   var numFills = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
 
   var subject  = "Autopay Reminder."
-  var message  = "Because you are enrolled in autopay, Good Pill Pharmacy will be be billing your card "+order.$Card.split(/ |(?=\d)/).join(' <Pause />')+' for $'+order.$Fee+".00. Again we will be billing your card for $"+order.$Fee+".00 for last month's Order #"+order.$OrderId+' of '+numFills+' items'
+  var message  = "Because you are enrolled in autopay, Good Pill Pharmacy will be be billing your card "+order.$Card.split(/ |(?=\d)/).join(' <Pause />')+' for $'+order.$Fee+".00. Please let us right away if your card has recently changed. Again we will be billing your card for $"+order.$Fee+".00 for last month's Order #"+order.$OrderId+' of '+numFills+' items'
 
   var email = { email:order.$Patient.email }
   var text  = { sms:getPhones(order), message:subject+' '+message }
