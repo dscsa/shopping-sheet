@@ -214,6 +214,7 @@ function newGroup(row) {
     },
     $PatientAdded:toDate(row.patient_added),
     $OrderDispensed:row.dispense_date ? toDate(row.dispense_date) : '',
+    $OrderShipped:row.ship_date ? toDate(row.ship_date) : '',
     $OrderAdded:toDate(row.order_added),
     $OrderChanged:toDate(row.order_changed),
     $Tracking:row.tracking_code && row.tracking_code != 'NULL' ? row.tracking_code : '' ,
