@@ -71,7 +71,7 @@ function normalizeDrugs(report) {
 
 function normalizeDrug(row) {
 
-  var dispenseDate = +row.is_refill ? row.dispense_date : row.orig_disp_date //See Order 10062.  Seems that orig_disp_date may get set before dispense date causing a mismatch.  Correct for that here.
+  var dispenseDate = +row.is_refill ? row.last_dispense_date : row.orig_disp_date //See Order 10062.  Seems that orig_disp_date may get set before dispense date causing a mismatch.  Correct for that here.
   var $NextRefill  = row.autofill_date ? row.autofill_date : row.refill_date
 
 
