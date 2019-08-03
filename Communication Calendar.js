@@ -3,7 +3,7 @@ function orderDispensedEvent(order, email, hoursToWait) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Dispensed: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(order.$Patient, ['Order Dispensed', 'Order Failed', 'Needs Form', 'Refill Reminder'])
+  var cancel = cancelEvents(order.$Patient, ['Order Dispensed', 'Order Failed', 'Needs Form'])
 
   var commArr = newCommArr(email)
 
@@ -17,7 +17,7 @@ function orderShippedEvent(order, email, text) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Order Shipped: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(order.$Patient, ['Order Shipped', 'Order Dispensed', 'Order Failed', 'Needs Form', 'Refill Reminder'])
+  var cancel = cancelEvents(order.$Patient, ['Order Shipped', 'Order Dispensed', 'Order Failed', 'Needs Form'])
 
   var commArr = newCommArr(email, text)
 
@@ -30,11 +30,11 @@ function refillReminderEvent(order, email, text, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Refill Reminder: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(order.$Patient, ['Refill Reminder'])
+  //var cancel = cancelEvents(order.$Patient, ['Refill Reminder'])
 
   var commArr = newCommArr(email, text)
 
-  infoEmail('refillReminderEvent', eventTitle, commArr, hoursToWait, hourOfDay, cancel, order)
+  infoEmail('refillReminderEvent', eventTitle, commArr, hoursToWait, hourOfDay, order) //cancel
 
   newEvent(eventTitle, commArr, hoursToWait, hourOfDay)
 }

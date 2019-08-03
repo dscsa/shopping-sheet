@@ -68,7 +68,7 @@ function orderShippedNotice(order, invoice) {
   var groups = groupDrugs(order)
 
   refillReminderNotice(order, groups)
-  autopayReminderNotice(order, groups)
+  //autopayReminderNotice(order, groups)
   confirmShipmentNotice(order, groups)
 
   var numFills = groups.FILL_ACTION.length + groups.FILL_NOACTION.length
