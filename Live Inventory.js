@@ -98,7 +98,7 @@ function liveInventoryByGcn(drug) {
     }
   }
 
-  if (drug.$IsRefill && ( ! liveInventoryCache[gcn] || liveInventoryCache[gcn].stock == 'Not Offered')) {
+  if (drug.$IsRefill && +gcn && ( ! liveInventoryCache[gcn] || liveInventoryCache[gcn].stock == 'Not Offered')) {
     debugEmail('Error: Refill Rx has "Not Offered" Stock', gcn, drug, liveInventoryCache[gcn], 'cache length', Object.keys(liveInventoryCache).length, 'genericNames', genericNames, 'inventoryQtys', inventoryQtys, 'enteredQtys', enteredQtys, 'dispensedQtys', dispensedQtys, liveInventoryCache)
   }
 
