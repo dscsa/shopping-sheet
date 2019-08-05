@@ -332,7 +332,7 @@ function removeDrugsFromEvents(patient, drugs, typeArr) {
   }
 
   if (log.length)
-    debugEmail('removeDrugsFromEvents', patient, drugs, typeArr, log, events)
+    infoEmail('removeDrugsFromEvents', patient, drugs, typeArr, log, events)
 }
 
 function cancelEvents(patient, typeArr) {
