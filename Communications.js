@@ -196,7 +196,7 @@ function orderCreatedNotice(order) {
   var drugList = '<br><br><u>These Rxs will be included once we confirm their availability:</u><br>'+groups.FILLED.join(';<br>')+';'
 
   if (order.$New)
-    message += ' Your first order will only be $6 for all of your medications.'
+    message += ' Your first order will only be $6 total for all of your medications.'
 
   if (numNoFills)
     drugList += '<br><br><u>We are NOT filling these Rxs:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
