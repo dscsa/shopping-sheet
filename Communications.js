@@ -21,13 +21,13 @@ function groupDrugs(order) {
     var name   = drug.$Name.replace(/[*^] /, '') //Get rid of the asterick we use for internal purposes that marks them as not in the order.
 
     var fill   = drug.$Days ? 'FILL_' : 'NOFILL_'
-    var price  = (drug.$Days && ! drug.$New) ? ' ( $'+drug.$Price+' for '+drug.$Days+' days)' : ''
+    var price  = (drug.$Days && ! drug.$New) ? ', $'+drug.$Price+' for '+drug.$Days+' days' : ''
     var action = (drug.$Status || 'NOACTION').split('_')[0] //ACTION OR NOACTION
 
-    group[fill+action].push(name+' '+drug.$Msg+price)
+    group[fill+action].push(name+' '+drug.$Msg)
 
     if (drug.$Days) //This is handy because it is not appended with a message like the others
-      group.FILLED.push(name)
+      group.FILLED.push(name+price)
 
     if ( ! drug.$Refills)
       group.NO_REFILLS.push(name+' '+drug.$Msg)
