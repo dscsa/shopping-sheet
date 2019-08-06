@@ -81,7 +81,7 @@ function normalizeDrug(row) {
   //See Order #8590.  Risperidone 2mg was dispensed but it didn't register here and so because it was out of refills was excluded from the order //Order 10862 was shipped within 4 days of 10698, so showed Levothroxine and Metoprolol as dispensed even though they were in order 10698 and not 10862.  However for 11640 a 2 day difference caused it to not be on invoice sheet, so getting it to 3 days since 2 is too little and 4 is too much
   //See Order #15472 which came 2.7 days after #15227.  Should not have been marked as isDispensed but threshold was at 3 days since it was actually shipped already
 
-  var $IsDispensed = row.dispense_date ? !!row.in_order : (row.in_order && daysSinceRefill < 4) //&& daysToRefill >= 15 removed because of Order 17109
+  var $IsDispensed = row.dispense_date ? !!row.in_order : (row.in_order && daysSinceRefill && daysSinceRefill < 4) //&& daysToRefill >= 15 removed because of Order 17109
   var $InOrder     = $IsDispensed || (row.in_order && +row.refills_total)   //Even if its "in the order" it could be a pending or denied surescript refill request (order 7236) so need to make sure refills are available
   var $RefillsLeft = ($InOrder && ! $IsDispensed) ? +row.refills_left : +row.refills_total //if not in order or already shipped use total refills not just the last dispensed to avoid erroneous out of refills warning
   var isRegistered = row.user_def_1.slice(1, -1) //Use presence of backup pharmacy as proxy for registration
