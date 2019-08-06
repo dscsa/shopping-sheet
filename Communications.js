@@ -21,7 +21,7 @@ function groupDrugs(order) {
     var name   = drug.$Name.replace(/[*^] /, '') //Get rid of the asterick we use for internal purposes that marks them as not in the order.
 
     var fill   = drug.$Days ? 'FILL_' : 'NOFILL_'
-    var price  = (drug.$Days && ! drug.$New) ? ', $'+drug.$Price+' for '+drug.$Days+' days' : ''
+    var price  = (drug.$Days && ! order.$New) ? ', $'+drug.$Price+' for '+drug.$Days+' days' : ''
     var action = (drug.$Status || 'NOACTION').split('_')[0] //ACTION OR NOACTION
 
     group[fill+action].push(name+' '+drug.$Msg)
@@ -191,11 +191,15 @@ function orderCreatedNotice(order) {
   if (order.$Patient.sourceCode == 3 || order.$Patient.sourceCode == 8) return transferRequestedNotice(order, groups)
   if ( ! numFills) return orderHoldNotice(order, groups)
 
-  var subject = 'Good Pill is starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'
-  var message = 'If your address has recently changed please let us know right away.<br><br><u>These Rxs will be included once we confirm their availability:</u><br>'+groups.FILLED.join(';<br>')+';'
+  var subject  = 'Good Pill is starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'
+  var message  = 'If your address has recently changed please let us know right away.'
+  var drugList = '<br><br><u>These Rxs will be included once we confirm their availability:</u><br>'+groups.FILLED.join(';<br>')+';'
+
+  if (order.$New)
+    message += ' Your first order will only be $6 for all of your medications.'
 
   if (numNoFills)
-    message += '<br><br><u>We are NOT filling these Rxs:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
+    drugList += '<br><br><u>We are NOT filling these Rxs:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
 
   var suffix = [
     "Note: if this is correct, there is no need to do anything. If you want to change or delay this order, please let us know as soon as possible. If delaying, please specify the date on which you want it filled, otherwise if you don't, we will delay it 3 weeks by default.",
@@ -203,13 +207,13 @@ function orderCreatedNotice(order) {
   ].join('<br><br>')
 
   var email = { email:order.$Patient.email }
-  var text  = { sms:getPhones(order), message:subject+' '+message }
+  var text  = { sms:getPhones(order), message:subject+' '+message+drugList }
 
   email.subject = subject
   email.message = [
     'Hello,',
     '',
-    subject+' We will notify you again once it ships. '+message,
+    subject+' We will notify you again once it ships. '+message+drugList,
     '',
     (numFills >= numNoFills) ? 'Thanks for choosing Good Pill!' : 'Apologies for any inconvenience,',
     'The Good Pill Team',
