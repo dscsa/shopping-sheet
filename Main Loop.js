@@ -102,8 +102,10 @@ function mainLoop() {
 
      var invoice = getInvoice(order)
 
-     if ( ! invoice)
-      return debugEmail('Warning shipped order has no invoice!', invoice, order)
+     if ( ! invoice) {
+        if (order.$OrderShipped > order.$OrderChanged) debugEmail('Warning shipped order has no invoice!', invoice, order) //Otherwise this might be a refill request.  TODO: Change mssql query so that manual surescript refill requests don't show up
+        return
+     }
 
      //Don't change Drugs and Invoice since should already be finalized
      order.$Drugs = drugs[order.$OrderId]
