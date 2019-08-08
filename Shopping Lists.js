@@ -147,7 +147,7 @@ function shopV2(drug, orderID) {
 function groupByNdc(rows, drug) {
   //Organize by NDC since we don't want to mix them
   var ndcs = {}
-  var caps = drug.$Name.match(/ cap(?!l)s?| cps?\b| softgel/i) //include cap, caps, capsule but not caplet which is more like a tablet
+  var caps = drug.$Name.match(/ cap(?!l)s?| cps?\b| softgel| sfgl\b/i) //include cap, caps, capsule but not caplet which is more like a tablet
   var tabs = drug.$Name.match(/ tabs?| tbs?| capl\b/i) //include caplet which is like a tablet
 
   //debugEmail('Shopping Now', $Name, v2name, minQty, minDays, drugStock, rows)
