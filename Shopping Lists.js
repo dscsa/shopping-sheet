@@ -84,7 +84,7 @@ function createShoppingLists(order, drugs) {
 
       var vals = [
         ['Order #'+orderID+' '+drug.$Name+' '+(new Date().toJSON()), '', '' ,'', ''],
-        ['Days:'+minDays+', Qty:'+minQty+', Count:'+shopped.list.length+(drug.$Stock ? ' ('+drug.$Stock+')' : ''), '', '', '', ''],
+        ['Days:'+minDays+', Qty:'+minQty+', Count:'+shopped.list.length+(drug.$Stock ? ' ('+drug.$Stock+')' : ''), list.halfFill || '', '', '', ''],
         ['', '', '', '', '']
       ].concat(shopped.list)
 
@@ -130,7 +130,10 @@ function shopV2(drug, orderID) {
   debugEmail('Shopping Error: Not enough qty found, trying 45 days and no safety', '#'+orderID, drug.$Name, v2name, minQty, minDays, drugStock, url, 'sortedNDCs', sortedNDCs, 'unsortedNDCs', unsortedNDCs, 'rows', rows)
 
   var list = makeList(sortedNDCs, +(45/minDays*minQty).toFixed(0), 0)
-  if (list) return list
+  if (list) {
+    list.halfFill = 'HALF FILL - COULD NOT FIND ENOUGH QUANTITY'
+    return list
+  }
 
   /*
   Cindy thinks its best to do a manual intervention if we can't do at least 45 days.  For example, Order 6552 had minQty of 450 for Vitamin B12 (5x a day).
