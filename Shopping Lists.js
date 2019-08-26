@@ -84,7 +84,7 @@ function createShoppingLists(order, drugs) {
 
       var vals = [
         ['Order #'+orderID+' '+drug.$Name+' '+(new Date().toJSON()), '', '' ,'', ''],
-        ['Days:'+minDays+', Qty:'+minQty+', Count:'+shopped.list.length+(drug.$Stock ? ' ('+drug.$Stock+')' : ''), list.halfFill || '', '', '', ''],
+        ['Days:'+minDays+', Qty:'+minQty+', Count:'+shopped.list.length+(drug.$Stock ? ' ('+drug.$Stock+')' : '')+(shopped.halfFill || ''), '', '', '', ''],
         ['', '', '', '', '']
       ].concat(shopped.list)
 
@@ -96,7 +96,7 @@ function createShoppingLists(order, drugs) {
       infoEmail('V2 Pended', drug.$Name, v2name, '#'+orderID, minQty, shopped.pend, res, drug, order)
 
     } catch (e) {
-      debugEmail('Shopping Error: was not shopped because already shopped (3)', e.stack, drug.$Name, v2name, '#'+orderID, minQty, drug, shopped.pend)
+      debugEmail('Shopping Error: was not shopped because already shopped (3)', e.message, e.stack, drug.$Name, v2name, '#'+orderID, minQty, drug, shopped.pend)
     }
   }
 }
@@ -131,7 +131,7 @@ function shopV2(drug, orderID) {
 
   var list = makeList(sortedNDCs, +(45/minDays*minQty).toFixed(0), 0)
   if (list) {
-    list.halfFill = 'HALF FILL - COULD NOT FIND ENOUGH QUANTITY'
+    list.halfFill = ', HALF FILL - COULD NOT FIND ENOUGH QUANTITY'
     return list
   }
 
