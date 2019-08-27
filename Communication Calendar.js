@@ -149,7 +149,7 @@ function confirmShipmentEvent(order, email, hoursToWait, hourOfDay) {
   var patientLabel = getPatientLabel(order)
   var eventTitle   = order.$OrderId+' Confirm Shipment: '+patientLabel+'.  Created:'+new Date()
 
-  var cancel = cancelEvents(order.$Patient, ['Confirm Shipment'])
+  var cancel = cancelEvents(order.$Patient)
 
   var commArr = newCommArr(email)
 
