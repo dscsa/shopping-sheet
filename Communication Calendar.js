@@ -273,6 +273,8 @@ function setHours(hourOfDay, date) {
 
 function searchEvents(patient, typeArr) {
 
+  typeArr = typeArr || []
+
   if ( ! patient.first) {
     debugEmail('searchEvents no patient first name', patient, typeArr)
     patient.first = ''
