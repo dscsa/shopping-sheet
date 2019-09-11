@@ -118,8 +118,18 @@ function saveWebformOrder(action, endpoint, woocommerceOrder) {
     //I could not figure out how to respond with a good error message to check for this by trying throwing/returning
     //errors from woocommerce but could not get it to work.  SOOOO just assume any error here means that we should try
     //creating the order rather than updating it
-    Log('saveWebformOrder Error.  Most likely trying to update an order that needs to be created', e, e.stack, content, response, action, endpoint, woocommerceOrder)
-    throw e
+    var err = {
+      e:e,
+      stack:e.stack,
+      content:content,
+      response:response,
+      action:action,
+      endpoint:endpoint,
+      woocommerceOrder:woocommerceOrder
+    }
+
+    Log('saveWebformOrder Error.  Most likely trying to update an order that needs to be created', err)
+    throw err
   }
 }
 
