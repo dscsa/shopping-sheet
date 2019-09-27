@@ -34,7 +34,7 @@ var drugStatus = {
       ES:''
     },
     NOACTION_NOT_DUE:{
-      EN:'is due for a refill on $NextRefill',
+      EN:'is not due for a refill until $NextRefill',
       ES:''
     },
     NOACTION_CHECK_SIG:{
