@@ -108,7 +108,7 @@ function saveWebformOrder(action, endpoint, woocommerceOrder) {
     var content = response.getContentText()
 
     var parsed = JSON.parse(content)
-    var success = parsed.number || parsed.code == "refill_order_already_exists"
+    var success = parsed.number || parsed.code == "refill_order_already_exists" || parsed.code == "woocommerce_rest_shop_order_invalid_id"
 
     if ( ! success)
       debugEmail('saveWebformOrder success?', 'action: '+action, 'endpoint: '+endpoint, 'http code: '+response.getResponseCode(), 'headers', response.getHeaders(), 'request', woocommerceOrder, 'response', parsed)
