@@ -11,6 +11,7 @@ function groupDrugs(order) {
     NOFILL_ACTION:[],
     NOFILL_NOACTION:[],
     FILLED:[],
+    PRICES:[],
     NO_REFILLS:[],
     NO_AUTOFILL:[],
     MIN_DAYS:Infinity
@@ -26,8 +27,10 @@ function groupDrugs(order) {
 
     group[fill+action].push(name+' '+drug.$Msg)
 
-    if (drug.$Days) //This is handy because it is not appended with a message like the others
-      group.FILLED.push(name+price)
+    if (drug.$Days) {//This is handy because it is not appended with a message like the others
+      group.FILLED.push(name)
+      group.FILLED_WITH_PRICES.push(name+price)
+    }
 
     if ( ! drug.$Refills)
       group.NO_REFILLS.push(name+' '+drug.$Msg)
@@ -193,7 +196,7 @@ function orderCreatedNotice(order) {
 
   var subject  = 'Good Pill is starting to prepare '+numFills+' items for Order #'+order.$OrderId+'.'
   var message  = 'If your address has recently changed please let us know right away.'
-  var drugList = '<br><br><u>These Rxs will be included once we confirm their availability:</u><br>'+groups.FILLED.join(';<br>')+';'
+  var drugList = '<br><br><u>These Rxs will be included once we confirm their availability:</u><br>'+groups.FILLED_WITH_PRICES.join(';<br>')+';'
 
   if (order.$New)
     message += ' Your first order will only be $6 total for all of your medications.'
@@ -324,7 +327,7 @@ function orderUpdatedNotice(order, drugsChanged) {
   var message = ''
 
   if (numFills)
-    message += '<br><u>These Rxs will be included once we confirm their availability:</u><br>'+groups.FILLED.join(';<br>')+';'
+    message += '<br><u>These Rxs will be included once we confirm their availability:</u><br>'+groups.FILLED_WITH_PRICES.join(';<br>')+';'
 
   if (numNoFills)
     message += '<br><br><u>We are NOT filling these Rxs:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
@@ -366,7 +369,7 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
   ///It's depressing to get updates if nothing is being filled
   if (numFills) {
     var subject = 'Welcome to Good Pill!  We are excited to fill your 1st Order.'
-    var message = 'Your order will be #'+order.$OrderId+". Please take 5mins to register so that we can fill the Rxs we got from your doctor as soon as possible. Once you register it will take 5-7 business days before you receive your order. You can register online at www.goodpill.org or by calling us at (888) 987-5187.<br><br><u>The drugs in your 1st order will be:</u><br>"+groups.FILLED.join(';<br>')+';'
+    var message = 'Your order will be #'+order.$OrderId+". Please take 5mins to register so that we can fill the Rxs we got from your doctor as soon as possible. Once you register it will take 5-7 business days before you receive your order. You can register online at www.goodpill.org or by calling us at (888) 987-5187.<br><br><u>The drugs in your 1st order will be:</u><br>"+groups.FILLED_WITH_PRICES.join(';<br>')+';'
   }
   else {
     var subject = "Welcome to Good Pill. Unfortunately we can't complete your 1st Order"
