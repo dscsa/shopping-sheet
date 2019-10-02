@@ -11,7 +11,7 @@ function groupDrugs(order) {
     NOFILL_ACTION:[],
     NOFILL_NOACTION:[],
     FILLED:[],
-    PRICES:[],
+    FILLED_WITH_PRICES:[],    
     NO_REFILLS:[],
     NO_AUTOFILL:[],
     MIN_DAYS:Infinity
