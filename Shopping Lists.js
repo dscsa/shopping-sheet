@@ -313,7 +313,13 @@ function v2Fetch(url, method, body) {
   if (method == 'POST') Log('v2Fetch POST', url, encodeURI(url), json, opts.payload)
 
   try {
-    return JSON.parse(json).rows
+    var parsed = JSON.parse(json)
+    var rows   = parsed.rows
+
+    if ( ! rows)
+      debugEmail('v2 Shopping Error: No Rows', rows, parsed, json)
+
+    return rows
   } catch (e) {
     debugEmail('v2 Shopping Error', e, json)
   }
