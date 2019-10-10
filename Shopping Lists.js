@@ -316,8 +316,8 @@ function v2Fetch(url, method, body) {
     var parsed = JSON.parse(json)
     var rows   = parsed.rows
 
-    if ( ! rows)
-      debugEmail('v2 Shopping Error: No Rows', rows, parsed, json)
+    if ( ! rows && method != 'POST')
+      debugEmail('v2 Shopping Error: No Rows', method, url, opts.payload, rows, parsed, json)
 
     return rows
   } catch (e) {
