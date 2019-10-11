@@ -81,7 +81,9 @@ function sortDrugs(a, b) {
 }
 
 function setDrugIsPended(drug) {
-  drug.$IsPended = !! openSpreadsheet('Shopping List #'+drug.$OrderId, 'Shopping Lists').getSheetByName(drug.$v2) //This should be cached so not too expensive
+  var prefix = shoppingListPrefix(drug)
+  var suffix = shoppingListSuffix(drug)
+  drug.$IsPended = !! openSpreadsheet(prefix+suffix, 'Shopping Lists') //Cached so hopefully not too expensive
 }
 
 function setDaysQtyRefills(drug) {

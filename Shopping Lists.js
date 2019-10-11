@@ -24,6 +24,15 @@ function deleteShoppingLists(orderID) {
   }
 }
 
+function shoppingListPrefix(drug) {
+  return 'Shopping List #'+drug.$OrderId
+}
+
+function shoppingListSuffix(drug) {
+  var name = drug.$v2 || drug.$Name
+  return ' '+name+': '+drug.$Qty
+}
+
 function createShoppingLists(order, drugs) {
 
   var orderID = order.$OrderId
@@ -35,9 +44,8 @@ function createShoppingLists(order, drugs) {
   for (var i in drugs) {
     try {
 
-      var name    = drugs[i].$v2 || drugs[i].$Name
-      var prefix = 'Shopping List #'+orderID
-      var suffix  = ' '+name+': '+drugs[i].$Qty
+      var prefix = shoppingListPrefix(drugs[i])
+      var suffix = shoppingListSuffix(drugs[i])
 
       var files = DriveApp.getFilesByName(prefix+suffix)
 
