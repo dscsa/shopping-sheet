@@ -15,8 +15,9 @@ function deleteShoppingLists(orderID) {
 
   var res = v2Fetch('/account/8889875187/pend/'+orderID, 'DELETE')
 
+  var prefix = shoppingListPrefix(orderID)
   var shoppingListFolder   = DriveApp.getFolderById('1PcDYKM_Ky-9zWmCNuBnTka3uCKjU3A0q')
-  var shoppingListIterator = shoppingListFolder.searchFiles(shoppingListPrefix(orderID))
+  var shoppingListIterator = shoppingListFolder.searchFiles('title contains "'+prefix+'"')
 
   while (shoppingListIterator.hasNext()) {
     shoppingListIterator.next().setTrashed(true) //Prevent printing an old list that Cindy pended and shipped on her own
@@ -330,7 +331,7 @@ function v2Fetch(url, method, body) {
     var parsed = JSON.parse(json)
     var rows   = parsed.rows
 
-    if ( ! rows && method != 'POST')
+    if ( ! rows && method != 'POST' && method != 'DELETE')
       debugEmail('v2 Shopping Error: No Rows', method, url, opts.payload, rows, parsed, json)
 
     return rows

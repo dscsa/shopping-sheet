@@ -87,10 +87,10 @@ function setDrugIsPended(drug) {
   var shoppingListFolder   = DriveApp.getFolderById('1PcDYKM_Ky-9zWmCNuBnTka3uCKjU3A0q')
 
   try {
-    var shoppingListIterator = shoppingListFolder.searchFiles(prefix+suffix)
+    var shoppingListIterator = shoppingListFolder.searchFiles('title contains "'+prefix+suffix+'"')
     drug.$IsPended = shoppingListIterator.hasNext() //Cached so hopefully not too expensive
   } catch (e) {
-    debugEmail('setDrugIsPended error', drug, prefix, suffix)
+    debugEmail('setDrugIsPended error', e, drug, prefix, suffix)
   }
 }
 
