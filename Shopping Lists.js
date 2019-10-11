@@ -50,15 +50,11 @@ function createShoppingLists(order, drugs) {
 
       var vals = createShoppingList(drugs[i], order)
 
-      if ( ! vals || ! vals.length) {
-        errs.push(vals)
-        continue
+      if (vals && vals.length) {
+        var ss = newSpreadsheet(prefix+suffix, 'Shopping Lists')
+        ss.getRange('A1:E'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
       }
-
-      var ss = newSpreadsheet(prefix+suffix, 'Shopping Lists')
-
-      ss.getRange('A1:E'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
-
+      
     } catch (err) {
       errs.push(err)
     }
