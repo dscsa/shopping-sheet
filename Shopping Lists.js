@@ -69,6 +69,7 @@ function createShoppingLists(order, drugs) {
 
 function createShoppingList(drug, order) {
 
+  var orderID   = order.$OrderId
   var v2name    = drug.$v2
   var minDays   = drug.$Days
   var minQty    = drug.$Qty
@@ -100,11 +101,11 @@ function createShoppingList(drug, order) {
       ['', '', '', '', '']
     ].concat(shopped.list)
 
+    return vals
+
   } catch (e) {
     debugEmail('Shopping Error: was not shopped because already shopped (3)', e.message, e.stack, drug.$Name, v2name, '#'+orderID, minQty, drug, shopped.pend)
   }
-
-  return vals
 }
 
 //Returns array on success and error string on failure
