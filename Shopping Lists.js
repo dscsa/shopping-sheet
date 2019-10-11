@@ -16,7 +16,7 @@ function deleteShoppingLists(orderID) {
   var res = v2Fetch('/account/8889875187/pend/'+orderID, 'DELETE')
 
   var shoppingListFolder   = DriveApp.getFolderById('1PcDYKM_Ky-9zWmCNuBnTka3uCKjU3A0q')
-  var shoppingListIterator = shoppingListFolder.getFilesByName('Shopping List #'+orderID)
+  var shoppingListIterator = shoppingListFolder.searchFiles('Shopping List #'+orderID)
   var hasNext              = shoppingListIterator.hasNext()
 
   if (hasNext)
@@ -31,74 +31,80 @@ function createShoppingLists(order, drugs) {
 
   //infoEmail('createShoppingLists', order, new Error().stack) //debug v2 shopping for meds after they are already dispensed
 
-  var ss   = openSpreadsheet('Shopping List #'+orderID, 'Shopping Lists')
-  var errs = []
+  var status = 'Shopping '+new Date().toJSON().slice(5,10)
+  var errs  = [] //Aggregate Errors By Order
   for (var i in drugs) {
     try {
-      createShoppingList(drugs[i], order)
+
+      var title = 'Shopping List #'+orderID+': '+drugs[i].$v2
+      var files = DriveApp.getFilesByName(title)
+
+      if (files.hasNext()) {
+        status = 'Re: '+status
+        errs.push(drugs[i].$v2+' was not shopped because the shopping list was already created')
+        continue
+      }
+
+      var vals = createShoppingList(drugs[i], order)
+
+      if ( ! vals.length) {
+        errs.push(vals)
+        continue
+      }
+
+      var ss = newSpreadsheet(title, 'Shopping Lists')
+
+      ss.getRange('A1:E'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
+
     } catch (err) {
       errs.push(err)
     }
   }
 
   if (errs.length) //Consolidate Error emails so we don't have email quota issues.  Most likely this order has already been shopped for so: "A sheet with the name XXX already exists. Please enter another name."
-    debugEmail('Could not create shopping list', '#'+orderID, errs, order)
+    debugEmail('Could not create shopping list(s)', '#'+orderID, errs, order)
 
-  var title = 'Shopping '+new Date().toJSON().slice(5,10)
+  return '=IF(NOW() - $OrderChanged > 4,  IF(NOW() - $OrderChanged > 7, "Not Filling", "Delayed"), "'+status+'")'
+}
+
+function createShoppingList(drug, order) {
+
+  var v2name    = drug.$v2
+  var minDays   = drug.$Days
+  var minQty    = drug.$Qty
+
+
+  if ( ! v2name || ! minDays || drug.$IsPended || drug.$IsDispensed || order.$Status == 'Dispensing') { //createShoppingLists gets called on a PER ORDER basis.  Some drugs in a Shopping Order may already be pended or dispensed
+    //$Msg should already be set when minDays is 0.  drug.$Msg += ' did not shop because minDays is 0'
+    return Log('createShoppingList no min days or is already pended/dispensed', drug.$Stock, drug.$Msg, orderID, v2name, minQty, minDays, drug)
+  }
+
+  var shopped = shopV2(drug, orderID)
+
+  if ( ! shopped) {
+    setDrugStatus(drug, 'NOACTION_SHOPPING_ERROR')
+    return debugEmail('Shopping Error: Could not be shopped because not enough qty found - tabs/caps/X00/Y00/Z00? (2)', drug.$Stock, drug.$Msg, '#'+orderID, v2name, minQty, minDays, drug)
+  }
+
+  if ( ! LIVE_MODE) return debugEmail('createShoppingList canceled because LIVE MODE OFF')
+
   try {
-    var sheet1 = ss.getSheetByName('Sheet1')
-    if (sheet1)
-      ss.deleteSheet(sheet1)
-    else
-      title = 'Re: '+title
+    //Pend after all forseeable errors are accounted for.
+    var res = v2Fetch('/account/8889875187/pend/'+orderID+' - '+minQty, 'POST', shopped.pend)
+
+    infoEmail('V2 Pended', drug.$Name, v2name, '#'+orderID, minQty, shopped.pend, res, drug, order)
+
+    var vals = [
+      ['Order #'+orderID+' '+drug.$Name+' '+(new Date().toJSON()), '', '' ,'', ''],
+      ['Days:'+minDays+', Qty:'+minQty+', Count:'+shopped.list.length+(drug.$Stock ? ' ('+drug.$Stock+')' : '')+(shopped.halfFill || ''), '', '', '', ''],
+      ['', '', '', '', '']
+    ].concat(shopped.list)
+
   } catch (e) {
-      //title = 'Re: '+title
-      //infoEmail('Could not get sheet 1', title, e)
+    debugEmail('Shopping Error: was not shopped because already shopped (3)', e.message, e.stack, drug.$Name, v2name, '#'+orderID, minQty, drug, shopped.pend)
   }
 
-  return '=HYPERLINK("'+ss.getUrl()+'", IF(NOW() - $OrderChanged > 4,  IF(NOW() - $OrderChanged > 7, "Not Filling", "Delayed"), "'+title+'"))'
-
-  function createShoppingList(drug, order) {
-
-    var v2name    = drug.$v2
-    var minDays   = drug.$Days
-    var minQty    = drug.$Qty
-
-
-    if ( ! v2name || ! minDays || drug.$IsPended || drug.$IsDispensed || order.$Status == 'Dispensing') { //createShoppingLists gets called on a PER ORDER basis.  Some drugs in a Shopping Order may already be pended or dispensed
-      //$Msg should already be set when minDays is 0.  drug.$Msg += ' did not shop because minDays is 0'
-      return Log('createShoppingList no min days or is already pended/dispensed', drug.$Stock, drug.$Msg, orderID, v2name, minQty, minDays, drug)
-    }
-
-    var shopped = shopV2(drug, orderID)
-
-    if ( ! shopped) {
-      setDrugStatus(drug, 'NOACTION_SHOPPING_ERROR')
-      return debugEmail('Shopping Error: Could not be shopped because not enough qty found - tabs/caps/X00/Y00/Z00? (2)', drug.$Stock, drug.$Msg, '#'+orderID, v2name, minQty, minDays, drug)
-    }
-
-    if ( ! LIVE_MODE) return debugEmail('createShoppingList canceled because LIVE MODE OFF')
-
-    try {
-      ss.insertSheet(v2name) //This will fail if sheet already exists, which prevents us from repending stock (when we delete a row to start a new sheet)
-
-      var vals = [
-        ['Order #'+orderID+' '+drug.$Name+' '+(new Date().toJSON()), '', '' ,'', ''],
-        ['Days:'+minDays+', Qty:'+minQty+', Count:'+shopped.list.length+(drug.$Stock ? ' ('+drug.$Stock+')' : '')+(shopped.halfFill || ''), '', '', '', ''],
-        ['', '', '', '', '']
-      ].concat(shopped.list)
-
-      ss.getRange('A1:E'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
-
-      //Pend after all forseeable errors are accounted for.
-      var res = v2Fetch('/account/8889875187/pend/'+orderID+' - '+minQty, 'POST', shopped.pend)
-
-      infoEmail('V2 Pended', drug.$Name, v2name, '#'+orderID, minQty, shopped.pend, res, drug, order)
-
-    } catch (e) {
-      debugEmail('Shopping Error: was not shopped because already shopped (3)', e.message, e.stack, drug.$Name, v2name, '#'+orderID, minQty, drug, shopped.pend)
-    }
-  }
+  return vals
 }
 
 //Returns array on success and error string on failure
