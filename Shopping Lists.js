@@ -16,7 +16,7 @@ function deleteShoppingLists(orderID) {
   var res = v2Fetch('/account/8889875187/pend/'+orderID, 'DELETE')
 
   var shoppingListFolder   = DriveApp.getFolderById('1PcDYKM_Ky-9zWmCNuBnTka3uCKjU3A0q')
-  var shoppingListIterator = shoppingListFolder.searchFiles('Shopping List #'+orderID)
+  var shoppingListIterator = shoppingListFolder.searchFiles(shoppingListPrefix(orderID))
 
   while (shoppingListIterator.hasNext()) {
     shoppingListIterator.next().setTrashed(true) //Prevent printing an old list that Cindy pended and shipped on her own
@@ -25,12 +25,12 @@ function deleteShoppingLists(orderID) {
 }
 
 function shoppingListPrefix(drug) {
-  return 'Shopping List #'+drug.$OrderId
+  return 'Shopping List #'+(drug.$OrderId || drug)
 }
 
 function shoppingListSuffix(drug) {
   var name = drug.$v2 || drug.$Name
-  return ' '+name+': '+drug.$Qty
+  return ' '+name+': '+(drug.$Qty || '')
 }
 
 function createShoppingLists(order, drugs) {

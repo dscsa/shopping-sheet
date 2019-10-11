@@ -83,7 +83,10 @@ function sortDrugs(a, b) {
 function setDrugIsPended(drug) {
   var prefix = shoppingListPrefix(drug)
   var suffix = shoppingListSuffix(drug)
-  drug.$IsPended = !! openSpreadsheet(prefix+suffix, 'Shopping Lists') //Cached so hopefully not too expensive
+
+  var shoppingListFolder   = DriveApp.getFolderById('1PcDYKM_Ky-9zWmCNuBnTka3uCKjU3A0q')
+  var shoppingListIterator = shoppingListFolder.searchFiles(prefix+suffix)
+  drug.$IsPended = shoppingListIterator.hasNext() //Cached so hopefully not too expensive
 }
 
 function setDaysQtyRefills(drug) {
