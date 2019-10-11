@@ -38,9 +38,10 @@ function createShoppingLists(order, drugs) {
 
       var name = drugs[i].$v2 || drugs[i].$Name
 
-      var title = 'Shopping List #'+orderID+': '+name
-      var files = DriveApp.getFilesByName(title)
+      var title = 'Shopping List #'+orderID
+      var files = DriveApp.getFilesByName(title+': '+name)
 
+      //TODO Compare Quantities and Incrementally Shop if Qty Increased
       if (files.hasNext()) {
         status = 'Re: '+status
         errs.push(name+' was not shopped because the shopping list was already created')
@@ -54,7 +55,7 @@ function createShoppingLists(order, drugs) {
         continue
       }
 
-      var ss = newSpreadsheet(title, 'Shopping Lists')
+      var ss = newSpreadsheet(title+': '+name, 'Shopping Lists')
 
       ss.getRange('A1:E'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
 
@@ -66,7 +67,7 @@ function createShoppingLists(order, drugs) {
   if (errs.length) //Consolidate Error emails so we don't have email quota issues.  Most likely this order has already been shopped for so: "A sheet with the name XXX already exists. Please enter another name."
     debugEmail('Could not create shopping list(s)', '#'+orderID, errs, order)
 
-  return '=IF(NOW() - $OrderChanged > 4,  IF(NOW() - $OrderChanged > 7, "Not Filling", "Delayed"), "'+status+'")'
+  return '=HYPERLINK("https://drive.google.com/drive/search?q="'+title+'", IF(NOW() - $OrderChanged > 4,  IF(NOW() - $OrderChanged > 7, "Not Filling", "Delayed"), "'+status+'"))'
 }
 
 function createShoppingList(drug, order) {
