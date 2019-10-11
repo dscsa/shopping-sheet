@@ -17,12 +17,11 @@ function deleteShoppingLists(orderID) {
 
   var shoppingListFolder   = DriveApp.getFolderById('1PcDYKM_Ky-9zWmCNuBnTka3uCKjU3A0q')
   var shoppingListIterator = shoppingListFolder.searchFiles('Shopping List #'+orderID)
-  var hasNext              = shoppingListIterator.hasNext()
 
-  if (hasNext)
+  while (shoppingListIterator.hasNext()) {
     shoppingListIterator.next().setTrashed(true) //Prevent printing an old list that Cindy pended and shipped on her own
-
-  infoEmail('deleteShoppingLists', orderID, 'hasNext', hasNext, res && res.getContentText(), res && res.getResponseCode(), res && res.getHeaders())
+    infoEmail('deleteShoppingLists', orderID, res && res.getContentText(), res && res.getResponseCode(), res && res.getHeaders())
+  }
 }
 
 function createShoppingLists(order, drugs) {
@@ -36,26 +35,27 @@ function createShoppingLists(order, drugs) {
   for (var i in drugs) {
     try {
 
-      var name = drugs[i].$v2 || drugs[i].$Name
+      var name    = drugs[i].$v2 || drugs[i].$Name
+      var prefix = 'Shopping List #'+orderID
+      var suffix  = ' '+name+': '+drugs[i].$Qty
 
-      var title = 'Shopping List #'+orderID
-      var files = DriveApp.getFilesByName(title+': '+name)
+      var files = DriveApp.getFilesByName(prefix+suffix)
 
       //TODO Compare Quantities and Incrementally Shop if Qty Increased
       if (files.hasNext()) {
         status = 'Re: '+status
-        errs.push(name+' was not shopped because the shopping list was already created')
+        errs.push(prefix+suffix+' was not shopped because the shopping list was already created')
         continue
       }
 
       var vals = createShoppingList(drugs[i], order)
 
-      if ( ! vals.length) {
+      if ( ! vals || ! vals.length) {
         errs.push(vals)
         continue
       }
 
-      var ss = newSpreadsheet(title+': '+name, 'Shopping Lists')
+      var ss = newSpreadsheet(prefix+suffix, 'Shopping Lists')
 
       ss.getRange('A1:E'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
 
@@ -67,7 +67,7 @@ function createShoppingLists(order, drugs) {
   if (errs.length) //Consolidate Error emails so we don't have email quota issues.  Most likely this order has already been shopped for so: "A sheet with the name XXX already exists. Please enter another name."
     debugEmail('Could not create shopping list(s)', '#'+orderID, errs, order)
 
-  return '=HYPERLINK("https://drive.google.com/drive/search?q="'+title+'", IF(NOW() - $OrderChanged > 4,  IF(NOW() - $OrderChanged > 7, "Not Filling", "Delayed"), "'+status+'"))'
+  return '=HYPERLINK("https://drive.google.com/drive/search?q="'+prefix+'", IF(NOW() - $OrderChanged > 4,  IF(NOW() - $OrderChanged > 7, "Not Filling", "Delayed"), "'+status+'"))'
 }
 
 function createShoppingList(drug, order) {
