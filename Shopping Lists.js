@@ -36,12 +36,14 @@ function createShoppingLists(order, drugs) {
   for (var i in drugs) {
     try {
 
-      var title = 'Shopping List #'+orderID+': '+drugs[i].$v2
+      var name = drugs[i].$v2 || drugs[i].$Name
+
+      var title = 'Shopping List #'+orderID+': '+name
       var files = DriveApp.getFilesByName(title)
 
       if (files.hasNext()) {
         status = 'Re: '+status
-        errs.push(drugs[i].$v2+' was not shopped because the shopping list was already created')
+        errs.push(name+' was not shopped because the shopping list was already created')
         continue
       }
 
