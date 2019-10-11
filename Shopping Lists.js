@@ -54,7 +54,7 @@ function createShoppingLists(order, drugs) {
         var ss = newSpreadsheet(prefix+suffix, 'Shopping Lists')
         ss.getRange('A1:E'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
       }
-      
+
     } catch (err) {
       errs.push(err)
     }
@@ -63,7 +63,7 @@ function createShoppingLists(order, drugs) {
   if (errs.length) //Consolidate Error emails so we don't have email quota issues.  Most likely this order has already been shopped for so: "A sheet with the name XXX already exists. Please enter another name."
     debugEmail('Could not create shopping list(s)', '#'+orderID, errs, order)
 
-  return '=HYPERLINK("https://drive.google.com/drive/search?q="'+prefix+'", IF(NOW() - $OrderChanged > 4,  IF(NOW() - $OrderChanged > 7, "Not Filling", "Delayed"), "'+status+'"))'
+  return '=HYPERLINK("https://drive.google.com/drive/search?q='+prefix+'", IF(NOW() - $OrderChanged > 4,  IF(NOW() - $OrderChanged > 7, "Not Filling", "Delayed"), "'+status+'"))'
 }
 
 function createShoppingList(drug, order) {
