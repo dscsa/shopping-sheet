@@ -236,8 +236,8 @@ function sortInventory(inventory, longExp) {
       bMonths = monthsBetween(inventory.prepackExp || longExp, b.exp.to.slice(0, 10)) // >0 if minPrepackExp < b.doc.exp.to (which is what we prefer)
 
       //Debugging
-      a.months = aMonths+' prepackExp:'+inventory.prepackExp+' longExp:'+longExp+' a.exp.to:'+a.exp.to
-      b.months = bMonths+' prepackExp:'+inventory.prepackExp+' longExp:'+longExp+' b.exp.to:'+b.exp.to
+      //a.months = aMonths+' prepackExp:'+inventory.prepackExp+' longExp:'+longExp+' a.exp.to:'+a.exp.to
+      //b.months = bMonths+' prepackExp:'+inventory.prepackExp+' longExp:'+longExp+' b.exp.to:'+b.exp.to
 
       //Deprioritize anything with a closer exp date than the min prepack exp date.  This - by definition - can only be non-prepack stock
       if (aMonths >= 0 && bMonths < 0) return -1
