@@ -1,5 +1,5 @@
 
-function createTransferFax(orderId) { //This is undefined when called from Menu
+function createTransferFax(orderId, drugsChanged) { //This is undefined when called from Menu
 
   var sheet = getSheet('Shopping', 'A', 2) //allow to work for archived shopping sheets as well
   order = sheet.rowByKey(orderId)    //Defaults to getting active row if OrderID is undefined
@@ -9,9 +9,17 @@ function createTransferFax(orderId) { //This is undefined when called from Menu
     debugEmail('order.$Drugs.filter is not a function', typeof order.$Drugs, order.$Drugs, order)
   }
 
-  //order.$Drugs
-  var drugs = order.$Drugs.filter(function(drug) {
-    return hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER') || hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER_CHECK_BACK')
+  drugsChanged = JSON.stringify(drugsChanged || '')
+  
+  drugs = order.$Drugs.filter(function(drug) {
+
+    var transferStatus = hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER') || hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER_CHECK_BACK')
+
+    if ( ! drugsChanged)
+      return transferStatus
+
+    //Only Fax Out New Drugs That Were Added
+    return ~ drugsChanged.indexOf(drug+' ADDED TO') ? transferStatus : false
   })
 
   if ( ! drugs.length || ! LIVE_MODE) return

@@ -193,6 +193,8 @@ function mainLoop() {
       order.$Status = createShoppingLists(order, order.$Drugs)
 
     sheet.updateRow(order)
+
+    createTransferFax(order.$OrderId, drugsChanged)
   }
 }
 

@@ -60,7 +60,7 @@ function createShoppingLists(order, drugs) {
       var vals = createShoppingList(drugs[i], order)
 
       if (vals && vals.length) {
-        var ss = newSpreadsheet(prefix+suffix+': '+(drug.$Qty || ''), 'Shopping Lists')
+        var ss = newSpreadsheet(prefix+suffix+': '+(drugs[i].$Qty || ''), 'Shopping Lists')
         ss.getRange('A1:E'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
       }
 
