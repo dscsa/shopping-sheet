@@ -31,7 +31,7 @@ function shoppingListPrefix(drug) {
 
 function shoppingListSuffix(drug) {
   var name = drug.$v2 || drug.$Name
-  return ' '+name+': '+(drug.$Qty || '')
+  return ' '+name
 }
 
 function createShoppingLists(order, drugs) {
@@ -48,7 +48,7 @@ function createShoppingLists(order, drugs) {
       var prefix = shoppingListPrefix(drugs[i])
       var suffix = shoppingListSuffix(drugs[i])
 
-      var files = DriveApp.getFilesByName(prefix+suffix)
+      var files = DriveApp.searchFiles('title contains "'+prefix+suffix+'"')
 
       //TODO Compare Quantities and Incrementally Shop if Qty Increased
       if (files.hasNext()) {
@@ -60,7 +60,7 @@ function createShoppingLists(order, drugs) {
       var vals = createShoppingList(drugs[i], order)
 
       if (vals && vals.length) {
-        var ss = newSpreadsheet(prefix+suffix, 'Shopping Lists')
+        var ss = newSpreadsheet(prefix+suffix+': '+(drug.$Qty || ''), 'Shopping Lists')
         ss.getRange('A1:E'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
       }
 
@@ -72,7 +72,7 @@ function createShoppingLists(order, drugs) {
   if (errs.length) //Consolidate Error emails so we don't have email quota issues.  Most likely this order has already been shopped for so: "A sheet with the name XXX already exists. Please enter another name."
     debugEmail('Could not create shopping list(s)', '#'+orderID, errs, order)
 
-  return '=HYPERLINK("https://drive.google.com/drive/search?q='+prefix+'", IF(NOW() - $OrderChanged > 4,  IF(NOW() - $OrderChanged > 7, "Not Filling", "Delayed"), "'+status+'"))'
+  return '=HYPERLINK("https://drive.google.com/drive/search?q='+prefix.replace('#', '')+'", IF(NOW() - $OrderChanged > 4,  IF(NOW() - $OrderChanged > 7, "Not Filling", "Delayed"), "'+status+'"))'
 }
 
 function createShoppingList(drug, order) {
