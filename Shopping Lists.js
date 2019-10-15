@@ -53,7 +53,7 @@ function createShoppingLists(order, drugs) {
       //TODO Compare Quantities and Incrementally Shop if Qty Increased
       if (files.hasNext()) {
         status = 'Re: '+status
-        errs.push(prefix+suffix+' was not shopped because the shopping list was already created')
+        //errs.push(prefix+suffix+' was not shopped because the shopping list was already created')
         continue
       }
 
