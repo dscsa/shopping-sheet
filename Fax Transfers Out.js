@@ -4,13 +4,14 @@ function createTransferFax(orderId, drugsChanged) { //This is undefined when cal
   var sheet = getSheet('Shopping', 'A', 2) //allow to work for archived shopping sheets as well
   order = sheet.rowByKey(orderId)    //Defaults to getting active row if OrderID is undefined
 
+
   //TODO we should not rely on "transferred" magic (and user-facing!) string.  Need to mark this in the json.
   if ( ! order.$Drugs.filter) {
     debugEmail('order.$Drugs.filter is not a function', typeof order.$Drugs, order.$Drugs, order)
   }
 
   drugsChanged = JSON.stringify(drugsChanged || '')
-  
+
   drugs = order.$Drugs.filter(function(drug) {
 
     var transferStatus = hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER') || hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER_CHECK_BACK')
@@ -21,6 +22,8 @@ function createTransferFax(orderId, drugsChanged) { //This is undefined when cal
     //Only Fax Out New Drugs That Were Added
     return ~ drugsChanged.indexOf(drug+' ADDED TO') ? transferStatus : false
   })
+
+  debugEmail('Transfer Out Fax Called', 'OrderId', orderId, 'order', order, 'drugsChanged', drugsChanged, 'drugs', drugs)
 
   if ( ! drugs.length || ! LIVE_MODE) return
 
@@ -34,7 +37,7 @@ function createTransferFax(orderId, drugsChanged) { //This is undefined when cal
     if (faxTo.length == 10) faxTo = '1'+faxTo
     var res = sendSFax('18882987726', pdf) //(faxTo, pdf)
     var success = res && res.isSuccess ? "External" : "Error External"
-    sendEmail('adam@sirum.org,cindy@goodpill.org', success + ' Transfer Out Fax', res.message+'. OrderId: '+orderId+'. See the <a href="'+fax.getUrl()+'">fax here</a>')
+    //sendEmail('adam@sirum.org,cindy@goodpill.org', success + ' Transfer Out Fax', res.message+'. OrderId: '+orderId+'. See the <a href="'+fax.getUrl()+'">fax here</a>')
   } else {
     var res = sendSFax('18882987726', pdf)
     var success = res && res.isSuccess ? "Internal" : "Error Internal"
@@ -43,7 +46,7 @@ function createTransferFax(orderId, drugsChanged) { //This is undefined when cal
   fax.setName(success + ": Transfer #"+order.$OrderId)
 
   if (res && ! res.isSuccess)
-    debugEmail(success + ' Transfer Out Fax', 'OrderId', orderId, 'isSuccess', res.isSuccess, fax.getUrl(), 'res', res, 'order', order)
+    debugEmail(success + ' Transfer Out Fax Failed', 'OrderId', orderId, 'isSuccess', res.isSuccess, fax.getUrl(), 'res', res, 'order', order, 'drugsChanged', drugsChanged)
 }
 
 function getToken(){

@@ -183,6 +183,8 @@ function mainLoop() {
 
     if ( ! drugsChanged) return
 
+    debugEmail('Drugs Changed', 'order', order, 'drugsChanged', drugsChanged)
+
     order.$Patient.changes = drugsChanged
 
     addDrugDetails(order, 'drugsChanged')  //this will prevent NULLs from appearing but is not necessary for functionality since when status updates details will get added then
