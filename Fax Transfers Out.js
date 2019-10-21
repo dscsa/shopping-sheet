@@ -23,7 +23,8 @@ function createTransferFax(orderId, drugsChanged) { //This is undefined when cal
     return ~ drugsChanged.indexOf(drug+' ADDED TO') ? transferStatus : false
   })
 
-  debugEmail('Transfer Out Fax Called', 'OrderId', orderId, 'order', order, 'drugsChanged', drugsChanged, 'drugs', drugs)
+  if ( ~ drugsChanged.indexOf('ADDED TO'))
+    debugEmail('Transfer Out Fax Called', 'OrderId', orderId, 'order', order, 'drugsChanged', drugsChanged, 'drugs', drugs)
 
   if ( ! drugs.length || ! LIVE_MODE) return
 
