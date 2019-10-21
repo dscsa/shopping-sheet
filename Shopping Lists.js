@@ -173,7 +173,7 @@ function groupByNdc(rows, drug) {
   for (var i in rows) {
 
     //Ignore Cindy's makeshift dispensed queue
-    if ( ~ ['M00', 'T00', 'W00', 'R00', 'F00', 'X00', 'Y00', 'Z00'].indexOf(rows[i].doc.bin) continue
+    if ( ~ ['M00', 'T00', 'W00', 'R00', 'F00', 'X00', 'Y00', 'Z00'].indexOf(rows[i].doc.bin)) continue
     //Only select the correct form even though v2 gives us both
     if ( ~ rows[i].doc.drug.form.indexOf('Tablet') && caps) {
       var msg = 'may only be available in capsule form'
