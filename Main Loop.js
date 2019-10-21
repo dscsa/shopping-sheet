@@ -84,7 +84,7 @@ function mainLoop() {
     Log('Order Added: Prepend Row')
 
     if (order.$Status != 'Dispensed')
-      return createTransferFax(order.$OrderId)
+      return createTransferFax(order)
 
     Log('Order Added: Is Dispensed')
 
@@ -197,7 +197,7 @@ function mainLoop() {
 
     sheet.updateRow(order)
 
-    createTransferFax(order.$OrderId, drugsChanged)
+    createTransferFax(order, drugsChanged)
   }
 }
 

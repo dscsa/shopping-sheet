@@ -1,9 +1,12 @@
 
-function createTransferFax(orderId, drugsChanged) { //This is undefined when called from Menu
+function createTransferFax(order, drugsChanged) { //This is undefined when called from Menu
 
-  var sheet = getSheet('Shopping', 'A', 2) //allow to work for archived shopping sheets as well
-  order = sheet.rowByKey(orderId)    //Defaults to getting active row if OrderID is undefined
+  if ( ! order) { //Call from Shopping Sheet to make manually
+    var sheet = getSheet('Shopping', 'A', 2) //allow to work for archived shopping sheets as well
+    order = sheet.rowByKey(order)    //Defaults to getting active row if OrderID is undefined
+  }
 
+  infoEmail('createTransferFax Transfer Out Fax', drugsChanged, order)
 
   //TODO we should not rely on "transferred" magic (and user-facing!) string.  Need to mark this in the json.
   if ( ! order.$Drugs.filter) {
@@ -24,7 +27,7 @@ function createTransferFax(orderId, drugsChanged) { //This is undefined when cal
   })
 
   if ( ~ drugsChanged.indexOf('ADDED TO'))
-    debugEmail('Transfer Out Fax Called', 'OrderId', orderId, 'order', order, 'drugsChanged', drugsChanged, 'drugs', drugs)
+    debugEmail('Transfer Out Fax Called', 'order', order, 'drugsChanged', drugsChanged, 'drugs', drugs)
 
   if ( ! drugs.length || ! LIVE_MODE) return
 
@@ -38,7 +41,7 @@ function createTransferFax(orderId, drugsChanged) { //This is undefined when cal
     if (faxTo.length == 10) faxTo = '1'+faxTo
     var res = sendSFax('18882987726', pdf) //(faxTo, pdf)
     var success = res && res.isSuccess ? "External" : "Error External"
-    //sendEmail('adam@sirum.org,cindy@goodpill.org', success + ' Transfer Out Fax', res.message+'. OrderId: '+orderId+'. See the <a href="'+fax.getUrl()+'">fax here</a>')
+    //sendEmail('adam@sirum.org,cindy@goodpill.org', success + ' Transfer Out Fax', res.message+'. See the <a href="'+fax.getUrl()+'">fax here</a>')
   } else {
     var res = sendSFax('18882987726', pdf)
     var success = res && res.isSuccess ? "Internal" : "Error Internal"
@@ -47,7 +50,7 @@ function createTransferFax(orderId, drugsChanged) { //This is undefined when cal
   fax.setName(success + ": Transfer #"+order.$OrderId)
 
   if (res && ! res.isSuccess)
-    debugEmail(success + ' Transfer Out Fax Failed', 'OrderId', orderId, 'isSuccess', res.isSuccess, fax.getUrl(), 'res', res, 'order', order, 'drugsChanged', drugsChanged)
+    debugEmail(success + ' Transfer Out Fax Failed', 'isSuccess', res.isSuccess, fax.getUrl(), 'res', res, 'order', order, 'drugsChanged', drugsChanged)
 }
 
 function getToken(){
