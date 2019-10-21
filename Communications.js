@@ -11,7 +11,7 @@ function groupDrugs(order) {
     NOFILL_ACTION:[],
     NOFILL_NOACTION:[],
     FILLED:[],
-    FILLED_WITH_PRICES:[],    
+    FILLED_WITH_PRICES:[],
     NO_REFILLS:[],
     NO_AUTOFILL:[],
     MIN_DAYS:Infinity
@@ -397,17 +397,17 @@ function needsFormNotice(order, email, text, hoursToWait, hourOfDay) {
   if(hourAdded < 10){
     //A if before 10am, the first one is at 10am, the next one is 5pm, then 10am tomorrow, then 5pm tomorrow
     var hoursToWait = [0, 0, 24, 24, 24*7, 24*14]
-    var hourOfDay   = [10, 17, 10, 17, 17, 17]
+    var hourOfDay   = [11, 17, 11, 17, 17, 17]
 
   } else if (hourAdded < 17){
     //A if before 5pm, the first one is 10mins from now, the next one is 5pm, then 10am tomorrow, then 5pm tomorrow
     var hoursToWait = [10/60, 0, 24, 24, 24*7, 24*14]
-    var hourOfDay   = [null, 17, 10, 17, 17, 17]
+    var hourOfDay   = [null, 17, 11, 17, 17, 17]
 
   } else {
     //B if after 5pm, the first one is 10am tomorrow, 5pm tomorrow, 10am the day after tomorrow, 5pm day after tomorrow.
     var hoursToWait = [24, 24, 48, 48, 24*7, 24*14]
-    var hourOfDay   = [10, 17, 10, 17, 17, 17]
+    var hourOfDay   = [11, 17, 11, 17, 17, 17]
   }
 
   needsFormEvent(order, email, text, hoursToWait[0], hourOfDay[0])
@@ -523,7 +523,7 @@ function confirmShippingInternal(order, groups) {
   ].join('<br>')
 
 
-  confirmShipmentEvent(order, email, daysAgo*24, 9)
+  confirmShipmentEvent(order, email, daysAgo*24, 13)
 }
 
 function confirmShippingExternal(order, groups) {
@@ -548,7 +548,7 @@ function confirmShippingExternal(order, groups) {
     ''
   ].join('<br>')
 
-  confirmShipmentEvent(order, email, 7*24, 11)
+  confirmShipmentEvent(order, email, 7*24, 14)
 }
 
 function trackingURL(trackingNumber) {
