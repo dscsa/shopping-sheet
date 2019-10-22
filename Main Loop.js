@@ -166,7 +166,7 @@ function mainLoop() {
 
       updateWebformDispensed(order, invoice) //Make sure webform is updated and has the exact amount as invoice (should match old fee[orderId] amount if $Days of each drug did not change)
 
-      deleteShoppingLists(order.$OrderId)
+      //deleteShoppingLists(order.$OrderId)
 
       try {
         shipped.prependRow(order)

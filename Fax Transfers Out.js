@@ -3,7 +3,7 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
 
   if ( ! order) { //Call from Shopping Sheet to make manually
     var sheet = getSheet('Shopping', 'A', 2) //allow to work for archived shopping sheets as well
-    order = sheet.rowByKey(order)    //Defaults to getting active row if OrderID is undefined
+    order = sheet.rowByKey()    //Defaults to getting active row if OrderID is undefined
   }
 
   infoEmail('createTransferFax Transfer Out Fax', drugsChanged, order)
