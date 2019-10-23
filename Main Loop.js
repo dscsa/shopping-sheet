@@ -10,7 +10,7 @@ function mainLoop() {
 
   var sheet     = getSheet('Shopping', 'A', 2)
   var shipped   = getSheet('Shipped', 'A', 2)
-  var report    = getReport('ShoppingSheet5.csv', sheet)
+  var report    = getReport('ShoppingSheet6.csv', sheet)
 
   var drugs     = sheet.colByKey('$Drugs')
   var tracking  = sheet.colByKey('$Tracking')
