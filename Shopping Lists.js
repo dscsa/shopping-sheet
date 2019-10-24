@@ -104,9 +104,9 @@ function createShoppingList(drug, order) {
     infoEmail('V2 Pended', drug.$Name, v2name, '#'+orderID, minQty, shopped.pend, res, drug, order)
 
     var vals = [
-      ['Order #'+orderID+' '+drug.$Name+' '+(new Date().toJSON()), '', '' ,'', ''],
-      ['Days:'+minDays+', Qty:'+minQty+', Count:'+shopped.list.length+(drug.$Stock ? ' ('+drug.$Stock+')' : '')+(shopped.halfFill || ''), '', '', '', ''],
-      ['', '', '', '', '']
+      ['Order #'+orderID+' '+drug.$Name+' '+(new Date().toJSON()), '', '' ,'', '', ''],
+      ['Days:'+minDays+', Qty:'+minQty+', Count:'+shopped.list.length+(drug.$Stock ? ' ('+drug.$Stock+')' : '')+(shopped.halfFill || ''), '', '', '', '', ''],
+      ['', '', '', '', '', '']
     ].concat(shopped.list)
 
     return vals
@@ -287,7 +287,7 @@ function makeList(ndcs, minQty, safety) {
 
       pend.unshift(inventory[i])
       qty -= pend[0].qty.to * (pend[0].bin.length == 3 ? 1 : (1 - safety))
-      list.push([pend[0].drug._id, pend[0].drug.form, pend[0].exp.to.slice(0, 7), pend[0].qty.to, pend[0].bin])
+      list.push([pend[0]._id, pend[0].drug._id, pend[0].drug.form, pend[0].exp.to.slice(0, 7), pend[0].qty.to, pend[0].bin])
 
       if (qty <= 0) {
         //infoEmail('Pending the following transactions', v2name, pend)
