@@ -61,7 +61,8 @@ function createShoppingLists(order, drugs) {
 
       if (vals && vals.length) {
         var ss = newSpreadsheet(prefix+suffix+': '+(drugs[i].$Qty || ''), 'Shopping Lists')
-        ss.getRange('A1:E'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
+        ss.getRange('A1:F'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
+        ss.setColumnWidth(1, 243); //show the full id when it print
       }
 
     } catch (err) {
