@@ -107,7 +107,9 @@ function createShoppingList(drug, order) {
     var vals = [
       ['Order #'+orderID+' '+drug.$Name+' '+(new Date().toJSON()), '', '' ,'', '', ''],
       ['Days:'+minDays+', Qty:'+minQty+', Count:'+shopped.list.length+(drug.$Stock ? ' ('+drug.$Stock+')' : '')+(shopped.halfFill || ''), '', '', '', '', ''],
-      ['', '', '', '', '', '']
+      ['', '', '', '', '', ''],
+      ['id', 'ndc', 'form', 'exp', 'qty', 'bin']
+
     ].concat(shopped.list)
 
     return vals
@@ -343,8 +345,8 @@ function v2Fetch(url, method, body) {
 
 function sortList(a, b) {
 
-  var aBin = a[4]
-  var bBin = b[4]
+  var aBin = a[5]
+  var bBin = b[5]
 
   var aPack = aBin && aBin.length == 3
   var bPack = bBin && bBin.length == 3
