@@ -288,7 +288,7 @@ function setStatus(drug) {
       setDrugStatus(drug, 'ACTION_EXPIRING')
     }
     //This will also catch drug.$DaysToRefill == ""
-    else if (drug.$DaysToRefill <= minMedSyncDays(drug)) {
+    else if (drug.$DaysToRefill && drug.$DaysToRefill <= minMedSyncDays(drug)) {
       setDrugStatus(drug, 'NOACTION_WAS_MEDSYNC') // Order #15736, Call Sheet #4949. was set to MAY MEDSYNC but then later removed from order by SYNC drugs.  Classifying as NOACTION_WAS_MEDSYNC will avoid this issue
     }
     //TODO id newQty/newDays > oldQty/oldDays then the sig changed and we should allow it to be filled early
