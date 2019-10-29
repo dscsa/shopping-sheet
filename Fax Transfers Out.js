@@ -26,8 +26,7 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
     return ~ drugsChanged.indexOf(drug+' ADDED TO') ? transferStatus : false
   })
 
-  if ( ~ drugsChanged.indexOf('ADDED TO'))
-    debugEmail('Transfer Out Fax Called', 'order', order, 'drugsChanged', drugsChanged, 'drugs', drugs)
+  debugEmail('Transfer Out Fax Called', 'drugsChanged', drugsChanged, 'drugs', drugs, 'order', order)
 
   if ( ! drugs.length || ! LIVE_MODE) return
 
@@ -49,7 +48,7 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
 
   fax.setName(success + ": Transfer #"+order.$OrderId)
 
-  if (res && ! res.isSuccess)
+  //if (res && ! res.isSuccess)
     debugEmail(success + ' Transfer Out Fax Failed', 'isSuccess', res.isSuccess, fax.getUrl(), 'res', res, 'order', order, 'drugsChanged', drugsChanged)
 }
 
