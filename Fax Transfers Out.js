@@ -19,7 +19,7 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
 
     var transferStatus = hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER') || hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER_CHECK_BACK')
 
-    if ( ! drugsChanged)
+    if (drugsChanged == '""') //Because of the JSON Stringify, empty becomes double quotes
       return transferStatus
 
     //Only Fax Out New Drugs That Were Added
