@@ -31,7 +31,7 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
          debugEmail('Order Debug', 'scriptChanged', scriptChanged, 'gcnChanged', gcnChanged, '$Status', $Status, 'newDrug', newDrug, 'oldDrug', oldDrug, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs)
       }*/
 
-      if (scriptChanged && (gcnChanged || newDrug.$Gcn == 'No GCN' )) continue //This is the wrong drug, keep moving
+      if (scriptChanged && (gcnChanged || newDrug.$Stock == 'No GCN' )) continue //This is the wrong drug, keep moving
 
       drugAdded = false //Match found so this is NOT a new drug
 
