@@ -35,7 +35,9 @@ function groupDrugs(order) {
     if ( ! drug.$Refills)
       group.NO_REFILLS.push(name+' '+drug.$Msg)
 
-    if (drug.$Days && ! drug.$Autofill.rx)
+    if ( ! drug.$Autofill)
+      debugEmail('groupDrugs error drug.$Autofill not set', drug, order)
+    else if (drug.$Days && ! drug.$Autofill.rx) //Not sure why $Autofill was not set once
       group.NO_AUTOFILL.push(name+' '+drug.$Msg)
 
     if (drug.$Days && ! drug.$Refills && drug.$Days < group.MIN_DAYS)
