@@ -26,7 +26,10 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
     return ~ drugsChanged.indexOf(drug+' ADDED TO') ? transferStatus : false
   })
 
-  debugEmail('Transfer Out Fax Called', 'drugsChanged', drugsChanged, 'drugs', drugs, 'order', order)
+  if (drugs.length)
+    debugEmail('Transfer Out Fax Called: Fax Sent', 'drugsChanged', drugsChanged, 'drugs', drugs, 'order', order)
+  else
+    infoEmail('Transfer Out Fax Called: No Fax', 'drugsChanged', drugsChanged, 'drugs', drugs, 'order', order)
 
   if ( ! drugs.length || ! LIVE_MODE) return
 

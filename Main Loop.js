@@ -72,7 +72,7 @@ function mainLoop() {
       needsFormNotice(order)
     }
     else {
-      if (order.$Status != 'Missing Rx') updateWebformReceived(order.$OrderId, order.$Patient.guardian_id, 'processing') //take it out of awaiting-rx or awaiting-transfer
+      if (order.$Status != 'Missing Rx') updateWebformReceived(order, 'processing') //take it out of awaiting-rx or awaiting-transfer
       if (order.$Status != 'Dispensed' && order.$Status != 'Shipped') orderCreatedNotice(order)
       infoEmail('orderUpdatedNotice by addOrder', '#'+order.$OrderId, order.$Status, order)
     }

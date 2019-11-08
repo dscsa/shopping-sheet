@@ -59,15 +59,18 @@ function updateWebformDispensed(order, invoice) {
     updateWebformOrder(order.$OrderId, woocommerceOrder, address)
 }
 
-function updateWebformReceived(orderId, guardianId, status) {
+function updateWebformReceived(order, status) {
+
   //infoEmail('updateStatus', orderId, guardianId, status)
-  var order = {status:status, meta_data:[  //pass guardian id just in case this order does not exist
+  var woocommerceOrder = {status:status, meta_data:[  //pass guardian id just in case this order does not exist
     {key:"date_received", value:new Date().toDateString()},
-    {key:"invoice_number", value:orderId},
-    {key:"guardian_id", value:guardianId}
+    {key:"invoice_number", value:order.$OrderId},
+    {key:"guardian_id", value:order.$Patient.guardian_id}
   ]}
 
-  return updateWebformOrder(orderId, order)
+  debugEmail('updateWebformReceived', '#'+order.$OrderId, woocommerceOrder, order)
+
+  //return updateWebformOrder(orderId, order)
 }
 
 function createWebformOrder(orderId, woocommerceOrder) {

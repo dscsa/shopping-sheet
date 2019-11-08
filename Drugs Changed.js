@@ -27,9 +27,9 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
       var gcnChanged    = newDrug.$Gcn && oldDrug.$Gcn && newDrug.$Gcn != oldDrug.$Gcn //Eliminate Gcn == 0 errors
       //var nameChanged   = (! newDrug.$Gcn || ! oldDrug.$Gcn) && newDrug.$Name.replace(/\^ *|\* */g, '').toUpperCase() != oldDrug.$Name.replace(/\^ *|\* */g, '').toUpperCase //Only if no GCN available
 
-      /*if (newDrugs[0].$OrderId == 15396) {
-         debugEmail('Order Debug', 'scriptChanged', scriptChanged, 'gcnChanged', gcnChanged, '$Status', $Status, 'newDrug', newDrug, 'oldDrug', oldDrug, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs)
-      }*/
+      if (newDrug.$OrderId == '21413') {
+         debugEmail('Order Debug', 'scriptChanged', scriptChanged, 'gcnChanged', gcnChanged, '$Status', newDrug.$Status, "scriptChanged && (gcnChanged || newDrug.$Stock == 'No GCN' )", scriptChanged && (gcnChanged || newDrug.$Stock == 'No GCN' ), 'newDrug', newDrug, 'oldDrug', oldDrug, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs)
+      }
 
       if (scriptChanged && (gcnChanged || newDrug.$Stock == 'No GCN' )) continue //This is the wrong drug, keep moving
 
@@ -54,10 +54,10 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
         changes.push(oldDrug.$Name+' -> '+newDrug.$Name+' REMOVED FROM ORDER '+oldDrug.$InOrder+' -> '+newDrug.$InOrder)
 
       else if ( ! oldDrug.$Days && ! oldDrug.$InOrder && newDrug.$InOrder) //Can't do this "|| (newDrug.$Days > 0 && oldDrug.$Days === 0)" because setDaysQtyRefills has not run yet so newDrug.$Days might not be 0 yet
-        changes.push(oldDrug.$Name+' -> '+newDrug.$Name+' ADDED TO ORDER'+oldDrug.$InOrder+' -> '+newDrug.$InOrder)
+        changes.push(oldDrug.$Name+' -> '+newDrug.$Name+' ADDED TO ORDER '+oldDrug.$InOrder+' -> '+newDrug.$InOrder)
 
       else if (newDrug.$RefillsLeft != oldDrug.$RefillsLeft) //"else if" because refills_left often change when adding a drug to an order - no need to double count
-        changes.push(newDrug.$Name+' REFILLS CHANGED RefillsLeft:'+oldDrug.$RefillsLeft+' -> '+newDrug.$RefillsLeft)
+        changes.push(newDrug.$Name+' REFILLS CHANGED RefillsLeft: '+oldDrug.$RefillsLeft+' -> '+newDrug.$RefillsLeft)
 
       else if (newDrug.$RefillsTotal && ! oldDrug.$RefillsTotal) //"else if" because refills_left often change when adding a drug to an order - no need to double count
         changes.push(newDrug.$Name+' NEW SCRIPT WITH REFILLS: RefillsTotal: '+oldDrug.$RefillsTotal+' -> '+newDrug.$RefillsTotal)
