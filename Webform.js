@@ -68,7 +68,7 @@ function updateWebformReceived(order, status) {
     {key:"guardian_id", value:order.$Patient.guardian_id}
   ]}
 
-  debugEmail('updateWebformReceived', '#'+order.$OrderId, woocommerceOrder, order)
+  infoEmail('updateWebformReceived', '#'+order.$OrderId, woocommerceOrder, order)
 
   //return updateWebformOrder(orderId, order)
 }
