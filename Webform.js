@@ -15,7 +15,7 @@ function updateWebformShipped(order, invoice) {
 
     webformPayMethod(order, woocommerceOrder, 'updateWebformShipped')
 
-    //Order was already created (1) by user when registering, or (2) by status update when rx recieved
+    //Order was already created (1) by user when registering, or (2) by status update when rx received
     updateWebformOrder(order.$OrderId, woocommerceOrder)
 }
 
@@ -55,7 +55,7 @@ function updateWebformDispensed(order, invoice) {
     webformPayMethod(order, woocommerceOrder, 'updateWebformDispensed')
 
     infoEmail('updateWebformDispensed', '#'+order.$OrderId, woocommerceOrder, address, order)
-    //Order was already created (1) by user when registering, or (2) by status update when rx recieved
+    //Order was already created (1) by user when registering, or (2) by status update when rx received
     updateWebformOrder(order.$OrderId, woocommerceOrder, address)
 }
 

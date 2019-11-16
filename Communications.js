@@ -238,7 +238,7 @@ function orderCreatedNotice(order) {
 
 function transferRequestedNotice(order, groups) {
 
-  var subject = 'Good Pill recieved your transfer request for Order #'+order.$OrderId+'.'
+  var subject = 'Good Pill received your transfer request for Order #'+order.$OrderId+'.'
   var message = 'We will notify you once we have contacted your pharmacy, '+order.$Pharmacy.short.replace(/ \(\d{10}\)/g, '')+', and let you know whether the transfer was successful or not;'
 
 
