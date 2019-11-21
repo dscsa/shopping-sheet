@@ -5,9 +5,16 @@
   "dependencies": {
     "jest": "^24.9.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "husky": "^3.1.0"
+  },
   "scripts": {
     "test": "jest",
     "test-watch": "jest --watch"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm test"
+    }
   }
 }
