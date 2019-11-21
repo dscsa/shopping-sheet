@@ -10,3 +10,7 @@ function JSONparse(str) {
     return {error:'json parse failed', value:str}
   }
 }
+
+if (typeof exports != 'undefined') {
+  exports.JSONparse = JSONparse;
+}
