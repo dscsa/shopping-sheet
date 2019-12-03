@@ -96,8 +96,12 @@ function sendSFax(toFax, blob){
 
     var res = UrlFetchApp.fetch(url, opts)
     Logger.log('sendSFax res: ' + JSON.stringify(res) + ' || ' + res.getResponseCode() + ' || ' + JSON.stringify(res.getHeaders()) + ' || ' + res.getContentText())
+    res = JSON.parse(res.getContentText()) //{"SendFaxQueueId":"539658135EB742968663C6820BE33DB0","isSuccess":true,"message":"Fax is received and being processed"}
+    res.url    = url
+    res.body   = {file:blob}
+    res.base64 = {file:btoa(blob)}
 
-    return JSON.parse(res.getContentText()) //{"SendFaxQueueId":"539658135EB742968663C6820BE33DB0","isSuccess":true,"message":"Fax is received and being processed"}
+    return res
 
   } catch(err){
     Logger.log('sendSFax err' + err)
