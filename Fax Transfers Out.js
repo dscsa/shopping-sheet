@@ -38,6 +38,8 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
   var fax = mergeDoc("Transfer Out Fax v1", "Transfer #"+order.$OrderId, "Transfer Outs", order)
   var pdf = fax.getAs(MimeType.PDF)
 
+  DriveApp.createFile(pdf); //Save as PDF for debuggin
+
   if (order.$Pharmacy.fax) {
     var faxTo = order.$Pharmacy.fax.replace(/\D/g, '')
     if (faxTo.length == 10) faxTo = '1'+faxTo
@@ -98,8 +100,8 @@ function sendSFax(toFax, blob){
     Logger.log('sendSFax res: ' + JSON.stringify(res) + ' || ' + res.getResponseCode() + ' || ' + JSON.stringify(res.getHeaders()) + ' || ' + res.getContentText())
     res = JSON.parse(res.getContentText()) //{"SendFaxQueueId":"539658135EB742968663C6820BE33DB0","isSuccess":true,"message":"Fax is received and being processed"}
     res.url    = url
-    res.body   = {file:blob}
-    res.base64 = {file:Utilities.base64Encode(blob)}
+    res.body   = {file:blob.getDataAsString()}
+    res.base64 = {file:Utilities.base64Encode(blob.getBytes())}
 
     debugEmail('sendSFax', res, opts)
 
