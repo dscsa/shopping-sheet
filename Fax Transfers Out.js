@@ -52,7 +52,7 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
   fax.setName(success + ": Transfer #"+order.$OrderId)
 
   //if (res && ! res.isSuccess)
-    debugEmail(success + ' Transfer Out Fax Failed', 'isSuccess', res.isSuccess, fax.getUrl(), 'res', res, 'order', order, 'drugsChanged', drugsChanged)
+  debugEmail('createTransferFax '+success, 'isSuccess', res.isSuccess, fax.getUrl(), 'res', res, 'order', order, 'drugsChanged', drugsChanged)
 }
 
 function getToken(){
@@ -100,6 +100,9 @@ function sendSFax(toFax, blob){
     res.url    = url
     res.body   = {file:blob}
     res.base64 = {file:btoa(blob)}
+
+    debugEmail('sendSFax', res, opts)
+
 
     return res
 
