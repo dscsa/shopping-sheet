@@ -99,7 +99,7 @@ function sendSFax(toFax, blob){
     res = JSON.parse(res.getContentText()) //{"SendFaxQueueId":"539658135EB742968663C6820BE33DB0","isSuccess":true,"message":"Fax is received and being processed"}
     res.url    = url
     res.body   = {file:blob}
-    res.base64 = {file:btoa(blob)}
+    res.base64 = {file:Utilities.base64Encode(blob)}
 
     debugEmail('sendSFax', res, opts)
 
