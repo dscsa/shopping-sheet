@@ -38,16 +38,16 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
   var fax = mergeDoc("Transfer Out Fax v1", "Transfer "+order.$OrderId, "Transfer Outs", order)
   var pdf = fax.getAs(MimeType.PDF)
 
-  DriveApp.createFile(pdf); //Save as PDF for debuggin
+  var pdf2 = DriveApp.createFile(pdf).getAs(MimeType.PDF); //Save as PDF for debuggin
 
   if (order.$Pharmacy.fax) {
     var faxTo = order.$Pharmacy.fax.replace(/\D/g, '')
     if (faxTo.length == 10) faxTo = '1'+faxTo
-    var res = sendSFax('18882987726', pdf) //(faxTo, pdf)
+    var res = sendSFax('18882987726', pdf2, pdf) //(faxTo, pdf)
     var success = res && res.isSuccess ? "External" : "Error External"
     //sendEmail('adam@sirum.org,cindy@goodpill.org', success + ' Transfer Out Fax', res.message+'. See the <a href="'+fax.getUrl()+'">fax here</a>')
   } else {
-    var res = sendSFax('18882987726', pdf)
+    var res = sendSFax('18882987726', pdf2, pdf)
     var success = res && res.isSuccess ? "Internal" : "Error Internal"
   }
 
@@ -75,7 +75,7 @@ function getToken(){
 //Given the info from an SFax ping, puts together an API request to them, and process the full info for a given fax
 //https://stackoverflow.com/questions/26615546/google-apps-script-urlfetchapp-post-file
 //https://stackoverflow.com/questions/24340340/urlfetchapp-upload-file-multipart-form-data-in-google-apps-script
-function sendSFax(toFax, blob){
+function sendSFax(toFax, blob, pdf){
 
   var token = getToken()
   //var blob  = DriveApp.getFileById("1lyRpFl0GiEvj5Ixu-BwTvQB-sw6lt3UH").getBlob()
@@ -100,8 +100,10 @@ function sendSFax(toFax, blob){
     Logger.log('sendSFax res: ' + JSON.stringify(res) + ' || ' + res.getResponseCode() + ' || ' + JSON.stringify(res.getHeaders()) + ' || ' + res.getContentText())
     res = JSON.parse(res.getContentText()) //{"SendFaxQueueId":"539658135EB742968663C6820BE33DB0","isSuccess":true,"message":"Fax is received and being processed"}
     res.url    = url
-    res.body   = {file:blob.getDataAsString()}
-    res.base64 = {file:Utilities.base64Encode(blob.getBytes())}
+    res.base64 = {
+      _new:Utilities.base64Encode(blob.getBytes()),
+      _old:Utilities.base64Encode(pdf.getBytes())
+    }
 
     debugEmail('sendSFax', res, opts)
 
