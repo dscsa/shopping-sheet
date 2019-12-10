@@ -51,7 +51,7 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
     var success = res && res.isSuccess ? "Internal" : "Error Internal"
   }
 
-  fax.setName("Transfer "+order.$OrderId+": "+success)
+  fax.setName("Transfer "+order.$OrderId+" "+success)
 
   //if (res && ! res.isSuccess)
   debugEmail('createTransferFax '+success, 'isSuccess', res.isSuccess, fax.getUrl(), 'res', res, 'order', order, 'drugsChanged', drugsChanged)
