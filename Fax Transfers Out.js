@@ -35,7 +35,7 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
 
   order.$Drugs = drugs
 
-  var fax = mergeDoc("Transfer Out Fax v1", "Transfer #"+order.$OrderId, "Transfer Outs", order)
+  var fax = mergeDoc("Transfer Out Fax v1", "Transfer "+order.$OrderId, "Transfer Outs", order)
   var pdf = fax.getAs(MimeType.PDF)
 
   DriveApp.createFile(pdf); //Save as PDF for debuggin
@@ -51,7 +51,7 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
     var success = res && res.isSuccess ? "Internal" : "Error Internal"
   }
 
-  fax.setName(success + ": Transfer #"+order.$OrderId)
+  fax.setName("Transfer "+order.$OrderId+": "+success)
 
   //if (res && ! res.isSuccess)
   debugEmail('createTransferFax '+success, 'isSuccess', res.isSuccess, fax.getUrl(), 'res', res, 'order', order, 'drugsChanged', drugsChanged)
