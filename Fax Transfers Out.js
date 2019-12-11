@@ -38,16 +38,36 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
   var fax = mergeDoc("Transfer Out Fax v1", "Transfer "+order.$OrderId, "Transfer Outs", order)
   var pdf = fax.getAs(MimeType.PDF)
 
-  var pdf2 = DriveApp.createFile(pdf).getAs(MimeType.PDF); //Save as PDF for debuggin
+  var token = ScriptApp.getOAuthToken();
+
+  //Make sure to replace the correct file Id
+  // Fetch the docx blob
+  var pdf3 = UrlFetchApp.fetch('https://docs.google.com/feeds/download/documents/export/Export?id='+fax.getId()+'&exportFormat=pdf',
+  {
+    headers : {
+      Authorization : 'Bearer '+token
+    }
+  }).getBlob();
+
+  //var file = DriveApp.createFile(pdf3).setName("Transfer "+order.$OrderId+" Type3.pdf");
+
+  //Put the file in a drive folder
+  //DriveApp.getFolderById('<FOLDER_ID>').addFile(file)
+
+  try {
+    var pdf2 = DriveApp.createFile(pdf).getAs('image/png'); //Save as PDF for debuggin
+  } catch (e) {
+    var pdf2 = ''
+  }
 
   if (order.$Pharmacy.fax) {
     var faxTo = order.$Pharmacy.fax.replace(/\D/g, '')
     if (faxTo.length == 10) faxTo = '1'+faxTo
-    var res = sendSFax('18882987726', pdf2, pdf) //(faxTo, pdf)
+    var res = sendSFax('18882987726', pdf3, pdf2, pdf) //(faxTo, pdf)
     var success = res && res.isSuccess ? "External" : "Error External"
     //sendEmail('adam@sirum.org,cindy@goodpill.org', success + ' Transfer Out Fax', res.message+'. See the <a href="'+fax.getUrl()+'">fax here</a>')
   } else {
-    var res = sendSFax('18882987726', pdf2, pdf)
+    var res = sendSFax('18882987726', pdf3, pdf2, pdf)
     var success = res && res.isSuccess ? "Internal" : "Error Internal"
   }
 
@@ -75,7 +95,7 @@ function getToken(){
 //Given the info from an SFax ping, puts together an API request to them, and process the full info for a given fax
 //https://stackoverflow.com/questions/26615546/google-apps-script-urlfetchapp-post-file
 //https://stackoverflow.com/questions/24340340/urlfetchapp-upload-file-multipart-form-data-in-google-apps-script
-function sendSFax(toFax, blob, pdf){
+function sendSFax(toFax, blob, pdf2, pdf1){
 
   var token = getToken()
   //var blob  = DriveApp.getFileById("1lyRpFl0GiEvj5Ixu-BwTvQB-sw6lt3UH").getBlob()
@@ -102,7 +122,8 @@ function sendSFax(toFax, blob, pdf){
     res.url    = url
     res.base64 = {
       _new:Utilities.base64Encode(blob.getBytes()),
-      _old:Utilities.base64Encode(pdf.getBytes())
+      _pdf2:Utilities.base64Encode(pdf2.getBytes()),
+      _pdf1:Utilities.base64Encode(pdf1.getBytes())
     }
 
     debugEmail('sendSFax', res, opts)
