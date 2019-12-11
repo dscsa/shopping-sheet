@@ -36,38 +36,19 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
   order.$Drugs = drugs
 
   var fax = mergeDoc("Transfer Out Fax v1", "Transfer "+order.$OrderId, "Transfer Outs", order)
-  var pdf = fax.getAs(MimeType.PDF)
-
-  var token = ScriptApp.getOAuthToken();
-
-  //Make sure to replace the correct file Id
-  // Fetch the docx blob
-  var pdf3 = UrlFetchApp.fetch('https://docs.google.com/feeds/download/documents/export/Export?id='+fax.getId()+'&exportFormat=pdf',
-  {
-    headers : {
-      Authorization : 'Bearer '+token
-    }
-  }).getBlob();
-
-  //var file = DriveApp.createFile(pdf3).setName("Transfer "+order.$OrderId+" Type3.pdf");
-
-  //Put the file in a drive folder
-  //DriveApp.getFolderById('<FOLDER_ID>').addFile(file)
-
-  try {
-    var pdf2 = DriveApp.createFile(pdf).getAs('image/png'); //Save as PDF for debuggin
-  } catch (e) {
-    var pdf2 = ''
-  }
+  //var pdf = fax.getAs(MimeType.PDF) //SFax Help Case: This stopped working on Nov 18th 2019 because Google's Skia PDF library added "rasterization" into that sfax couldn't parse
+  //Instead of PDF we have to be a little hacky and use a docx instead
+  var docx = UrlFetchApp.fetch('https://docs.google.com/feeds/download/documents/export/Export?id='+fax.getId()+'&exportFormat=docx',
+  { headers : { Authorization : 'Bearer '+ ScriptApp.getOAuthToken() }})
 
   if (order.$Pharmacy.fax) {
     var faxTo = order.$Pharmacy.fax.replace(/\D/g, '')
     if (faxTo.length == 10) faxTo = '1'+faxTo
-    var res = sendSFax('18882987726', pdf3, pdf2, pdf) //(faxTo, pdf)
+    var res = sendSFax('18882987726', docx.getBlob()) //(faxTo, pdf)
     var success = res && res.isSuccess ? "External" : "Error External"
     //sendEmail('adam@sirum.org,cindy@goodpill.org', success + ' Transfer Out Fax', res.message+'. See the <a href="'+fax.getUrl()+'">fax here</a>')
   } else {
-    var res = sendSFax('18882987726', pdf3, pdf2, pdf)
+    var res = sendSFax('18882987726', docx.getBlob())
     var success = res && res.isSuccess ? "Internal" : "Error Internal"
   }
 
