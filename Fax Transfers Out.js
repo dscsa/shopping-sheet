@@ -35,7 +35,9 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
 
   order.$Drugs = drugs
 
-  var fax = mergeDoc("Transfer Out Fax v1", "Transfer "+order.$OrderId, "Transfer Outs", order)
+  var name = "Transfer "+order.$OrderId
+
+  var fax = mergeDoc("Transfer Out Fax v1", name, "Transfer Outs", order)
   //var pdf = fax.getAs(MimeType.PDF) //SFax Help Case: This stopped working on Nov 18th 2019 because Google's Skia PDF library added "rasterization" into that sfax couldn't parse
   //Instead of PDF we have to be a little hacky and use a docx instead
   var docx = UrlFetchApp.fetch('https://docs.google.com/feeds/download/documents/export/Export?id='+fax.getId()+'&exportFormat=docx',
@@ -44,11 +46,11 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
   if (order.$Pharmacy.fax) {
     var faxTo = order.$Pharmacy.fax.replace(/\D/g, '')
     if (faxTo.length == 10) faxTo = '1'+faxTo
-    var res = sendSFax('18882987726', docx.getBlob()) //(faxTo, pdf)
+    var res = sendSFax('18882987726', docx.getBlob(), name) //(faxTo, pdf)
     var success = res && res.isSuccess ? "External" : "Error External"
     //sendEmail('adam@sirum.org,cindy@goodpill.org', success + ' Transfer Out Fax', res.message+'. See the <a href="'+fax.getUrl()+'">fax here</a>')
   } else {
-    var res = sendSFax('18882987726', docx.getBlob())
+    var res = sendSFax('18882987726', docx.getBlob(), name)
     var success = res && res.isSuccess ? "Internal" : "Error Internal"
   }
 
@@ -76,7 +78,7 @@ function getToken(){
 //Given the info from an SFax ping, puts together an API request to them, and process the full info for a given fax
 //https://stackoverflow.com/questions/26615546/google-apps-script-urlfetchapp-post-file
 //https://stackoverflow.com/questions/24340340/urlfetchapp-upload-file-multipart-form-data-in-google-apps-script
-function sendSFax(toFax, blob){
+function sendSFax(toFax, blob, name){
 
   var token = getToken()
   //var blob  = DriveApp.getFileById("1lyRpFl0GiEvj5Ixu-BwTvQB-sw6lt3UH").getBlob()
@@ -84,7 +86,7 @@ function sendSFax(toFax, blob){
   var url = "https://api.sfaxme.com/api/SendFax?token=" + encodeURIComponent(token) + "&ApiKey=" + encodeURIComponent(SFAX_KEY) + "&RecipientName=" + encodeURIComponent('Good Pill Pharmacy - Active')  + "&RecipientFax=" + encodeURIComponent(toFax)
 
   if (toFax != '18882987726') //Have external faxes come from Good Pill and gointo our sent folder
-    url += "&OptionalParams=" + encodeURIComponent('SenderFaxNumber=18882987726')
+    url += "&OptionalParams=" + encodeURIComponent('SenderFaxNumber=18882987726;CoverPageSubject='+name)
 
   var opts  = {
     method:'POST',

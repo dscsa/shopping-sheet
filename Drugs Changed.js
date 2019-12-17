@@ -93,7 +93,7 @@ function didDrugsChange(newDrugs, oldDrugs, $Status) {
   }
 
   if (changes.length) {
-     debugEmail('DrugsChanged', changes, '$Status', $Status, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs)
+     //debugEmail('DrugsChanged', changes, '$Status', $Status, 'newDrugs', newDrugs, 'oldDrugs', oldDrugs)
      return changes
   }
 }
