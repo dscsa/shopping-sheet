@@ -81,18 +81,18 @@ function orderShippedNotice(order, invoice) {
   var subject  = 'Your order '+(numFills ? 'of '+numFills+' items ' : '')+'has shipped and should arrive in 3-5 days.'
   var message  = ''
 
-  if (groups.FILLED.length)
-    message += '<br><u>These Rxs are on the way:</u><br>'+groups.FILL_ACTION.concat(groups.FILL_NOACTION).join(';<br>')+';'
+  //if (groups.FILLED.length)
+  //  message += '<br><u>These Rxs are on the way:</u><br>'+groups.FILL_ACTION.concat(groups.FILL_NOACTION).join(';<br>')+';'
 
-  if (groups.NOFILL_ACTION.length)
-    message += '<br><br><u>We cannot fill these Rxs without your help:</u><br>'+groups.NOFILL_ACTION.join(';<br>')+';'
+  //if (groups.NOFILL_ACTION.length)
+  //  message += '<br><br><u>We cannot fill these Rxs without your help:</u><br>'+groups.NOFILL_ACTION.join(';<br>')+';'
 
   var email = { email:order.$Patient.email }
   var text  = { sms:getPhones(order) }
 
   text.message =
     subject+
-    (invoice ? ' View it at '+shortLink('https://docs.google.com/document/d/'+invoice.getId()+'/pub?embedded=true')+'. ' : '') +
+    (false && invoice ? ' View it at '+shortLink('https://docs.google.com/document/d/'+invoice.getId()+'/pub?embedded=true')+'. ' : '') +
     'Track it at '+shortLink(trackingURL(order.$Tracking))+'. '+
     message
 
@@ -111,7 +111,7 @@ function orderShippedNotice(order, invoice) {
     '',
     ''
   ].join('<br>')
-  if (invoice) email.attachments = [invoice.getId()]
+  if (false && invoice) email.attachments = [invoice.getId()]
 
   orderShippedEvent(order, email, text)
 }
