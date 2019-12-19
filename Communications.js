@@ -102,7 +102,7 @@ function orderShippedNotice(order, invoice) {
     '',
     'Thanks for choosing Good Pill Pharmacy. '+subject,
     '',
-    'Your receipt for order <strong>#'+order.$OrderId+'</strong> is attached. Your tracking number is '+trackingLink(order.$Tracking)+'.',
+    'Your receipt for order <strong>#'+order.$OrderId+'</strong> is attached.', // Your tracking number is '+trackingLink(order.$Tracking)+'.',
     'Use this link to request delivery notifications and/or provide the courier specific delivery instructions.',
     message,
     '',
