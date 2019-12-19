@@ -536,13 +536,13 @@ function confirmShippingExternal(order, groups) {
   var subject = "Order #"+order.$OrderId+" was delivered."
   var message = " should have been delivered within the past few days.  Please contact us at 888.987.5187 if you have not yet received your order."
 
-  text.message = subject+' Your order with tracking number '+order.$Tracking+message
+  text.message = subject //+' Your order with tracking number '+order.$Tracking+message
 
   email.subject = subject
   email.message = [
     'Hello,',
     '',
-    subject+' Your order with tracking number '+trackingLink(order.$Tracking)+message,
+    subject+' Your order '+message,//+with tracking number trackingLink(order.$Tracking)
     '',
     'Thanks!',
     'The Good Pill Team',
