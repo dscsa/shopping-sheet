@@ -92,8 +92,8 @@ function orderShippedNotice(order, invoice) {
 
   text.message =
     subject+
-    (false && invoice ? ' View it at '+shortLink('https://docs.google.com/document/d/'+invoice.getId()+'/pub?embedded=true')+'. ' : '') +
-    'Track it at '+shortLink(trackingURL(order.$Tracking))+'. '+
+    //(invoice ? ' View it at '+shortLink('https://docs.google.com/document/d/'+invoice.getId()+'/pub?embedded=true')+'. ' : '') +
+    //'Track it at '+shortLink(trackingURL(order.$Tracking))+'. '+
     message
 
   email.subject = subject
@@ -102,8 +102,8 @@ function orderShippedNotice(order, invoice) {
     '',
     'Thanks for choosing Good Pill Pharmacy. '+subject,
     '',
-    'Your receipt for order <strong>#'+order.$OrderId+'</strong> is attached.', // Your tracking number is '+trackingLink(order.$Tracking)+'.',
-    'Use this link to request delivery notifications and/or provide the courier specific delivery instructions.',
+    //'Your receipt for order <strong>#'+order.$OrderId+'</strong> is attached.', // Your tracking number is '+trackingLink(order.$Tracking)+'.',
+    //'Use this link to request delivery notifications and/or provide the courier specific delivery instructions.',
     message,
     '',
     'Thanks!',
@@ -111,7 +111,7 @@ function orderShippedNotice(order, invoice) {
     '',
     ''
   ].join('<br>')
-  if (false && invoice) email.attachments = [invoice.getId()]
+  //if (invoice) email.attachments = [invoice.getId()]
 
   orderShippedEvent(order, email, text)
 }
