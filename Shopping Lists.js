@@ -57,12 +57,23 @@ function createShoppingLists(order, drugs) {
         continue
       }
 
-      var vals = createShoppingList(drugs[i], order)
+      var shopped = createShoppingList(drugs[i], order)
 
-      if (vals && vals.length) {
-        var ss = newSpreadsheet(prefix+suffix+': '+(drugs[i].$Qty || ''), 'Shopping Lists')
-        ss.getRange('A1:F'+vals.length).setValues(vals).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
-        ss.setColumnWidth(1, 243); //show the full id when it print
+      try {
+
+        if (shopped && shopped.list && shopped.list.length) {
+          var ss = newSpreadsheet(prefix+suffix+': '+(drugs[i].$Qty || ''), 'Shopping Lists')
+          ss.getRange('A1:F'+shopped.list.length).setValues(shopped.list).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
+          ss.setColumnWidth(1, 243); //show the full id when it print
+        }
+
+        //Pend after all forseeable errors are accounted for.
+        var res = v2Fetch('/account/8889875187/pend/'+orderID+' - '+drugs[i].$Qty, 'POST', shopped.pend)
+
+        infoEmail('V2 Pended', drugs[i].$Name, '#'+orderID, drugs[i].$Qty, shopped.pend, res, drug, order)
+
+      } catch (e) {
+        debugEmail('Shopping Sheet could not be created/pended', e, order)
       }
 
     } catch (err) {
@@ -98,25 +109,15 @@ function createShoppingList(drug, order) {
 
   if ( ! LIVE_MODE) return debugEmail('createShoppingList canceled because LIVE MODE OFF')
 
-  try {
-    //Pend after all forseeable errors are accounted for.
-    var res = v2Fetch('/account/8889875187/pend/'+orderID+' - '+minQty, 'POST', shopped.pend)
+  shopped.list = [
+    ['Order #'+orderID+' '+drug.$Name+' '+(new Date().toJSON()), '', '' ,'', '', ''],
+    ['Days:'+minDays+', Qty:'+minQty+', Count:'+shopped.list.length+(drug.$Stock ? ' ('+drug.$Stock+')' : '')+(shopped.halfFill || ''), '', '', '', '', ''],
+    ['', '', '', '', '', ''],
+    ['id', 'ndc', 'form', 'exp', 'qty', 'bin']
 
-    infoEmail('V2 Pended', drug.$Name, v2name, '#'+orderID, minQty, shopped.pend, res, drug, order)
+  ].concat(shopped.list)
 
-    var vals = [
-      ['Order #'+orderID+' '+drug.$Name+' '+(new Date().toJSON()), '', '' ,'', '', ''],
-      ['Days:'+minDays+', Qty:'+minQty+', Count:'+shopped.list.length+(drug.$Stock ? ' ('+drug.$Stock+')' : '')+(shopped.halfFill || ''), '', '', '', '', ''],
-      ['', '', '', '', '', ''],
-      ['id', 'ndc', 'form', 'exp', 'qty', 'bin']
-
-    ].concat(shopped.list)
-
-    return vals
-
-  } catch (e) {
-    debugEmail('Shopping Error: was not shopped because already shopped (3)', e.message, e.stack, drug.$Name, v2name, '#'+orderID, minQty, drug, shopped.pend)
-  }
+  return shopped
 }
 
 //Returns array on success and error string on failure
