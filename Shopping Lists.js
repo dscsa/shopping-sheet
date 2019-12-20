@@ -137,7 +137,7 @@ function shopV2(drug, orderID) {
   var url  = '/transaction/_design/inventory.qty-by-generic/_view/inventory.qty-by-generic?reduce=false&include_docs=true&limit=300&startkey='+startkey+'&endkey='+endkey
   var rows = v2Fetch(url)
 
-  var unsortedNDCs = groupByNdc(rows, drug)
+  var unsortedNDCs = groupByNdc(rows, drug, url)
   var sortedNDCs   = sortNDCs(unsortedNDCs, longExp)
 
   Log('shopV2', drug.$Name, v2name, 'orderID', '#'+orderID, 'minQty', minQty, 'minDays', minDays, 'drugStock', drugStock, 'url:', url, 'rows:', rows, 'sortedNDCs', sortedNDCs)
@@ -165,7 +165,7 @@ function shopV2(drug, orderID) {
     debugEmail('Shopping Error: Not enough qty found, must be pended manually', '#'+orderID, drug.$Name, v2name, minQty, minDays)
 }
 
-function groupByNdc(rows, drug) {
+function groupByNdc(rows, drug, url) {
   //Organize by NDC since we don't want to mix them
   var ndcs = {}
   var caps = drug.$Name.match(/ cap(?!l)s?| cps?\b| softgel| sfgl\b/i) //include cap, caps, capsule but not caplet which is more like a tablet
@@ -174,6 +174,9 @@ function groupByNdc(rows, drug) {
   //debugEmail('Shopping Now', $Name, v2name, minQty, minDays, drugStock, rows)
 
   for (var i in rows) {
+
+    if (rows[i].doc.next.length)
+      debugEmail('Shopping list is pulling from a next bin!', url, rows[i])
 
     //Ignore Cindy's makeshift dispensed queue
     if ( ~ ['M00', 'T00', 'W00', 'R00', 'F00', 'X00', 'Y00', 'Z00'].indexOf(rows[i].doc.bin)) continue
