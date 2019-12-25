@@ -316,17 +316,17 @@ function v2Fetch(url, method, body) {
   }
 
   try {
-    var json = UrlFetchApp.fetch(encodeURI('http://52.8.112.88'+url), opts)
+    var json = UrlFetchApp.fetch(encodeURI('http://54.215.209.255'+url), opts)
     if ( ~ JSON.stringify(json).indexOf('Internal Server Error'))
       throw new Error('Adam: Internal Server Error')//This is getting returned without an HTTP error code so its not throwing an error
   } catch (e) {
     try {
-      debugEmail('Could not fetch v2 Shopping List from Primary (52.8.112.88).  Is the 52.8.112.88 server down?', e, url, opts, json)
-      var json = UrlFetchApp.fetch(encodeURI('http://52.9.6.78'+url), opts)
+      debugEmail('Could not fetch v2 Shopping List from Primary (54.215.209.255).  Is the 54.215.209.255 server down?', e, url, opts, json)
+      var json = UrlFetchApp.fetch(encodeURI('http://13.57.7.19'+url), opts)
       if ( ~ JSON.stringify(json).indexOf('Internal Server Error'))
         throw new Error('Adam: Internal Server Error')//This is getting returned without an HTTP error code so its not throwing an error
     } catch (e) {
-      return debugEmail('Could not fetch v2 Shopping List from Primary (52.8.112.88) OR Secondary (52.9.6.78).  Are both v2 servers down?', e, url, opts, json)
+      return debugEmail('Could not fetch v2 Shopping List from Primary (54.215.209.255) OR Secondary (13.57.7.19).  Are both v2 servers down?', e, url, opts, json)
     }
   }
 
