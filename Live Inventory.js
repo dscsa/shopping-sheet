@@ -67,9 +67,9 @@ function liveInventoryByGcn(drug) {
     if ( ! genericNames)
       throw new Error('Live Inventory Sheet Down.  Stopping Shopping Sheet!')
 
-    var inventoryQtys = sheet.colByKey('inventory.qty')
-    var dispensedQtys = sheet.colByKey('dispensed.qty')
-    var enteredQtys   = sheet.colByKey('entered.qty')
+    var inventoryQtys = sheet.colByKey('qty.inventory')
+    var dispensedQtys = sheet.colByKey('qty.dispensed')
+    var enteredQtys   = sheet.colByKey('qty.entered')
     var qtyThreshold  = sheet.colByKey('qty threshold')
     var stockLevels   = sheet.colByKey('stock')
     var monthlyPrices = sheet.colByKey('price / month')
