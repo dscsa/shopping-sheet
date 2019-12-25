@@ -68,7 +68,7 @@ function createShoppingLists(order, drugs) {
         }
 
         //Pend after all forseeable errors are accounted for.
-        var res = v2Fetch('/account/8889875187/pend/'+orderID+' - '+drugs[i].$Qty, 'POST', shopped.pend)
+        var res = v2Fetch('/account/8889875187/pend/'+orderID+'?repackQty='+drugs[i].$Qty, 'POST', shopped.pend)
 
         infoEmail('V2 Pended', drugs[i].$Name, '#'+orderID, drugs[i].$Qty, shopped.pend, res, drug, order)
 
