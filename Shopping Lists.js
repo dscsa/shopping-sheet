@@ -135,7 +135,7 @@ function shopV2(drug, orderID) {
   var startkey  = '["8889875187","month","'+minExp[0]+'","'+minExp[1]+'","'+v2name+'"]'
   var endkey    = '["8889875187","month","'+minExp[0]+'","'+minExp[1]+'","'+v2name+'",{}]'
 
-  var url  = '/transaction/_design/inventory.qty-by-generic/_view/inventory.qty-by-generic?reduce=false&include_docs=true&limit=300&startkey='+startkey+'&endkey='+endkey
+  var url  = '/transaction/_design/inventory-by-generic/_view/inventory-by-generic?reduce=false&include_docs=true&limit=300&startkey='+startkey+'&endkey='+endkey
   var rows = v2Fetch(url)
 
   var unsortedNDCs = groupByNdc(rows, drug, url)
