@@ -68,7 +68,7 @@ function createShoppingLists(order, drugs) {
         }
 
         //Pend after all forseeable errors are accounted for.
-        var res = v2Fetch('/account/8889875187/pend/'+orderID+'?repackQty='+drugs[i].$Qty, 'POST', shopped.pend)
+        var res = v2Fetch('/account/8889875187/pend/'+pend_group(order)+'?repackQty='+drugs[i].$Qty, 'POST', shopped.pend)
 
         infoEmail('V2 Pended', drugs[i].$Name, '#'+orderID, drugs[i].$Qty, shopped.pend, res, drug, order)
 
@@ -85,6 +85,21 @@ function createShoppingLists(order, drugs) {
     debugEmail('Could not create shopping list(s)', '#'+orderID, errs, order)
 
   return '=HYPERLINK("https://drive.google.com/drive/search?q='+prefix.replace('#', '')+'", IF(NOW() - $OrderChanged > 11,  IF(NOW() - $OrderChanged > 14, "Not Filling", "Delayed"), "'+status+'"))'
+}
+
+function pend_group(order) {
+
+  if (order.$AddedToOrderBy == "AUTOFILL") {
+     var pick_time  = new Date(new Date().getTime() + 3*24*60*60)
+     var invoice    = "R"+order.$OrderId
+   } else {
+     var pick_time  = new Date(new Date().getTime() + 24*60*60)
+     var invoice    = "N"+order.$OrderId
+   }
+
+   var pick_date = pick_time.toJSON().slice(0, 10)
+
+   return pick_date+' '+invoice
 }
 
 function createShoppingList(drug, order) {
