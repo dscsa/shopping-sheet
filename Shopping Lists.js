@@ -337,11 +337,11 @@ function v2Fetch(url, method, body) {
   } catch (e) {
     try {
       debugEmail('Could not fetch v2 Shopping List from Primary (54.215.209.255).  Is the 54.215.209.255 server down?', e, url, opts, json)
-      var json = UrlFetchApp.fetch(encodeURI('http://13.57.7.19'+url), opts)
+      var json = UrlFetchApp.fetch(encodeURI('http://13.57.7.199'+url), opts)
       if ( ~ JSON.stringify(json).indexOf('Internal Server Error'))
         throw new Error('Adam: Internal Server Error')//This is getting returned without an HTTP error code so its not throwing an error
     } catch (e) {
-      return debugEmail('Could not fetch v2 Shopping List from Primary (54.215.209.255) OR Secondary (13.57.7.19).  Are both v2 servers down?', e, url, opts, json)
+      return debugEmail('Could not fetch v2 Shopping List from Primary (54.215.209.255) OR Secondary (13.57.7.199).  Are both v2 servers down?', e, url, opts, json)
     }
   }
 
