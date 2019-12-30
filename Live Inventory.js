@@ -75,7 +75,7 @@ function liveInventoryByGcn(drug) {
     var qtyThreshold  = sheet.colByKey('stock_threshold')
     var stockLevels   = sheet.colByKey('stock_level')
     var monthlyPrices = sheet.colByKey('price_per_month')
-    var repackQty     = sheet.colByKey('order.qty_repack')
+    var repackQty     = sheet.colByKey('qty_repack')
 
     for (var gcns in genericNames) {
       gcns = gcns.split(',')
