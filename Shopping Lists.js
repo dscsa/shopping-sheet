@@ -89,7 +89,7 @@ function createShoppingLists(order, drugs) {
 
 function pend_group(order) {
 
-  if (order.$AddedToOrderBy == "AUTOFILL") {
+  if (order.$Drugs[0].$AddedToOrderBy == "AUTOFILL") {
      var pick_time  = new Date(new Date().getTime() + 3*24*60*60)
      var invoice    = "R"+order.$OrderId
    } else {

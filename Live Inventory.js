@@ -35,6 +35,7 @@ function _setV2info(drug) {
 
   drug.$MonthlyPrice = +v2info['price / month']
 
+  /*
   var emailBody = []
 
   var qtyThreshold = Math.ceil((+v2info['dispensed.qty']+5*v2info['qty threshold'])/2500)*2500 //qty threshold was too low for warning, want a little buffer.
@@ -50,6 +51,7 @@ function _setV2info(drug) {
 
   if (emailBody.length && drug.$IsDispensed)
     debugEmail('Consider updating v2 Drug Orders', emailBody, v2info)
+  */
 }
 
 var liveInventoryCache = {}
@@ -60,23 +62,20 @@ function liveInventoryByGcn(drug) {
   if ( ! Object.keys(liveInventoryCache).length) {
 
     //IF ROWS ARE ADDED TO THE SHEET THE COLUMN WITH GCNS e.g. "U" MUST BE UPDATED.
-    var sheet = getSheet('https://docs.google.com/spreadsheets/d/1gF7EUirJe4eTTJ59EQcAs1pWdmTm2dNHUAcrLjWQIpY/edit#gid=505223313', 'U', 1)
+    var sheet = getSheet('https://docs.google.com/spreadsheets/d/1E8KVM8Ih6XgWYuCZVCSa9kvLPiLbbQ-Kh8AHYHrnT4E/edit#gid=1087582433', 'U', 1)
 
-    var genericNames  = sheet.colByKey('key.2')
+    var genericNames  = sheet.colByKey('drug_generic')
 
     if ( ! genericNames)
       throw new Error('Live Inventory Sheet Down.  Stopping Shopping Sheet!')
 
-    var inventoryQtys = sheet.colByKey('qty.inventory')
-    var dispensedQtys = sheet.colByKey('qty.dispensed')
-    var enteredQtys   = sheet.colByKey('qty.entered')
-    var qtyThreshold  = sheet.colByKey('qty threshold')
-    var stockLevels   = sheet.colByKey('stock')
-    var monthlyPrices = sheet.colByKey('price / month')
-    var minQtys       = sheet.colByKey('order.minQty')
-    var minDays       = sheet.colByKey('order.minDays')
-    var maxInventory  = sheet.colByKey('order.maxInventory')
-    var repackQty     = sheet.colByKey('order.repackQty')
+    var inventoryQtys = sheet.colByKey('qty_inventory')
+    var dispensedQtys = sheet.colByKey('qty_dispensed')
+    var enteredQtys   = sheet.colByKey('qty_entered')
+    var qtyThreshold  = sheet.colByKey('stock_threshold')
+    var stockLevels   = sheet.colByKey('stock_level')
+    var monthlyPrices = sheet.colByKey('price_per_month')
+    var repackQty     = sheet.colByKey('order.qty_repack')
 
     for (var gcns in genericNames) {
       gcns = gcns.split(',')
@@ -89,9 +88,9 @@ function liveInventoryByGcn(drug) {
           'qty threshold':qtyThreshold[gcns],
           'stock':stockLevels[gcns],
           'price / month':monthlyPrices[gcns],
-          'order.minQty':minQtys[gcns],
-          'order.minDays':minDays[gcns],
-          'order.maxInventory':maxInventory[gcns],
+          //'order.minQty':minQtys[gcns],
+          //'order.minDays':minDays[gcns],
+          //'order.maxInventory':maxInventory[gcns],
           'order.repackQty':repackQty[gcns]
         }
       }
