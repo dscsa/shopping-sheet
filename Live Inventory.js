@@ -54,6 +54,18 @@ function _setV2info(drug) {
   */
 }
 
+function testLive() {
+  var sheet = getSheet('https://docs.google.com/spreadsheets/d/1E8KVM8Ih6XgWYuCZVCSa9kvLPiLbbQ-Kh8AHYHrnT4E/edit#gid=1087582433', 'L', 1)
+  var genericNames  = sheet.colByKey('drug_generic')
+
+  for (var gcns in genericNames) {
+      gcns = gcns.split(',')
+      for (var i in gcns) {
+        Logger.log(gcns[i].length+' '+gcns[i])
+      }
+  }
+}
+
 var liveInventoryCache = {}
 function liveInventoryByGcn(drug) {
 
@@ -78,6 +90,9 @@ function liveInventoryByGcn(drug) {
     var repackQty     = sheet.colByKey('qty_repack')
 
     for (var gcns in genericNames) {
+
+      if ( ! gcns) continue
+
       gcns = gcns.slice(1, -1).split(',')
       for (var i in gcns) {
         liveInventoryCache[gcns[i]] = {
