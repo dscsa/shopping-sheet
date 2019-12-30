@@ -94,9 +94,9 @@ function liveInventoryByGcn(drug) {
 
       if ( ! gcns) continue
 
-      gcns = gcns.slice(1, -1).split(',')
-      for (var i in gcns) {
-        liveInventoryCache[gcns[i]] = {
+      var gcnArray = gcns.slice(1, -1).split(',')
+      for (var i in gcnArray) {
+        liveInventoryCache[gcnArray[i]] = {
           'generic':genericNames[gcns],
           'inventory.qty':inventoryQtys[gcns],
           'entered.qty':enteredQtys[gcns],
