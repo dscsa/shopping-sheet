@@ -59,10 +59,11 @@ function testLive() {
   var genericNames  = sheet.colByKey('drug_generic')
 
   for (var gcns in genericNames) {
-      gcns = gcns.split(',')
-      for (var i in gcns) {
-        Logger.log(gcns[i].length+' '+gcns[i])
-      }
+    if ( ! gcns) continue
+    gcns = gcns.slice(1, -1).split(',')
+    for (var i in gcns) {
+      Logger.log(gcns[i].length+' '+gcns[i])
+    }
   }
 }
 
