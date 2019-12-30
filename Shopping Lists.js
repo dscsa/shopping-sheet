@@ -61,12 +61,14 @@ function createShoppingLists(order, drugs) {
 
       try {
 
-        if (shopped && shopped.list && shopped.list.length) {
-          var ss = newSpreadsheet(prefix+suffix+': '+(drugs[i].$Qty || ''), 'Shopping Lists')
-          ss.getRange('A1:F'+shopped.list.length).setValues(shopped.list).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
-          ss.setColumnWidth(1, 243); //show the full id when it print
+        if ( ! shopped || ! shopped.list || ! shopped.list.length)
+          continue
         }
 
+        var ss = newSpreadsheet(prefix+suffix+': '+(drugs[i].$Qty || ''), 'Shopping Lists')
+        ss.getRange('A1:F'+shopped.list.length).setValues(shopped.list).setHorizontalAlignment('left').setFontFamily('Roboto Mono')
+        ss.setColumnWidth(1, 243); //show the full id when it print
+      
         //Pend after all forseeable errors are accounted for.
         var res = v2Fetch('/account/8889875187/pend/'+pend_group(order)+'?repackQty='+drugs[i].$Qty, 'POST', shopped.pend)
 
