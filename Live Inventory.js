@@ -62,7 +62,7 @@ function liveInventoryByGcn(drug) {
   if ( ! Object.keys(liveInventoryCache).length) {
 
     //IF ROWS ARE ADDED TO THE SHEET THE COLUMN WITH GCNS e.g. "U" MUST BE UPDATED.
-    var sheet = getSheet('https://docs.google.com/spreadsheets/d/1E8KVM8Ih6XgWYuCZVCSa9kvLPiLbbQ-Kh8AHYHrnT4E/edit#gid=1087582433', 'U', 1)
+    var sheet = getSheet('https://docs.google.com/spreadsheets/d/1E8KVM8Ih6XgWYuCZVCSa9kvLPiLbbQ-Kh8AHYHrnT4E/edit#gid=1087582433', 'L', 1)
 
     var genericNames  = sheet.colByKey('drug_generic')
 
