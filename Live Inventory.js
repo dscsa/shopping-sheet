@@ -78,7 +78,7 @@ function liveInventoryByGcn(drug) {
     var repackQty     = sheet.colByKey('qty_repack')
 
     for (var gcns in genericNames) {
-      gcns = gcns.split(',')
+      gcns = gcns.slice(1, -1).split(',')
       for (var i in gcns) {
         liveInventoryCache[gcns[i]] = {
           'generic':genericNames[gcns],
