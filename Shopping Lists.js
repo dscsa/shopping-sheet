@@ -127,7 +127,7 @@ function createShoppingList(drug, order) {
   if ( ! LIVE_MODE) return debugEmail('createShoppingList canceled because LIVE MODE OFF')
 
   shopped.list = [
-    ['Order #'+orderID+' '+drug.$Name+' '+(new Date().toJSON()), '', '' ,'', '', ''],
+    ['Order '+pend_group(order)+' '+drug.$Name+' Created:'+(new Date().toJSON()), '', '' ,'', '', ''],
     ['Days:'+minDays+', Qty:'+minQty+', Count:'+shopped.list.length+(drug.$Stock ? ' ('+drug.$Stock+')' : '')+(shopped.halfFill || ''), '', '', '', '', ''],
     ['', '', '', '', '', ''],
     ['id', 'ndc', 'form', 'exp', 'qty', 'bin']
