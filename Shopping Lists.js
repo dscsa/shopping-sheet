@@ -9,11 +9,15 @@ function testShoppingLists() {
 }
 
 //So Cindy doesn't have to unpend things that didn't ship
-function deleteShoppingLists(orderID) {
+function deleteShoppingLists(order) {
 
   if ( ! LIVE_MODE) return debugEmail('deleteShoppingLists canceled because LIVE MODE OFF')
 
-  var res = v2Fetch('/account/8889875187/pend/'+orderID, 'DELETE')
+  var orderID = order.$OrderId
+
+  var url = '/account/8889875187/pend/'+pend_group(order)
+
+  var res = v2Fetch(url, 'DELETE')
 
   var prefix = shoppingListPrefix(orderID)
   var shoppingListFolder   = DriveApp.getFolderById('1PcDYKM_Ky-9zWmCNuBnTka3uCKjU3A0q')
@@ -23,7 +27,7 @@ function deleteShoppingLists(orderID) {
     shoppingListIterator.next().setTrashed(true) //Prevent printing an old list that Cindy pended and shipped on her own
   }
 
-  debugEmail('deleteShoppingLists', orderID, res && res.getContentText(), res && res.getResponseCode(), res && res.getHeaders())
+  debugEmail('deleteShoppingLists', url, order, res && res.getContentText(), res && res.getResponseCode(), res && res.getHeaders())
 }
 
 function shoppingListPrefix(drug) {
