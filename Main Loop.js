@@ -107,14 +107,14 @@ function mainLoop() {
         return
      }
 
+     deleteShoppingLists(order)
+
      //Don't change Drugs and Invoice since should already be finalized
      order.$Drugs = drugs[order.$OrderId]
 
      setPriceFeesDue(order)
 
      updateWebformShipped(order, invoice)
-
-     deleteShoppingLists(order.$OrderId)
 
      orderShippedNotice(order, invoice)
 
@@ -166,7 +166,7 @@ function mainLoop() {
 
       updateWebformDispensed(order, invoice) //Make sure webform is updated and has the exact amount as invoice (should match old fee[orderId] amount if $Days of each drug did not change)
 
-      //deleteShoppingLists(order.$OrderId)
+      //deleteShoppingLists(order)
 
       try {
         shipped.prependRow(order)
