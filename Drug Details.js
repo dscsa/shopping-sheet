@@ -237,7 +237,7 @@ function setStatus(drug) {
       setDrugStatus(drug, 'NOACTION_LIVE_INVENTORY_ERROR')
       debugEmail('Live Inventory Encountered An Error', drug)
     }
-    else if ( ! drug.$IsRefill && ! drug.$IsPended && ~ ['Out of Stock', 'Refills Only'].indexOf(drug.$Stock)) {
+    else if ( ! drug.$IsRefill && ! drug.$IsPended && ~ ['OUT OF STOCK', 'REFILL ONLY'].indexOf(drug.$Stock)) {
 
       if (drug.$NoTransfer) {
         set0Days(drug)
