@@ -77,7 +77,7 @@ function createShoppingLists(order, drugs) {
         //Pend after all forseeable errors are accounted for.
         var res = v2Fetch('/account/8889875187/pend/'+pend_group(order)+'?repackQty='+drugs[i].$Qty, 'POST', shopped.pend)
 
-        infoEmail('V2 Pended', drugs[i].$Name, '#'+orderID, drugs[i].$Qty, shopped.pend, res, drug, order)
+        infoEmail('V2 Pended', drugs[i].$Name, '#'+orderID, drugs[i].$Qty, shopped.pend, res, drugs[i], order)
 
       } catch (e) {
         debugEmail('Shopping Sheet could not be created/pended', e, order)
