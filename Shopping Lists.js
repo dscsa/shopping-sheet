@@ -198,8 +198,10 @@ function groupByNdc(rows, drug, url) {
 
   for (var i in rows) {
 
-    if (rows[i].doc.next.length)
+    if (rows[i].doc.next.length) {
       debugEmail('Shopping list is pulling from a next bin!', url, rows[i])
+      continue
+    }
 
     //Ignore Cindy's makeshift dispensed queue
     if ( ~ ['M00', 'T00', 'W00', 'R00', 'F00', 'X00', 'Y00', 'Z00'].indexOf(rows[i].doc.bin)) continue
