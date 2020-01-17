@@ -43,7 +43,7 @@ function setSyncDate(order, drug) {
   var excludeMedSynced = ! p.syncDates.inOrder || ~ ['Dispensed', 'Shipped'].indexOf(order.$Status)
 
   //We can do keep accurate check of p.syncDates.inOrder within the loop as long as loop's drug order sorted by InOrder == true first
-  if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && excludeMedSynced){
+  if (hasDrugStatus(drug, 'NOACTION_MAY_MEDSYNC') && excludeMedSynced && drug.$FirstRefill){
     set0Days(drug)
     setDrugStatus(drug, 'NOACTION_NOT_DUE')
   }
