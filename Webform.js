@@ -62,7 +62,7 @@ function updateWebformDispensed(order, invoice) {
 function updateWebformReceived(order, status) {
 
   //infoEmail('updateStatus', orderId, guardianId, status)
-  var woocommerceOrder = {status:status, meta_data:[  //pass guardian id just in case this order does not exist
+  var woocommerceOrder = { /*status:status,*/ meta_data:[  //pass guardian id just in case this order does not exist
     {key:"date_received", value:new Date().toDateString()},
     {key:"invoice_number", value:order.$OrderId},
     {key:"guardian_id", value:order.$Patient.guardian_id}
@@ -173,13 +173,13 @@ function webformPayMethod(order, woocommerceOrder, debugMsg) {
   var payMethod = payment(order)
 
   if (payMethod == payment.COUPON) {
-    woocommerceOrder.status = 'shipped-coupon'
+    //woocommerceOrder.status = 'shipped-coupon'
     woocommerceOrder.coupon_lines = [{code:order.$Coupon}]
   } else if (payMethod == payment.AUTOPAY) {
-    woocommerceOrder.status = 'shipped-autopay'
+    //woocommerceOrder.status = 'shipped-autopay'
     woocommerceOrder.payment_method = 'stripe'
   } else if (payMethod == payment.MANUAL){
-    woocommerceOrder.status = 'shipped-unpaid'
+    //woocommerceOrder.status = 'shipped-unpaid'
     woocommerceOrder.payment_method = 'cheque'
   } else {
     debugEmail(debugMsg+' UNKNOWN Payment Method', payMethod, woocommerceOrder, order)
