@@ -198,7 +198,7 @@ function groupByNdc(rows, drug, url) {
 
   for (var i in rows) {
 
-    if (rows[i].doc.next.length) {
+    if (rows[i].doc.next.length && Object.keys(rows[i].doc.next[0]) > 1) {
       debugEmail('Shopping list is pulling from a next bin!', url, rows[i])
       continue
     }
