@@ -17,6 +17,8 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
 
   drugs = order.$Drugs.filter(function(drug) {
 
+    drug.$Sig = drug.$Sig.raw || drug.$Sig
+
     var transferStatus = hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER') || hasDrugStatus(drug, 'NOACTION_WILL_TRANSFER_CHECK_BACK')
 
     if (drugsChanged == '""') //Because of the JSON Stringify, empty becomes double quotes
