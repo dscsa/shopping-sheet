@@ -89,7 +89,7 @@ function updateWebformOrder(orderId, woocommerceOrder, address) {
     if (res.code != "woocommerce_rest_shop_order_invalid_id") return res
 
   } catch (err) {
-    //infoEmail('updateWebformOrder failed', err, '#'+orderId, woocommerceOrder)
+    debugEmail('updateWebformOrder failed', err, '#'+orderId, woocommerceOrder, res)
   }
 
   if (address) { //Just to be certain we are HIPAA compliant, only change address information on creation
@@ -173,13 +173,13 @@ function webformPayMethod(order, woocommerceOrder, debugMsg) {
   var payMethod = payment(order)
 
   if (payMethod == payment.COUPON) {
-    //woocommerceOrder.status = 'shipped-coupon'
+    woocommerceOrder.status = 'shipped-coupon'
     woocommerceOrder.coupon_lines = [{code:order.$Coupon}]
   } else if (payMethod == payment.AUTOPAY) {
-    //woocommerceOrder.status = 'shipped-autopay'
+    woocommerceOrder.status = 'shipped-autopay'
     woocommerceOrder.payment_method = 'stripe'
   } else if (payMethod == payment.MANUAL){
-    //woocommerceOrder.status = 'shipped-unpaid'
+    woocommerceOrder.status = 'shipped-unpaid'
     woocommerceOrder.payment_method = 'cheque'
   } else {
     debugEmail(debugMsg+' UNKNOWN Payment Method', payMethod, woocommerceOrder, order)
