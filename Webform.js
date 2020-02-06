@@ -86,7 +86,7 @@ function updateWebformOrder(orderId, woocommerceOrder, address) {
     //infoEmail('updateWebformOrder', '#'+orderId, woocommerceOrder)
     var res = saveWebformOrder('put', 'orders/'+orderId, woocommerceOrder)
 
-    if (res.code != "woocommerce_rest_shop_order_invalid_id") return res
+    if (res && res.code != "woocommerce_rest_shop_order_invalid_id") return res
 
   } catch (err) {
     debugEmail('updateWebformOrder failed', err, '#'+orderId, woocommerceOrder, res)
@@ -175,13 +175,17 @@ function webformPayMethod(order, woocommerceOrder, debugMsg) {
   if (payMethod == payment.COUPON) {
     woocommerceOrder.status = 'shipped-coupon'
     woocommerceOrder.coupon_lines = [{code:order.$Coupon}]
+    woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet '+payMethod+' '+(new Date().toDateString())})
   } else if (payMethod == payment.AUTOPAY) {
     woocommerceOrder.status = 'shipped-autopay'
     woocommerceOrder.payment_method = 'stripe'
+    woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet '+payMethod+' '+(new Date().toDateString())})
   } else if (payMethod == payment.MANUAL){
     woocommerceOrder.status = 'shipped-unpaid'
     woocommerceOrder.payment_method = 'cheque'
+    woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet '+payMethod+' '+(new Date().toDateString())})
   } else {
+    woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet UNKNOWN '+payMethod+' '+(new Date().toDateString())})
     debugEmail(debugMsg+' UNKNOWN Payment Method', payMethod, woocommerceOrder, order)
   }
 
