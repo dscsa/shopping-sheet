@@ -134,6 +134,12 @@ function mainLoop() {
     Log('Status changed', '#'+order.$OrderId, status[order.$OrderId], order.$Status, order, drugs[order.$OrderId])
     infoEmail('Status changed', '#'+order.$OrderId, status[order.$OrderId],  order.$Status, order, drugs[order.$OrderId])
 
+    if (order.$Drugs[0] && drugs[order.$OrderId][0] && order.$Drugs[0].$OrderId != drugs[order.$OrderId][0].$OrderId) {
+      debugEmail('ABORTING didDrugsChange because OrderId Mismatch', order.$Drugs[0].$OrderId+' != '+drugs[order.$OrderId][0].$OrderId, '$Status', order.$Status, 'newDrugs', order.$Drugs, 'oldDrugs', drugs[order.$OrderId])
+      return
+      throw new Error('didDrugsChange Drugs in wrong order '+newDrugs[0].$OrderId+' != '+oldDrugs[0].$OrderId)
+    }
+
     var drugsChanged = didDrugsChange(order.$Drugs, drugs[order.$OrderId], order.$Status)
 
     //This is catching some "Dispensed" that are going back to "Shipping".  Need to investigate why.
@@ -178,6 +184,12 @@ function mainLoop() {
   }
 
   function drugsChanged(order) {
+
+    if (order.$Drugs[0] && drugs[order.$OrderId][0] && order.$Drugs[0].$OrderId != drugs[order.$OrderId][0].$OrderId) {
+      debugEmail('ABORTING didDrugsChange because OrderId Mismatch', order.$Drugs[0].$OrderId+' != '+drugs[order.$OrderId][0].$OrderId, '$Status', order.$Status, 'newDrugs', order.$Drugs, 'oldDrugs', drugs[order.$OrderId])
+      return
+      throw new Error('didDrugsChange Drugs in wrong order '+newDrugs[0].$OrderId+' != '+oldDrugs[0].$OrderId)
+    }
 
     var drugsChanged = didDrugsChange(order.$Drugs, drugs[order.$OrderId], order.$Status)
 
