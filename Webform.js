@@ -62,7 +62,7 @@ function updateWebformDispensed(order, invoice) {
 function updateWebformReceived(order, status) {
 
   //infoEmail('updateStatus', orderId, guardianId, status)
-  var woocommerceOrder = { /*status:status,*/ meta_data:[  //pass guardian id just in case this order does not exist
+  var woocommerceOrder = { status:status, meta_data:[  //pass guardian id just in case this order does not exist
     {key:"date_received", value:new Date().toDateString()},
     {key:"invoice_number", value:order.$OrderId},
     {key:"guardian_id", value:order.$Patient.guardian_id}
@@ -175,17 +175,17 @@ function webformPayMethod(order, woocommerceOrder, debugMsg) {
   if (payMethod == payment.COUPON) {
     woocommerceOrder.status = 'shipped-coupon'
     woocommerceOrder.coupon_lines = [{code:order.$Coupon}]
-    woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet '+payMethod+' '+(new Date().toDateString())})
+    woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet '+payMethod+' '+(new Date().toJSON())})
   } else if (payMethod == payment.AUTOPAY) {
     woocommerceOrder.status = 'shipped-autopay'
     woocommerceOrder.payment_method = 'stripe'
-    woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet '+payMethod+' '+(new Date().toDateString())})
+    woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet '+payMethod+' '+(new Date().toJSON())})
   } else if (payMethod == payment.MANUAL){
     woocommerceOrder.status = 'shipped-unpaid'
     woocommerceOrder.payment_method = 'cheque'
-    woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet '+payMethod+' '+(new Date().toDateString())})
+    woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet '+payMethod+' '+(new Date().toJSON())})
   } else {
-    woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet UNKNOWN '+payMethod+' '+(new Date().toDateString())})
+    woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet UNKNOWN '+payMethod+' '+(new Date().toJSON())})
     debugEmail(debugMsg+' UNKNOWN Payment Method', payMethod, woocommerceOrder, order)
   }
 
