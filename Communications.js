@@ -203,9 +203,6 @@ function orderCreatedNotice(order) {
   if (order.$New)
     message += ' Your first order will only be $6 total for all of your medications.'
 
-  if (numNoFills)
-    drugList += '<br><br><u>We are NOT filling these Rxs:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';'
-
   var suffix = [
     "Note: if this is correct, there is no need to do anything. If you want to change or delay this order, please let us know as soon as possible. If delaying, please specify the date on which you want it filled, otherwise if you don't, we will delay it 3 weeks by default.",
     order.$Patient.medsync ? '* The goal of Med Sync is to synchronize your refill dates so that we can consolidate as many of your medications as possible into a single order, rather than sending your medications in separate orders. For this reason, this Rx may be filled for a fewer number of days in this Order before resuming to a normal number of days.' : ''
@@ -223,6 +220,7 @@ function orderCreatedNotice(order) {
     (numFills >= numNoFills) ? 'Thanks for choosing Good Pill!' : 'Apologies for any inconvenience,',
     'The Good Pill Team',
     '',
+    numNoFills ? '<u>We are NOT filling these Rxs:</u><br>'+groups.NOFILL_NOACTION.concat(groups.NOFILL_ACTION).join(';<br>')+';' : '',
     '',
     suffix
   ].join('<br>')
