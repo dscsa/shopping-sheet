@@ -196,7 +196,7 @@ function mainLoop() {
     if ( ! drugsChanged) return
 
     if ( ~ JSON.stringify(drugsChanged).indexOf('ADDED TO'))
-      debugEmail('Drugs Changed', 'order', order, 'drugsChanged', drugsChanged)
+      infoEmail('Drugs Changed', 'order', order, 'drugsChanged', drugsChanged)
 
     order.$Patient.changes = drugsChanged
 
