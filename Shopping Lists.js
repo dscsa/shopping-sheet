@@ -27,7 +27,7 @@ function deleteShoppingLists(order) {
     shoppingListIterator.next().setTrashed(true) //Prevent printing an old list that Cindy pended and shipped on her own
   }
 
-  debugEmail('deleteShoppingLists', url, order, res && res.getContentText(), res && res.getResponseCode(), res && res.getHeaders())
+  infoEmail('deleteShoppingLists', url, order, res && res.getContentText(), res && res.getResponseCode(), res && res.getHeaders())
 }
 
 function shoppingListPrefix(drug) {
