@@ -173,15 +173,15 @@ function webformPayMethod(order, woocommerceOrder, debugMsg) {
   var payMethod = payment(order)
 
   if (payMethod == payment.COUPON) {
-    woocommerceOrder.status = 'shipped-coupon'
+    woocommerceOrder.status = 'done-clinic-pay'
     woocommerceOrder.coupon_lines = [{code:order.$Coupon}]
     woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet '+payMethod+' '+(new Date().toJSON())})
   } else if (payMethod == payment.AUTOPAY) {
-    woocommerceOrder.status = 'shipped-autopay'
+    woocommerceOrder.status = 'shipped-auto-pay'
     woocommerceOrder.payment_method = 'stripe'
     woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet '+payMethod+' '+(new Date().toJSON())})
   } else if (payMethod == payment.MANUAL){
-    woocommerceOrder.status = 'shipped-unpaid'
+    woocommerceOrder.status = 'shipped-mail-pay'
     woocommerceOrder.payment_method = 'cheque'
     woocommerceOrder.meta_data.push({key:"status_update", value:'ShoppingSheet '+payMethod+' '+(new Date().toJSON())})
   } else {
