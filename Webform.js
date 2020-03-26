@@ -7,7 +7,7 @@ function updateWebformShipped(order, invoice) {
         {key:"guardian_id", value:order.$Patient.guardian_id},
         {key:"tracking_number", value:order.$Tracking},
         {key:"date_shipped", value:new Date().toDateString()},
-        {key:"invoice_doc_id", value:invoice && invoice.getId() || ''},
+        //{key:"invoice_doc_id", value:invoice && invoice.getId() || ''},
         {key:"invoice_number", value:order.$OrderId},
       ],
       shipping_lines:[{method_id:'flat_rate', total:order.$Fee+''}] //Must be a string
@@ -45,8 +45,8 @@ function updateWebformDispensed(order, invoice) {
       meta_data:[
         {key:"date_dispensed", value:new Date().toDateString()},
         {key:"guardian_id", value:order.$Patient.guardian_id},
-        {key:"invoice_number", value:order.$OrderId},
-        {key:"invoice_doc_id", value:invoice && invoice.getId() || ''} //cannot be null otherwise nothing saves
+        {key:"invoice_number", value:order.$OrderId}
+        //{key:"invoice_doc_id", value:invoice && invoice.getId() || ''} //cannot be null otherwise nothing saves
       ],
       shipping_lines:[{method_id:'flat_rate', total:order.$Fee+''}] //Must be a string
 
