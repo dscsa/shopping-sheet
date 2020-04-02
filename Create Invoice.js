@@ -75,7 +75,7 @@ function createInvoice(order) { //This is undefined when called from Menu
    Log('flatten order', order.$OrderId, order)
 
    var template  = fileByName("Order Summary v4")
-   var invoice   = makeCopy(template, getInvoiceName(order.$OrderId, order.$OrderChanged), "OLD")
+   var invoice   = makeCopy(template, getInvoiceName(order.$OrderId, order.$OrderChanged), "Old")
 
    addInvoiceIdToRow(sheet, order.$OrderId, invoice)
 

@@ -1,6 +1,10 @@
 
 function fileByName(name) {
-  return DriveApp.getFilesByName(name).next()
+  var matches = DriveApp.getFilesByName(name)
+  if (matches.hasNext())
+    return matches.next()
+
+  Logger.log('fileByName(name) failed for name: '+name)
 }
 
 function folderByName(name) {
@@ -17,9 +21,10 @@ function parentByFile(file) {
 }
 
 function makeCopy(oldFile, copyName, copyFolder) {
-   var newFile = oldFile.makeCopy(copyName)
-   parentByFile(newFile).removeFile(newFile)
-   folderByName(copyFolder).addFile(newFile)
+
+   var newFolder = folderByName(copyFolder)
+   var newFile = oldFile.makeCopy(copyName, newFolder)
+
    publishToWeb(newFile)
    return DocumentApp.openById(newFile.getId())
 }
