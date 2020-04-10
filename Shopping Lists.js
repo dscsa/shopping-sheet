@@ -340,17 +340,18 @@ function v2Fetch(url, method, body) {
   }
 
   try {
-    var json = UrlFetchApp.fetch(encodeURI('http://54.215.209.255'+url), opts)
+    var json = UrlFetchApp.fetch(encodeURI('http://v2.goodpill.org'+url), opts)
     if ( ~ JSON.stringify(json).indexOf('Internal Server Error'))
       throw new Error('Adam: Internal Server Error')//This is getting returned without an HTTP error code so its not throwing an error
   } catch (e) {
     try {
-      debugEmail('Could not fetch v2 Shopping List from Primary (54.215.209.255).  Is the 54.215.209.255 server down?', e, url, opts, json)
-      var json = UrlFetchApp.fetch(encodeURI('http://13.57.7.199'+url), opts)
+      debugEmail('Could not fetch v2 Shopping List from v2.goodpill.org Attempt 1 of 2?!, e, url, opts, json)
+      Utilities.sleep(5000)
+      var json = UrlFetchApp.fetch(encodeURI('http://v2.goodpill.org'+url), opts)
       if ( ~ JSON.stringify(json).indexOf('Internal Server Error'))
         throw new Error('Adam: Internal Server Error')//This is getting returned without an HTTP error code so its not throwing an error
     } catch (e) {
-      return debugEmail('Could not fetch v2 Shopping List from Primary (54.215.209.255) OR Secondary (13.57.7.199).  Are both v2 servers down?', e, url, opts, json)
+      return debugEmail('Could not fetch v2 Shopping List from v2.goodpill.org Attempt 2 of 2!', e, url, opts, json)
     }
   }
 
