@@ -345,7 +345,7 @@ function v2Fetch(url, method, body) {
       throw new Error('Adam: Internal Server Error')//This is getting returned without an HTTP error code so its not throwing an error
   } catch (e) {
     try {
-      debugEmail('Could not fetch v2 Shopping List from v2.goodpill.org Attempt 1 of 2?!, e, url, opts, json)
+      debugEmail('Could not fetch v2 Shopping List from v2.goodpill.org Attempt 1 of 2!', e, url, opts, json)
       Utilities.sleep(5000)
       var json = UrlFetchApp.fetch(encodeURI('http://v2.goodpill.org'+url), opts)
       if ( ~ JSON.stringify(json).indexOf('Internal Server Error'))
