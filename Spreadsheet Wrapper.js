@@ -335,7 +335,7 @@ function toObject(keys, vals) {
 
     if (vals[i] && (vals[i][0] == '[' || vals[i][0] == '{'))
         vals[i] = JSONparse(vals[i])
-    else if (vals[i].trim)
+    else if (vals[i] && vals[i].trim)
       vals[i] = vals[i].trim()
 
     var key = keys[i].trim()
