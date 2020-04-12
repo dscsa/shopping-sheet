@@ -39,7 +39,7 @@ function createTransferFax(order, drugsChanged) { //This is undefined when calle
 
   var name = "Transfer "+order.$OrderId
 
-  var fax = mergeDoc("Transfer Out Fax v1", name, "Transfer Outs", order)
+  var fax = mergeDoc("Transfer Out Fax v1", name, "Faxed", order)
   //var pdf = fax.getAs(MimeType.PDF) //SFax Help Case: This stopped working on Nov 18th 2019 because Google's Skia PDF library added "rasterization" into that sfax couldn't parse
   //Instead of PDF we have to be a little hacky and use a docx instead
   var docx = UrlFetchApp.fetch('https://docs.google.com/feeds/download/documents/export/Export?id='+fax.getId()+'&exportFormat=docx',
