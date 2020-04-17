@@ -107,7 +107,7 @@ function sendEmail(to, subject, body, attachments) {
     if (MailApp.getRemainingDailyQuota() < 1) //Put in try because this was throwing an error once in a while "We're sorry, a server error occurred"
       return Log('Skipping email since likely over quota and email failures are time-consuming')
 
-    GmailApp.sendEmail(to, subject, '', opts)
+    //GmailApp.sendEmail(to, subject, '', opts)
     //MailApp.sendEmail(opts)
   } catch (e) {
     //TODO confirm this by checking if error matches "Email quota likely reached Exception: Service invoked too many times for one day: email."  "
